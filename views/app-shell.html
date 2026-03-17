@@ -1,0 +1,574 @@
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>강사별 DB보고서</h1>
+        <div class="sub">✅ 모집DB=Owned+Paid · DB당가치=실매출/모집DB · 예상매출=이전기수 DB당가치×현기수 모집DB</div>
+      </div>
+      <div class="actions">
+        <span class="pill">현재 프로젝트: <b id="curProjLabel">없음</b></span>
+        <span class="pill"><b id="statDates">0</b>일</span>
+        <span class="pill">로그인: <b id="authStatus">미로그인</b></span>
+        <button id="btnLogout" style="display:none">로그아웃</button>
+        <button id="btnReset" class="btn-danger">전체 초기화</button>
+        <button id="btnRecalc" class="btn-primary">재계산</button>
+      </div>
+    </div>
+
+    <div class="projToolbar">
+      <div class="projMenuWrap">
+        <button id="btnProjectMenu" class="iconBtn" title="강사/기수 메뉴">☰</button>
+        <select id="projSelect" class="projSelectHidden" aria-hidden="true"></select>
+        <div id="projectMenuPanel" class="projectMenuPanel">
+          <div class="menuHead">
+            <div>
+              <div class="menuTitle">강사 / 기수 선택</div>
+              <div class="menuHint">강사를 펼치고 기수를 눌러 바로 이동</div>
+            </div>
+            <button id="btnProjectMenuClose" class="iconBtn" style="width:34px;height:34px;font-size:16px" title="닫기">✕</button>
+          </div>
+          <div class="menuActions">
+            <button id="btnNewProj" class="btn-primary">새 프로젝트</button>
+            <button id="btnDupProj">복제</button>
+            <button id="btnRenameProj">이름 변경</button>
+            <button id="btnDelProj" class="btn-danger">삭제</button>
+            <button id="btnImportProjCsv">강사별 기수정리 업로드</button>
+            <button id="btnImportProjZip">ZIP 광고DB 일괄등록</button>
+            <button id="btnImportProjBatch">프로젝트 파일 일괄반영</button>
+          </div>
+          <div class="menuSearchWrap">
+            <input id="projectMenuSearch" class="menuSearchInput" type="text" placeholder="강사명 또는 기수명 검색" autocomplete="off" />
+            <div class="menuMetaRow">
+              <div class="recentWrap">
+                <span class="recentLabel">최근 본 강사</span>
+                <div id="recentInstructorChips" class="recentChips"></div>
+              </div>
+              <div id="projectMenuMeta" class="menuResultMeta">-</div>
+            </div>
+          </div>
+          <div id="projectMenuList" class="menuList"></div>
+        </div>
+
+        <span class="badge">강사: <b id="curInstructor">-</b></span>
+        <span class="badge">기수: <b id="curCohort">-</b></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab active" data-tab="main">메인(시뮬)</button>
+    <button class="tab" data-tab="owned">온드DB</button>
+    <button class="tab" data-tab="ads">광고DB</button>
+    <button class="tab" data-tab="compare">강사/기수 비교</button>
+    <button class="tab" data-tab="settings">설정/이전기수/매출</button>
+  </div>
+
+  <section id="view-main" class="grid">
+    <div class="card">
+      <div class="hd">
+        <div>
+          <h2>메인 시뮬레이션 표</h2>
+          <div class="hint">전체DB(=모집DB) / PaidDB / OwnedDB / 예상매출 + 예산 사용</div>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="row">
+          <label class="small">날짜 범위(옵션)</label>
+          <input type="date" id="rangeStart"/>
+          <input type="date" id="rangeEnd"/>
+          <button id="btnSaveRange" class="btn-primary">범위 저장</button>
+          <span class="small"></span>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="kpi">
+          <div class="box">
+            <div class="lbl">모집DB(전체, 누적)</div>
+            <div class="val" id="kpiTotalDb">0</div>
+            <div class="sub">Owned 누적 + Paid 누적</div>
+          </div>
+          <div class="box">
+            <div class="lbl">Paid DB(누적)</div>
+            <div class="val" id="kpiPaidDb">0</div>
+            <div class="sub">광고DB 실DB(전환) 누적</div>
+          </div>
+          <div class="box">
+            <div class="lbl">Owned DB(누적)</div>
+            <div class="val" id="kpiOwnedDb">0</div>
+            <div class="sub">온드DB 추가DB 누적</div>
+          </div>
+          <div class="box">
+            <div class="lbl">예상 매출액(누적)</div>
+            <div class="val" id="kpiExpectedRev">₩0</div>
+            <div class="sub">이전기수 DB당가치 × 현기수 모집DB(누적)</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="twoCol">
+          <div class="chartBox">
+            <div class="chartHead">
+              <div>
+                <div style="font-weight:900;font-size:13px">누적 DB 추이 (Owned / Paid / 모집DB)</div>
+                <div class="small"></div>
+              </div>
+              <div class="legend">
+                <span><span class="dot" style="background:rgba(37,99,235,.95)"></span>Owned</span>
+                <span><span class="dot" style="background:rgba(16,185,129,.95)"></span>Paid</span>
+                <span><span class="dot" style="background:rgba(15,23,42,.85)"></span>모집DB</span>
+              </div>
+            </div>
+            <canvas id="chartDb"></canvas>
+          </div>
+
+          <div class="chartBox">
+            <div class="chartHead">
+              <div>
+                <div style="font-weight:900;font-size:13px">일자별 사용예산 추이</div>
+                <div class="small"></div>
+              </div>
+              <div class="legend">
+                <span><span class="dot" style="background:rgba(37,99,235,.35)"></span>일사용예산</span>
+                <span><span class="dot" style="background:rgba(15,23,42,.40)"></span>일예산</span>
+              </div>
+            </div>
+            <canvas id="chartDailySpend"></canvas>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="sticky">날짜</th>
+                <th class="num">Owned(누적)</th>
+                <th class="num">Paid(누적)</th>
+                <th class="num">모집DB(누적)</th>
+                <th class="num">일예산</th>
+                <th class="num">일사용예산</th>
+                <th class="num">누적사용예산</th>
+                <th class="center">예산사용현황</th>
+                <th class="num">예상매출(누적)</th>
+              </tr>
+            </thead>
+            <tbody id="mainTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-owned" class="grid" style="display:none">
+    <div class="card">
+      <div class="hd">
+        <div>
+          <h2>온드DB (매체별 필터)</h2>
+          <div class="hint">엑셀 업로드: D=매체, H=신청일 → (일자×매체) 카운트</div>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="row">
+          <button id="btnOwnedXlsx" class="btn-primary">엑셀(.xlsx) 업로드</button>
+          <button id="btnOwnedCsv" class="btn-primary">CSV 업로드(대안)</button>
+          <label class="small">매체 필터</label>
+          <select id="ownedFilter"></select>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <input type="date" id="ownedDate"/>
+          <input type="text" id="ownedMedia" placeholder="온드 매체" style="min-width:240px"/>
+          <input type="number" id="ownedAddDb" placeholder="추가DB" min="0" step="1"/>
+          <button id="btnAddOwned" class="btn-primary">추가/업데이트</button>
+          <button id="btnDelOwned">삭제</button>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="chartBox">
+          <div class="calendarHead">
+            <div>
+              <div class="calendarTitle">온드DB 달력형 편집</div>
+              <div class="small">기본은 전체 내역 표시, 날짜 칸을 클릭하면 선택한 날짜만 필터해서 보여줘.</div>
+            </div>
+            <div class="row">
+              <button id="btnOwnedClearSelection">날짜선택 해제</button>
+              <button id="btnOwnedPrevMonth">◀ 이전달</button>
+              <div id="ownedMonthLabel" class="badge"><b>-</b></div>
+              <button id="btnOwnedNextMonth">다음달 ▶</button>
+            </div>
+          </div>
+          <div id="ownedCalendar"></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="table-wrap">
+          <table style="min-width:820px">
+            <thead>
+              <tr>
+                <th class="sticky">날짜</th>
+                <th>매체</th>
+                <th class="num">추가DB</th>
+              </tr>
+            </thead>
+            <tbody id="ownedTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-ads" class="grid" style="display:none">
+    <div class="card">
+      <div class="hd">
+        <div>
+          <h2>광고DB (구글/메타 + 평균 지표)</h2>
+          <div class="hint">CSV 업로드: B(일자), I(클릭), C(실DB), F(광고비) → 날짜별 합산</div>
+        </div>
+      </div>
+
+      <div class="bd">
+        <div class="row">
+          <button id="btnMetaCsv" class="btn-primary">메타 CSV 업로드</button>
+          <button id="btnGoogleCsv" class="btn-primary">구글 CSV 업로드</button>
+          <label class="small">매체 필터</label>
+          <select id="adsFilter">
+            <option value="all">전체</option>
+            <option value="google">구글</option>
+            <option value="meta">메타</option>
+          </select>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="kpi">
+          <div class="box">
+            <div class="lbl">평균 CPC</div>
+            <div class="val" id="kpiAvgCpc">₩0</div>
+            <div class="sub">총예산 / 총클릭</div>
+          </div>
+          <div class="box">
+            <div class="lbl">평균 전환당 단가(CPA)</div>
+            <div class="val" id="kpiAvgCpa">₩0</div>
+            <div class="sub">총예산 / 총전환(실DB)</div>
+          </div>
+          <div class="box">
+            <div class="lbl">전환/클릭율(CVR)</div>
+            <div class="val" id="kpiCvr">0.00%</div>
+            <div class="sub">총전환 / 총클릭</div>
+          </div>
+          <div class="box">
+            <div class="lbl">총 사용예산</div>
+            <div class="val" id="kpiAdSpend">₩0</div>
+            <div class="sub">필터 적용</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <input type="date" id="adsDate"/>
+          <select id="adsPlatform">
+            <option value="google">구글</option>
+            <option value="meta">메타</option>
+          </select>
+          <input type="number" id="adsSpend" placeholder="사용예산(원)" min="0" step="1"/>
+          <input type="number" id="adsClicks" placeholder="클릭" min="0" step="1"/>
+          <input type="number" id="adsRealDb" placeholder="실DB(전환)" min="0" step="1"/>
+          <button id="btnAddAds" class="btn-primary">추가/업데이트</button>
+          <button id="btnDelAds">삭제</button>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="chartBox">
+          <div class="calendarHead">
+            <div>
+              <div class="calendarTitle">광고DB 달력형 편집</div>
+              <div class="small">기본은 전체 내역 표시, 날짜 칸을 누르면 해당 날짜만 필터하고 입력칸 날짜도 자동으로 들어가.</div>
+            </div>
+            <div class="row">
+              <button id="btnAdsClearSelection">날짜선택 해제</button>
+              <button id="btnAdsPrevMonth">◀ 이전달</button>
+              <div id="adsMonthLabel" class="badge"><b>-</b></div>
+              <button id="btnAdsNextMonth">다음달 ▶</button>
+            </div>
+          </div>
+          <div id="adsCalendar"></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="table-wrap">
+          <table style="min-width:1100px">
+            <thead>
+              <tr>
+                <th class="sticky">날짜</th>
+                <th>매체</th>
+                <th class="num">사용예산</th>
+                <th class="num">클릭</th>
+                <th class="num">전환(실DB)</th>
+                <th class="num">CPC</th>
+                <th class="num">전환당단가(CPA)</th>
+                <th class="center">전환/클릭율(CVR)</th>
+              </tr>
+            </thead>
+            <tbody id="adsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-compare" class="grid" style="display:none">
+    <div class="card">
+      <div class="hd">
+        <div>
+          <h2>강사/기수 비교 (좌 · 우 비교)</h2>
+          <div class="hint">드롭다운으로 좌측/우측 비교 대상을 고르고, 아래 표와 그래프에서 바로 비교할 수 있어.</div>
+        </div>
+      </div>
+
+      <div class="bd">
+        <div class="compare2Top">
+          <div class="compareSide blue">
+            <div class="sideHead">좌측 비교</div>
+            <div class="compareSelectors">
+              <div class="field">
+                <label>강사</label>
+                <select id="cmpLeftInstructor"></select>
+              </div>
+              <div class="field grow">
+                <label>기수</label>
+                <select id="cmpLeftProject"></select>
+              </div>
+            </div>
+            <div id="cmpLeftTitle" class="projTitle blue">-</div>
+          </div>
+
+          <div class="compareCenterBadge">VS</div>
+
+          <div class="compareSide red">
+            <div class="sideHead">우측 비교</div>
+            <div class="compareSelectors">
+              <div class="field">
+                <label>강사</label>
+                <select id="cmpRightInstructor"></select>
+              </div>
+              <div class="field grow">
+                <label>기수</label>
+                <select id="cmpRightProject"></select>
+              </div>
+            </div>
+            <div id="cmpRightTitle" class="projTitle red">-</div>
+          </div>
+        </div>
+
+        <div class="compareMetricPanel">
+          <div>
+            <div style="font-weight:900;margin-bottom:6px">비교 항목 선택</div>
+            <div class="small">여러 개 선택 가능 · 기존 비교표처럼 좌측값 / 차이 / 우측값이 함께 표시돼.</div>
+          </div>
+          <div id="cmpMetricPicker" class="metricPickGrid"></div>
+        </div>
+
+        <div id="cmpSummaryBadges" class="compareSummaryBadges"></div>
+
+        <div class="table-wrap" style="border:none;border-radius:0">
+          <table class="vsTable">
+            <thead>
+              <tr>
+                <th class="vsLeftCell">좌측</th>
+                <th class="vsMidCell">비교 항목</th>
+                <th class="vsRightCell">우측</th>
+              </tr>
+            </thead>
+            <tbody id="cmpVsTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="cmpControls compact">
+          <div class="group">
+            <label>그래프 지표</label>
+            <select id="cmpMetric" style="min-width:220px"></select>
+          </div>
+          <button id="btnApplyCompare" class="btn-primary">그래프 적용</button>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="cmpGraphWrap">
+          <div class="cmpGraphTitle" id="cmpGraphTitle">-</div>
+          <div class="cmpGraphSub" id="cmpGraphSub">좌측과 우측 기수만 막대로 비교</div>
+          <canvas id="chartCompare"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<section id="view-settings" class="grid" style="display:none">
+    <div class="card">
+      <div class="hd">
+        <div>
+          <h2>설정 / 이전기수 연결 / 매출 입력</h2>
+          <div class="hint"></div>
+        </div>
+      </div>
+      <div class="bd">
+        <div class="threeCol">
+          <div class="chartBox">
+            <div style="font-weight:900;margin-bottom:8px">현재 기수 설정</div>
+            <div class="row">
+              <label class="small">일예산(원)</label>
+              <input type="number" id="cfgDailyBudget" min="0" step="1000" style="min-width:220px"/>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <label class="small">강사별 정산비율(%)</label>
+              <input type="number" id="cfgInstructorRate" min="0" max="100" step="0.1" style="min-width:220px"/>
+              <span class="small">예: 35 입력 = 35%</span>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <label class="small">광고 분담비율(%)</label>
+              <input type="number" id="cfgAdShareCost" min="0" step="1000" style="min-width:220px"/>
+              <span class="small">강사별 부담 광고비 기록용</span>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <label class="small">DB당 가치(자동)</label>
+              <input type="number" id="cfgValuePerDb" readonly style="min-width:220px"/>
+              <span class="small">= 실매출 / 모집DB(Owned+Paid)</span>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <button id="btnSaveCfg" class="btn-primary">저장</button>
+            </div>
+            <div class="sep"></div>
+            <div class="note"></div>
+          </div>
+
+          <div class="chartBox">
+            <div style="font-weight:900;margin-bottom:8px">이전 기수 연결</div>
+            <div class="row">
+              <label class="small">이전기수(프로젝트) 선택</label>
+              <select id="prevProjSelect" style="min-width:260px"></select>
+              <button id="btnLinkPrev" class="btn-primary">연결</button>
+              <button id="btnUnlinkPrev">해제</button>
+            </div>
+            <div class="sep"></div>
+            <div class="row">
+              <label class="small">또는 수동 입력(연결 안할 때)</label>
+            </div>
+            <div class="row">
+              <input type="number" id="prevDb" placeholder="이전기수 모집DB(최종=Owned+Paid)" min="0" step="1"/>
+              <input type="number" id="prevSpend" placeholder="이전기수 총예산(참고)" min="0" step="1"/>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <input type="number" id="prevRevenue" placeholder="이전기수 실매출(참고)" min="0" step="1"/>
+              <button id="btnSavePrevManual" class="btn-primary">수동값 저장</button>
+            </div>
+            <div class="sep"></div>
+            <div class="note" id="prevLinkInfo">현재: 이전기수 미연결</div>
+          </div>
+
+          <div class="chartBox">
+            <div style="font-weight:900;margin-bottom:8px">현재 기수 “실매출(최종 결제매출)” 입력</div>
+            <div class="row">
+              <label class="small">실매출(원)</label>
+              <input type="number" id="actualRevenue" min="0" step="1000" style="min-width:240px"/>
+              <button id="btnSaveActualRevenue" class="btn-primary">저장</button>
+            </div>
+            <div class="sep"></div>
+            <div class="note" id="revenueCompareBox">
+              실매출/DB당가치/예상매출/이전기수 DB당가치 비교가 여기 표시됨
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="loginOverlay" style="
+  position:fixed; inset:0; background:rgba(15,23,42,.45);
+  display:none; align-items:center; justify-content:center; z-index:9998;
+">
+  <div style="
+    width:min(420px, calc(100vw - 32px));
+    background:#fff; border:1px solid #e5e7eb; border-radius:18px;
+    box-shadow:0 20px 50px rgba(0,0,0,.18); padding:22px;
+  ">
+    <div style="font-size:18px;font-weight:900;margin-bottom:6px">로그인</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:16px">
+      저장된 데이터를 보려면 로그인해야 합니다.
+    </div>
+
+    <div style="display:grid;gap:10px">
+      <input id="loginId" type="text" placeholder="아이디" value="classaround"/>
+      <input id="loginPw" type="password" placeholder="비밀번호"/>
+      <button id="btnLogin" class="btn-primary">로그인</button>
+      <div id="loginMsg" style="font-size:12px;color:#dc2626;min-height:18px"></div>
+    </div>
+  </div>
+</div>
+
+
+<input id="fileInput" type="file" accept=".csv,.tsv,.xlsx,.xls,.zip,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,application/x-zip-compressed" style="display:none"/>
+<input id="zipFileInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" style="display:none"/>
+
+<div id="zipPreviewModal" class="modalOverlay" aria-hidden="true">
+  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="zipPreviewTitle">
+    <div class="modalHead">
+      <div>
+        <h3 id="zipPreviewTitle" class="modalTitle">ZIP 광고DB 일괄등록 미리보기</h3>
+        <div class="modalSub">파일명에서 강사 / 아이템 / 기수를 읽어서 생성 전 요약을 보여줘.</div>
+      </div>
+      <button id="btnZipPreviewClose" class="iconBtn" style="width:36px;height:36px;font-size:16px" title="닫기">✕</button>
+    </div>
+    <div class="modalBody">
+      <div id="zipPreviewStats" class="previewStats"></div>
+      <div class="choiceCard">
+        <div style="font-size:13px;font-weight:900;margin-bottom:8px">중복 프로젝트 처리</div>
+        <div class="choiceRow">
+          <label class="choiceOpt"><input type="radio" name="zipDupMode" value="skip" checked/>중복 건너뛰기<div class="small" style="margin-top:6px">같은 날짜·매체 광고DB가 이미 있으면 그 행은 건너뜀</div></label>
+          <label class="choiceOpt"><input type="radio" name="zipDupMode" value="update"/>중복 업데이트<div class="small" style="margin-top:6px">같은 날짜·매체 광고DB가 있으면 ZIP 값으로 덮어씀</div></label>
+        </div>
+      </div>
+      <div id="zipPreviewErrors" class="previewErrors" style="display:none"></div>
+      <div class="previewTableWrap">
+        <table class="previewTable">
+          <thead>
+            <tr><th style="width:88px">상태</th><th style="width:130px">강사</th><th>아이템/기수</th><th style="width:90px">파일수</th><th>예시 파일</th></tr>
+          </thead>
+          <tbody id="zipPreviewTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="previewFoot">
+      <div id="zipPreviewFootHint" class="previewHint">-</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="btnZipPreviewCancel">취소</button>
+        <button id="btnZipPreviewApply" class="btn-primary">등록 실행</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loadingOverlay" class="loadingOverlay" aria-hidden="true">
+  <div class="loadingCard" role="status" aria-live="polite">
+    <div class="loadingSpinner"></div>
+    <div class="loadingTitle" id="loadingTitle">업로드 중</div>
+    <div class="loadingSub" id="loadingSub">파일을 읽고 데이터를 반영하고 있어. 잠시만 기다려줘.</div>
+  </div>
+</div>
+
+<div id="tooltip" class="tip"></div>
+<div id="toast" class="toast"><div class="ttl"></div><div class="msg"></div></div>
