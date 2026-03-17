@@ -479,6 +479,246 @@ async function applyProjectBatchPayloadToProject(project, parsedPayload){
     settlementApplied: payload.instructorRate !== undefined || payload.adShareRate !== undefined
   };
 }
+function parseNumberOrNull(v){
+  if(v === undefined || v === null || String(v).trim() === '') return null;
+  const n = parseNumberLoose(v);
+  return Number.isFinite(n) ? n : null;
+}
+function normalizeLooseProjectText(v){
+  return String(v || '').toLowerCase().replace(/[\s_\-\/|]+/g,'').trim();
+}
+function parseMetaBatchHeaderName(v){
+  return String(v || '').toLowerCase().replace(/\s+/g,'').replace(/[()]/g,'').trim();
+}
+function resolveMetaBatchColumnIndexes(headerRow){
+  const headers = (headerRow || []).map(parseMetaBatchHeaderName);
+  const findIdx = (aliases)=> headers.findIndex(h => aliases.includes(h));
+  return {
+    projectName: findIdx(['프로젝트명','프로젝트','프로젝트라벨','기수명','프로젝트이름']),
+    instructor: findIdx(['강사명','강사']),
+    item: findIdx(['아이템명','아이템','상품명']),
+    cohort: findIdx(['기수','기수명','코호트']),
+    actualRevenue: findIdx(['실매출','결제금액','매출액','최종결제매출']),
+    dailyBudget: findIdx(['일예산','예산','광고일예산']),
+    prevDb: findIdx(['이전db','이전모집db','이전기수db','이전db수']),
+    prevSpend: findIdx(['이전광고비','이전총예산','이전기수광고비','이전예산']),
+    prevRevenue: findIdx(['이전매출','이전실매출','이전기수매출']),
+    instructorRate: findIdx(['강사정산비율','정산비율','강사비율']),
+    adShareRate: findIdx(['광고분담비율','광고비분담비율','광고분담률'])
+  };
+}
+function hasMetaBatchRecognizedColumns(indexes){
+  return Object.values(indexes || {}).some(v => Number.isInteger(v) && v >= 0);
+}
+function parseMetaBatchProjectName(raw){
+  const src = String(raw || '').trim();
+  if(!src) return null;
+  const cleaned = src.replace(/\.[^.]+$/,'').trim();
+  const tokens = cleaned.split(/[ _/|-]+/).map(x=>String(x || '').trim()).filter(Boolean);
+  if(tokens.length >= 3 && /^\d+기$/i.test(tokens[tokens.length - 1])){
+    const cohort = tokens[tokens.length - 1];
+    const instructor = tokens[0];
+    const item = tokens.slice(1, -1).join(' ').trim();
+    if(instructor && item){
+      return { instructor, item, cohort, cohortLabel:`${item}/${cohort}` };
+    }
+  }
+  return null;
+}
+function readMetaBatchRow(row, idx){
+  const projectName = String(cellValue(row, idx.projectName) || '').trim();
+  const instructor = String(cellValue(row, idx.instructor) || '').trim();
+  const item = String(cellValue(row, idx.item) || '').trim();
+  const cohort = String(cellValue(row, idx.cohort) || '').trim();
+  const actualRevenue = parseNumberOrNull(cellValue(row, idx.actualRevenue));
+  const dailyBudget = parseNumberOrNull(cellValue(row, idx.dailyBudget));
+  const prevDb = parseNumberOrNull(cellValue(row, idx.prevDb));
+  const prevSpend = parseNumberOrNull(cellValue(row, idx.prevSpend));
+  const prevRevenue = parseNumberOrNull(cellValue(row, idx.prevRevenue));
+  const instructorRate = parseNumberOrNull(cellValue(row, idx.instructorRate));
+  const adShareRate = parseNumberOrNull(cellValue(row, idx.adShareRate));
+  const parsedProjectName = parseMetaBatchProjectName(projectName);
+
+  const hasAnyValue = [actualRevenue, dailyBudget, prevDb, prevSpend, prevRevenue, instructorRate, adShareRate].some(v => v !== null && v !== undefined);
+  if(!projectName && !instructor && !item && !cohort && !hasAnyValue) return null;
+
+  return {
+    projectName,
+    instructor: instructor || parsedProjectName?.instructor || '',
+    item: item || parsedProjectName?.item || '',
+    cohort: cohort || parsedProjectName?.cohort || '',
+    actualRevenue,
+    dailyBudget,
+    prevDb,
+    prevSpend,
+    prevRevenue,
+    instructorRate,
+    adShareRate
+  };
+}
+function buildMetaBatchCohortLabel(rowData){
+  if(rowData.item && rowData.cohort) return `${rowData.item}/${rowData.cohort}`;
+  if(rowData.projectName){
+    const raw = String(rowData.projectName).trim();
+    if(raw.includes('/')) return raw;
+    const parsed = parseMetaBatchProjectName(raw);
+    if(parsed?.cohortLabel) return parsed.cohortLabel;
+  }
+  if(rowData.cohort) return rowData.cohort;
+  return '';
+}
+function findProjectForMetaBatchRow(rowData){
+  const all = listProjects();
+  const projectText = normalizeLooseProjectText(rowData.projectName);
+  if(projectText){
+    const exact = all.filter(p => {
+      const cohortOnly = normalizeLooseProjectText(p.cohort);
+      const full1 = normalizeLooseProjectText(`${p.instructor}_${p.cohort}`);
+      const full2 = normalizeLooseProjectText(`${p.instructor}/${p.cohort}`);
+      const full3 = normalizeLooseProjectText(`${p.instructor} ${p.cohort}`);
+      return projectText === cohortOnly || projectText === full1 || projectText === full2 || projectText === full3;
+    });
+    if(exact.length === 1) return exact[0];
+  }
+
+  const instructorKey = normalizeProjectKeyPart(rowData.instructor);
+  const cohortLabel = buildMetaBatchCohortLabel(rowData);
+  const cohortKey = normalizeProjectKeyPart(cohortLabel);
+  if(instructorKey && cohortKey){
+    const exact = all.find(p => normalizeProjectKeyPart(p.instructor) === instructorKey && normalizeProjectKeyPart(p.cohort) === cohortKey);
+    if(exact) return exact;
+  }
+
+  if(projectText){
+    const looseCandidates = all.filter(p => normalizeLooseProjectText(`${p.instructor}${p.cohort}`).includes(projectText) || projectText.includes(normalizeLooseProjectText(`${p.instructor}${p.cohort}`)));
+    if(looseCandidates.length === 1) return looseCandidates[0];
+  }
+
+  return null;
+}
+async function applyMetaBatchRowToProject(project, rowData){
+  const p = project;
+  let changed = false;
+
+  if(rowData.actualRevenue !== null && rowData.actualRevenue !== undefined){
+    p.actualRevenue = Number(rowData.actualRevenue || 0);
+    changed = true;
+  }
+  if(rowData.dailyBudget !== null && rowData.dailyBudget !== undefined){
+    p.cfg.dailyBudget = Number(rowData.dailyBudget || 0);
+    changed = true;
+  }
+  if([rowData.prevDb, rowData.prevSpend, rowData.prevRevenue].some(v => v !== null && v !== undefined)){
+    p.prevLink = {
+      mode:'manual',
+      prevProjectId:'',
+      manual:{
+        db:Number(rowData.prevDb || 0),
+        spend:Number(rowData.prevSpend || 0),
+        revenue:Number(rowData.prevRevenue || 0)
+      }
+    };
+    changed = true;
+  }
+  if([rowData.instructorRate, rowData.adShareRate].some(v => v !== null && v !== undefined)){
+    p.settlement = {
+      instructorRate: Number(rowData.instructorRate !== null && rowData.instructorRate !== undefined ? rowData.instructorRate : (p.settlement?.instructorRate || 0)),
+      adShareRate: Number(rowData.adShareRate !== null && rowData.adShareRate !== undefined ? rowData.adShareRate : (p.settlement?.adShareRate || 0))
+    };
+    setExtraCfg(p.id, p.settlement);
+    changed = true;
+  }
+
+  if(changed){
+    await updateProjectMetaOnDb(p);
+  }
+  return changed;
+}
+async function importProjectMetaBatchFile(file){
+  await ensureAuth();
+  requireLogin();
+
+  const rows = await readProjectBatchRowsFromFile(file);
+  if(!rows || rows.length < 2){
+    alert('업로드 파일에 데이터가 없어');
+    return;
+  }
+
+  const idx = resolveMetaBatchColumnIndexes(rows[0] || []);
+  if(!hasMetaBatchRecognizedColumns(idx)){
+    alert('헤더를 인식하지 못했어.\n필수 예시: 프로젝트명, 실매출, 일예산, 이전DB, 이전광고비, 이전매출');
+    return;
+  }
+
+  const logs = [];
+  let appliedCount = 0;
+  let createdCount = 0;
+  let skippedCount = 0;
+  let failCount = 0;
+  let lastProjectId = '';
+
+  for(let i=1;i<rows.length;i++){
+    const rowData = readMetaBatchRow(rows[i], idx);
+    if(!rowData) continue;
+
+    const hasAnyValue = [rowData.actualRevenue, rowData.dailyBudget, rowData.prevDb, rowData.prevSpend, rowData.prevRevenue, rowData.instructorRate, rowData.adShareRate].some(v => v !== null && v !== undefined);
+    if(!hasAnyValue){
+      skippedCount++;
+      logs.push(`건너뜀 · ${i+1}행 · 반영할 숫자값이 없어`);
+      continue;
+    }
+
+    let project = findProjectForMetaBatchRow(rowData);
+    if(!project){
+      const instructor = rowData.instructor;
+      const cohortLabel = buildMetaBatchCohortLabel(rowData);
+      if(instructor && cohortLabel){
+        project = await createProjectOnDb(instructor, cohortLabel, true);
+        createdCount++;
+      }else{
+        failCount++;
+        logs.push(`실패 · ${i+1}행 · 프로젝트를 찾지 못했고 자동 생성 정보도 부족해`);
+        continue;
+      }
+    }
+
+    try{
+      const changed = await applyMetaBatchRowToProject(project, rowData);
+      lastProjectId = project.id || lastProjectId;
+      if(changed){
+        appliedCount++;
+        const parts = [];
+        if(rowData.actualRevenue !== null && rowData.actualRevenue !== undefined) parts.push('실매출');
+        if(rowData.dailyBudget !== null && rowData.dailyBudget !== undefined) parts.push('일예산');
+        if([rowData.prevDb, rowData.prevSpend, rowData.prevRevenue].some(v => v !== null && v !== undefined)) parts.push('이전기수값');
+        if([rowData.instructorRate, rowData.adShareRate].some(v => v !== null && v !== undefined)) parts.push('비율');
+        logs.push(`완료 · ${i+1}행 → ${project.instructor} / ${project.cohort} · ${parts.join(', ')}`);
+      }else{
+        skippedCount++;
+        logs.push(`건너뜀 · ${i+1}행 · 변경된 값이 없어`);
+      }
+    }catch(err){
+      failCount++;
+      logs.push(`실패 · ${i+1}행 · ${err?.message || '반영 실패'}`);
+    }
+  }
+
+  if(lastProjectId && state.projects[lastProjectId]) state.currentProjectId = lastProjectId;
+  saveState();
+  renderAll();
+
+  const previewLogs = logs.slice(0, 18).join('\n');
+  alert(
+    `추가입력값 일괄업로드 완료\n` +
+    `- 반영 ${fmtInt(appliedCount)}행\n` +
+    `- 자동 생성 ${fmtInt(createdCount)}개\n` +
+    `- 건너뜀 ${fmtInt(skippedCount)}행\n` +
+    `- 실패 ${fmtInt(failCount)}행\n\n` +
+    previewLogs +
+    (logs.length > 18 ? `\n...외 ${fmtInt(logs.length - 18)}건` : '')
+  );
+}
+
 async function importProjectBatchFiles(files){
   await ensureAuth();
   requireLogin();

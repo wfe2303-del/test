@@ -106,6 +106,11 @@ const prevLinkInfo = $('prevLinkInfo');
 const actualRevenue = $('actualRevenue');
 const btnSaveActualRevenue = $('btnSaveActualRevenue');
 const revenueCompareBox = $('revenueCompareBox');
+const btnImportProjectMetaBatch = $('btnImportProjectMetaBatch');
+const btnQuickMetaBatch = $('btnQuickMetaBatch');
+const btnMobileMenu = $('btnMobileMenu');
+const btnMobileMetaBatch = $('btnMobileMetaBatch');
+const btnMobileSettings = $('btnMobileSettings');
 
 const loginOverlay = $('loginOverlay');
 const loginId = $('loginId');

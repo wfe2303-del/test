@@ -15,6 +15,17 @@ document.querySelectorAll('.tab').forEach(btn=>{
   });
 });
 
+function switchTab(tab){
+  const target = document.querySelector(`.tab[data-tab="${tab}"]`);
+  if(target) target.click();
+}
+function openMetaBatchUpload(){
+  pendingUpload='project_meta_batch';
+  fileInput.multiple = false;
+  fileInput.value='';
+  fileInput.click();
+}
+
 /** =========================
  *  General events
  *  ========================= */
@@ -31,6 +42,11 @@ btnNewProj.addEventListener('click', createProject);
 btnDupProj.addEventListener('click', duplicateProject);
 btnRenameProj?.addEventListener('click', renameProject);
 btnDelProj.addEventListener('click', deleteProject);
+btnImportProjectMetaBatch?.addEventListener('click', openMetaBatchUpload);
+btnQuickMetaBatch?.addEventListener('click', openMetaBatchUpload);
+btnMobileMetaBatch?.addEventListener('click', openMetaBatchUpload);
+btnMobileMenu?.addEventListener('click', ()=> toggleProjectMenu());
+btnMobileSettings?.addEventListener('click', ()=> switchTab('settings'));
 
 btnRecalc.addEventListener('click', ()=> renderAll());
 
@@ -208,7 +224,8 @@ fileInput.addEventListener('change', async ()=>{
       owned_xlsx:['온드DB 업로드 중','엑셀을 읽어서 온드DB를 반영하고 있어.'],
       owned_csv:['온드DB 업로드 중','CSV를 읽어서 온드DB를 반영하고 있어.'],
       project_sheet:['프로젝트 정리표 업로드 중','강사/아이템/기수 데이터를 읽어서 프로젝트를 반영하고 있어.'],
-      project_batch_files:['프로젝트 파일 일괄반영 중','파일명으로 프로젝트를 찾고 헤더 기준으로 값을 밀어넣고 있어.'],
+      project_batch_files:['날짜/광고DB 파일 일괄반영 중','파일명으로 프로젝트를 찾고 헤더 기준으로 값을 밀어넣고 있어.'],
+      project_meta_batch:['추가입력값 일괄업로드 중','프로젝트명/실매출/일예산 같은 설정값을 한 번에 반영하고 있어.'],
       project_zip:['ZIP 광고DB 분석 중','ZIP 파일 안의 구글/메타 파일을 분석하고 있어.']
     };
     const loadingInfo = loadingMap[pendingUpload] || ['업로드 중','파일을 처리하고 있어. 잠시만 기다려줘.'];
@@ -251,6 +268,11 @@ fileInput.addEventListener('change', async ()=>{
 
     if(pendingUpload==='project_batch_files'){
       await importProjectBatchFiles(files);
+      return;
+    }
+
+    if(pendingUpload==='project_meta_batch'){
+      await importProjectMetaBatchFile(f);
       return;
     }
 
