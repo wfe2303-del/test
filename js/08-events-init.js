@@ -43,6 +43,7 @@ btnDupProj.addEventListener('click', duplicateProject);
 btnRenameProj?.addEventListener('click', renameProject);
 btnDelProj.addEventListener('click', deleteProject);
 btnImportProjectMetaBatch?.addEventListener('click', openMetaBatchUpload);
+btnImportProjectMetaBatchMenu?.addEventListener('click', openMetaBatchUpload);
 btnQuickMetaBatch?.addEventListener('click', openMetaBatchUpload);
 btnMobileMetaBatch?.addEventListener('click', openMetaBatchUpload);
 btnMobileMenu?.addEventListener('click', ()=> toggleProjectMenu());
@@ -138,6 +139,11 @@ btnLinkPrev.addEventListener('click', async ()=>{
 
   const id=(prevProjSelect.value||'').trim();
   if(!id) return alert('이전기수 프로젝트를 선택해줘');
+  const target = state.projects?.[id];
+  if(!target) return alert('선택한 이전기수 프로젝트를 찾지 못했어');
+  if(String(target.instructor||'').trim() !== String(p.instructor||'').trim()){
+    return alert('이전기수 연결은 같은 강사 내부 프로젝트끼리만 가능해');
+  }
 
   p.prevLink = { mode:'linked', prevProjectId:id, manual:{db:0,spend:0,revenue:0} };
 

@@ -21,6 +21,7 @@ const projectMenuMeta = $('projectMenuMeta');
 const projectMenuList = $('projectMenuList');
 const btnImportProjZip = $('btnImportProjZip');
 const btnImportProjBatch = $('btnImportProjBatch');
+const btnImportProjectMetaBatchMenu = $('btnImportProjectMetaBatchMenu');
 const btnNewProj = $('btnNewProj');
 const btnDupProj = $('btnDupProj');
 const btnRenameProj = $('btnRenameProj');
