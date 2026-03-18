@@ -4,7 +4,8 @@
 
 ## 구조
 
-- `index.html` : 최소 엔트리 파일
+- `index.html` : 강사 목록 메인 페이지
+- `instructor.html` : 강사별 상세 페이지(기존 기능 + 강사별 기수 비교 + 다음 기수 광고비 증액 예상 계산기)
 - `views/app-shell.html` : 실제 화면 마크업 전체
 - `styles/main.css` : 스타일
 - `js/00-bootstrap.js` : 화면 HTML 로드 후 스크립트를 순차 로드
@@ -21,7 +22,7 @@
 
 ### GitHub
 1. 이 폴더 전체를 새 저장소 루트에 업로드
-2. `index.html`, `js`, `styles`, `views`, `vercel.json`이 모두 루트 기준으로 올라가야 함
+2. `index.html`, `instructor.html`, `js`, `styles`, `views`, `vercel.json`이 모두 루트 기준으로 올라가야 함
 
 ### Vercel
 1. GitHub 저장소 Import
@@ -84,3 +85,15 @@
 - 이전매출
 - 강사정산비율
 - 광고분담비율
+
+
+## 새 구조: 강사별 페이지 분리
+
+- `index.html`에서 로그인 후 등록된 강사 목록을 바로 확인할 수 있다.
+- 강사를 누르면 새 창으로 `instructor.html?instructor=강사명`이 열린다.
+- 강사 페이지에서는 해당 강사의 프로젝트만 보이도록 자동 필터링된다.
+- 상단 강사 영역에서 기수 칩을 누르면 현재 프로젝트가 바로 바뀐다.
+- 다음 기수 광고비 증액 예상 계산기는 현재 선택한 기수의
+  - 광고 효율(CPA)
+  - DB당 가치(실매출/모집DB)
+  를 기준으로 다음 기수 예상 매출을 계산한다.

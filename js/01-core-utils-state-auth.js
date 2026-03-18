@@ -15,6 +15,26 @@ const LOGIN_ID_MAP = {
   test: 'test@gmail.com'
 };
 
+const PAGE_CONTEXT = (() => {
+  const params = new URLSearchParams(window.location.search || '');
+  const instructor = decodeURIComponent(params.get('instructor') || '').trim();
+  const page = document.body?.dataset?.page || '';
+  return {
+    page,
+    instructorFilter: instructor
+  };
+})();
+function getPageInstructorFilter(){
+  return PAGE_CONTEXT.instructorFilter || '';
+}
+function isInstructorPage(){
+  return !!getPageInstructorFilter();
+}
+function isLandingPage(){
+  return PAGE_CONTEXT.page === 'landing';
+}
+
+
 /** =========================
  *  공통 유틸
  *  ========================= */

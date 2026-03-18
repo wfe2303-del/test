@@ -29,7 +29,8 @@
       './js/05-render-shell.js',
       './js/06-project-import-management.js',
       './js/07-charts-compare.js',
-      './js/08-events-init.js'
+      './js/08-events-init.js',
+      './js/09-instructor-pages.js'
     ];
     for(const src of scripts){
       await loadScript(src);

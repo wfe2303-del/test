@@ -124,6 +124,17 @@ const loginPw = $('loginPw');
 const btnLogin = $('btnLogin');
 const loginMsg = $('loginMsg');
 
+const instructorHero = $('instructorHero');
+const pageInstructorTitle = $('pageInstructorTitle');
+const pageInstructorSub = $('pageInstructorSub');
+const instructorHeroStats = $('instructorHeroStats');
+const instructorCohortChips = $('instructorCohortChips');
+const nextCalcBaseLabel = $('nextCalcBaseLabel');
+const nextCalcNextLabel = $('nextCalcNextLabel');
+const nextCalcExtraSpend = $('nextCalcExtraSpend');
+const nextCalcSummary = $('nextCalcSummary');
+const btnOpenCompareTab = $('btnOpenCompareTab');
+
 const fileInput = $('fileInput');
 const zipFileInput = $('zipFileInput');
 const zipPreviewModal = $('zipPreviewModal');
@@ -203,8 +214,19 @@ function showToast(title, msg=''){
 /** =========================
  *  Projects
  *  ========================= */
-function getProj(){ return state.projects[state.currentProjectId]; }
-function listProjects(){ return Object.values(state.projects || {}); }
+function rawProjects(){ return Object.values(state.projects || {}); }
+function listProjects(){
+  const all = rawProjects();
+  const inst = getPageInstructorFilter ? getPageInstructorFilter() : '';
+  if(!inst) return all;
+  return all.filter(p => String(p?.instructor || '').trim() === inst);
+}
+function getProj(){
+  const p = state.projects[state.currentProjectId];
+  const inst = getPageInstructorFilter ? getPageInstructorFilter() : '';
+  if(inst && p && String(p.instructor || '').trim() !== inst) return listProjects()[0] || null;
+  return p;
+}
 
 function normalizeProjectKeyPart(v){ return String(v || '').replace(/\s+/g,'').trim().toLowerCase(); }
 function makeProjectKey(instructor, cohort){ return `${normalizeProjectKeyPart(instructor)}||${normalizeProjectKeyPart(cohort)}`; }

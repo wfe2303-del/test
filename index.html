@@ -3,15 +3,46 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>강사별 DB보고서</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <title>강사별 DB보고서 · 강사 목록</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="./styles/main.css"/>
 </head>
-<body>
-  <div id="app-root"></div>
-  <div id="boot-message" style="max-width:720px;margin:40px auto;padding:20px;border:1px solid #e5e7eb;background:#fff;border-radius:16px;color:#0f172a;line-height:1.6;">앱을 불러오는 중이야...</div>
-  <script src="./js/00-bootstrap.js"></script>
+<body data-page="landing">
+  <div class="landingWrap">
+    <header class="landingHeader">
+      <div>
+        <div class="landingEyebrow">ClassAround · Instructor Hub</div>
+        <h1>등록된 강사 목록</h1>
+        <p>강사를 누르면 새 창으로 해당 강사의 기수 목록과 비교 화면이 열려. 각 강사 페이지에서 기존 기능과 다음 기수 광고비 증액 예상 매출 계산기를 같이 볼 수 있어.</p>
+      </div>
+      <div class="landingAuth">
+        <span class="pill">로그인: <b id="landingAuthStatus">미로그인</b></span>
+        <button id="landingLogout" style="display:none">로그아웃</button>
+      </div>
+    </header>
+
+    <section id="landingLoginCard" class="landingCard">
+      <h2>로그인</h2>
+      <p class="landingMuted">프로젝트 목록을 보려면 먼저 로그인해야 해.</p>
+      <div class="landingLoginGrid">
+        <input id="landingLoginId" type="text" placeholder="아이디" value="classaround"/>
+        <input id="landingLoginPw" type="password" placeholder="비밀번호"/>
+        <button id="landingLoginBtn" class="btn-primary">로그인</button>
+      </div>
+      <div id="landingLoginMsg" class="landingError"></div>
+    </section>
+
+    <section id="landingContent" style="display:none">
+      <div class="landingToolbar">
+        <input id="landingInstructorSearch" type="text" placeholder="강사명 검색"/>
+        <div class="landingMeta">
+          <span class="badge">강사 <b id="landingInstructorCount">0</b>명</span>
+          <span class="badge">프로젝트 <b id="landingProjectCount">0</b>개</span>
+        </div>
+      </div>
+      <div id="landingInstructorGrid" class="landingInstructorGrid"></div>
+    </section>
+  </div>
+  <script src="./js/landing.js"></script>
 </body>
 </html>

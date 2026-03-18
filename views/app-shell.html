@@ -55,6 +55,44 @@
 </header>
 
 <main>
+
+  <section id="instructorHero" class="instructorHero" style="display:none">
+    <div class="instructorHeroHead">
+      <div>
+        <div class="badge" style="margin-bottom:10px">강사 페이지</div>
+        <h2 id="pageInstructorTitle">-</h2>
+        <div id="pageInstructorSub" class="hint">-</div>
+      </div>
+      <button id="btnOpenCompareTab" class="btn-primary">강사/기수 비교 열기</button>
+    </div>
+
+    <div id="instructorHeroStats" class="instructorHeroStats"></div>
+
+    <div class="instructorHeroGrid">
+      <div class="chartBox">
+        <div style="font-weight:900;margin-bottom:8px">등록된 기수 목록</div>
+        <div class="small" style="margin-bottom:10px">기수를 누르면 현재 프로젝트가 바로 바뀌고 기존 화면도 해당 기수 기준으로 갱신돼.</div>
+        <div id="instructorCohortChips" class="instructorCohortChips"></div>
+      </div>
+
+      <div class="chartBox">
+        <div style="font-weight:900;margin-bottom:8px">다음 기수 광고비 증액 예상 매출 계산기</div>
+        <div class="small" style="margin-bottom:10px">현재 선택한 기수를 기준으로 다음 기수 광고비를 더 넣었을 때 예상되는 매출을 계산해줘. 다음 기수가 이미 종료됐어도 기준 기수 + 1 계산으로 보여줘.</div>
+        <div class="row">
+          <label class="small">기준 기수</label>
+          <div id="nextCalcBaseLabel" class="badge"><b>-</b></div>
+          <label class="small">다음 기수</label>
+          <div id="nextCalcNextLabel" class="badge"><b>-</b></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label class="small">추가 광고비(원)</label>
+          <input id="nextCalcExtraSpend" type="number" min="0" step="10000" value="0" style="min-width:220px"/>
+        </div>
+        <div id="nextCalcSummary" class="note" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+
   <div class="tabs">
     <button class="tab active" data-tab="main">메인(시뮬)</button>
     <button class="tab" data-tab="owned">온드DB</button>
