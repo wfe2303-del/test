@@ -48,6 +48,21 @@ function parseNumberRounded(v){
   const n=parseNumberLoose(v);
   return Number.isFinite(n) ? Math.round(n) : 0;
 }
+function normalizePercentInput(v){
+  if(v === null || v === undefined || v === '') return 0;
+  let s = String(v).trim();
+  if(!s) return 0;
+  s = s.replace(/%/g,'').replace(/,/g,'').trim();
+  if(!s) return 0;
+  const n = Number(s);
+  if(!Number.isFinite(n)) return 0;
+  if(n <= 1 && n >= -1) return n * 100;
+  return n;
+}
+function fmtPercentValue(v){
+  const n = normalizePercentInput(v);
+  return Number.isFinite(n) ? String(n) : '0';
+}
 function normalizeDateFromText(s){
   const t=String(s||'').trim();
   if(!t) return '';
@@ -90,8 +105,8 @@ function getExtraCfg(projectId){
   const m=getExtraCfgMap();
   const raw = m[projectId] || {};
   return {
-    instructorRate:Number(raw.instructorRate || 0),
-    adShareRate:Number(raw.adShareRate ?? 0),
+    instructorRate: normalizePercentInput(raw.instructorRate),
+    adShareRate: normalizePercentInput(raw.adShareRate),
     autoPrevOptOut: !!raw.autoPrevOptOut
   };
 }
@@ -100,8 +115,8 @@ function setExtraCfg(projectId, cfg){
   const prev = m[projectId] || {};
   const merged = { ...prev, ...(cfg || {}) };
   m[projectId] = {
-    instructorRate:Number(merged.instructorRate || 0),
-    adShareRate:Number(merged.adShareRate ?? 0),
+    instructorRate: normalizePercentInput(merged.instructorRate),
+    adShareRate: normalizePercentInput(merged.adShareRate),
     autoPrevOptOut: !!merged.autoPrevOptOut
   };
   saveExtraCfgMap(m);

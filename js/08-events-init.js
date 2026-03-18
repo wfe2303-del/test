@@ -121,9 +121,11 @@ btnSaveCfg.addEventListener('click', async ()=>{
 
   p.cfg.dailyBudget=Number(cfgDailyBudget.value||0);
   p.settlement = {
-    instructorRate:Number(cfgInstructorRate.value||0),
-    adShareRate:Number(cfgAdShareCost.value||0)
+    instructorRate: normalizePercentInput(cfgInstructorRate.value),
+    adShareRate: normalizePercentInput(cfgAdShareCost.value)
   };
+  cfgInstructorRate.value = fmtPercentValue(p.settlement.instructorRate);
+  cfgAdShareCost.value = fmtPercentValue(p.settlement.adShareRate);
   setExtraCfg(p.id, p.settlement);
   try{
     await updateProjectMetaOnDb(p);

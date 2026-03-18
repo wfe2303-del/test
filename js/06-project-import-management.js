@@ -460,8 +460,8 @@ async function applyProjectBatchPayloadToProject(project, parsedPayload){
   }
   if(payload.instructorRate !== undefined || payload.adShareRate !== undefined){
     p.settlement = {
-      instructorRate: Number(payload.instructorRate !== undefined ? payload.instructorRate : (p.settlement?.instructorRate || 0)),
-      adShareRate: Number(payload.adShareRate !== undefined ? payload.adShareRate : (p.settlement?.adShareRate || 0))
+      instructorRate: normalizePercentInput(payload.instructorRate !== undefined ? payload.instructorRate : (p.settlement?.instructorRate || 0)),
+      adShareRate: normalizePercentInput(payload.adShareRate !== undefined ? payload.adShareRate : (p.settlement?.adShareRate || 0))
     };
     setExtraCfg(p.id, p.settlement);
   }
@@ -622,8 +622,8 @@ async function applyMetaBatchRowToProject(project, rowData){
   }
   if([rowData.instructorRate, rowData.adShareRate].some(v => v !== null && v !== undefined)){
     p.settlement = {
-      instructorRate: Number(rowData.instructorRate !== null && rowData.instructorRate !== undefined ? rowData.instructorRate : (p.settlement?.instructorRate || 0)),
-      adShareRate: Number(rowData.adShareRate !== null && rowData.adShareRate !== undefined ? rowData.adShareRate : (p.settlement?.adShareRate || 0))
+      instructorRate: normalizePercentInput(rowData.instructorRate !== null && rowData.instructorRate !== undefined ? rowData.instructorRate : (p.settlement?.instructorRate || 0)),
+      adShareRate: normalizePercentInput(rowData.adShareRate !== null && rowData.adShareRate !== undefined ? rowData.adShareRate : (p.settlement?.adShareRate || 0))
     };
     setExtraCfg(p.id, p.settlement);
     changed = true;

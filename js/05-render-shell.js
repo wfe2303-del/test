@@ -460,8 +460,8 @@ function refreshSettingsUI(){
   }
 
   cfgDailyBudget.value = p.cfg.dailyBudget ?? 0;
-  cfgInstructorRate.value = p.settlement?.instructorRate ?? 0;
-  cfgAdShareCost.value = p.settlement?.adShareRate ?? 0;
+  cfgInstructorRate.value = fmtPercentValue(p.settlement?.instructorRate ?? 0);
+  cfgAdShareCost.value = fmtPercentValue(p.settlement?.adShareRate ?? 0);
   rangeStart.value = p.cfg.rangeStart ?? '';
   rangeEnd.value   = p.cfg.rangeEnd ?? '';
   actualRevenue.value = p.actualRevenue ?? 0;
