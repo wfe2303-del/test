@@ -30,12 +30,16 @@ function openPrevManualModal(){
   if(!prevManualModal) return;
   prevManualModal.classList.add('open');
   prevManualModal.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
 }
+window.openPrevManualModal = openPrevManualModal;
 function closePrevManualModal(){
   if(!prevManualModal) return;
   prevManualModal.classList.remove('open');
   prevManualModal.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
 }
+window.closePrevManualModal = closePrevManualModal;
 
 /** =========================
  *  General events
@@ -367,7 +371,12 @@ document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && zipPreviewM
 /** =========================
  *  Compare events
  *  ========================= */
-btnApplyCompare.addEventListener('click', ()=>{
+btnApplyCompare?.addEventListener('click', ()=>{
+  state.compare.metric = cmpMetric.value;
+  saveState();
+  renderCompareGraph();
+});
+cmpMetric?.addEventListener('change', ()=>{
   state.compare.metric = cmpMetric.value;
   saveState();
   renderCompareGraph();

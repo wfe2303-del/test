@@ -621,3 +621,23 @@ button, input, select { max-width: 100%; }
   #view-ads thead th:first-child,
   #view-ads tbody td:first-child{min-width:58px !important}
 }
+
+
+/* ===== v6i compare/settings hotfix ===== */
+.compareSelectorsLeft{grid-template-columns:minmax(0,1fr) minmax(150px,220px);align-items:end;}
+.compareSelectorsLeft > [hidden]{display:none !important;}
+.compareSelectorsLeft .field{min-width:0;}
+.compareSelectorsLeft .field.grow select,
+.compareSelectorsLeft input{width:100%;}
+#view-compare .compareMetricPanel{padding-bottom:10px;}
+#view-compare .cmpControls{padding:10px 12px;}
+#view-compare .cmpControls .group{min-width:0;width:100%;}
+#view-compare .cmpControls select{width:100%;min-width:0 !important;}
+#view-settings .chartBox .row{align-items:end;}
+#view-settings #prevProjSelect{min-width:0 !important;}
+@media (max-width: 1280px){
+  .compareSelectorsLeft{grid-template-columns:minmax(0,1fr) minmax(130px,190px);}
+}
+@media (max-width: 980px){
+  .compareSelectorsLeft{grid-template-columns:1fr;}
+}
