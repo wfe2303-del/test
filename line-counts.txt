@@ -1,12 +1,14 @@
-    49 js/00-bootstrap.js
-   310 js/01-core-utils-state-auth.js
-   369 js/04-data.js
-   454 js/02-core-db-mapping.js
-   491 js/08-events-init.js
-   500 js/03-core-dom-ui.js
-   537 js/05-render-shell.js
-   599 views/app-shell.html
-   620 styles/main.css
-   636 js/07-charts-compare.js
-   902 js/06-project-import-management.js
-  5467 total
+Line counts
+   321 ./js/01-core-utils-state-auth.js
+   454 ./js/02-core-db-mapping.js
+   505 ./js/03-core-dom-ui.js
+   369 ./js/04-data.js
+   544 ./js/05-render-shell.js
+   902 ./js/06-project-import-management.js
+   664 ./js/07-charts-compare.js
+   512 ./js/08-events-init.js
+    49 ./js/00-bootstrap.js
+   623 ./styles/main.css
+   605 ./views/app-shell.html
+    17 ./index.html
+  5565 total

@@ -345,10 +345,7 @@
                 <label>강사 검색</label>
                 <input id="cmpLeftInstructorSearch" type="text" placeholder="강사명 검색" autocomplete="off" />
               </div>
-              <div class="field">
-                <label>강사</label>
-                <select id="cmpLeftInstructor"></select>
-              </div>
+              <select id="cmpLeftInstructor" hidden></select>
               <div class="field grow">
                 <label>기수</label>
                 <select id="cmpLeftProject"></select>
@@ -464,18 +461,7 @@
               <select id="prevProjSelect" style="min-width:260px"></select>
               <button id="btnLinkPrev" class="btn-primary">연결</button>
               <button id="btnUnlinkPrev">해제</button>
-            </div>
-            <div class="sep"></div>
-            <div class="row">
-              <label class="small">또는 수동 입력(연결 안할 때)</label>
-            </div>
-            <div class="row">
-              <input type="number" id="prevDb" placeholder="이전기수 모집DB(최종=Owned+Paid)" min="0" step="1"/>
-              <input type="number" id="prevSpend" placeholder="이전기수 총예산(참고)" min="0" step="1"/>
-            </div>
-            <div class="row" style="margin-top:8px">
-              <input type="number" id="prevRevenue" placeholder="이전기수 실매출(참고)" min="0" step="1"/>
-              <button id="btnSavePrevManual" class="btn-primary">수동값 저장</button>
+              <button id="btnOpenPrevManual">수동 입력</button>
             </div>
             <div class="sep"></div>
             <div class="note" id="prevLinkInfo">현재: 이전기수 미연결 (같은 강사 내부에서 수동 연결 가능 / 같은 강사+아이템이면 자동 연결)</div>
@@ -494,24 +480,6 @@
             </div>
           </div>
 
-          <div class="chartBox batchCard">
-            <div class="sectionBadge">새 기능</div>
-            <div style="font-weight:900;margin-bottom:8px">매출/예산/이전기수값 일괄업로드</div>
-            <div class="note batchGuide">
-              한 파일에 여러 프로젝트의 실매출, 일예산, 이전DB, 이전광고비, 이전매출, 정산비율을 한 번에 넣을 수 있어.<br/>
-              권장 헤더: <b>프로젝트명</b>, <b>강사명</b>, <b>아이템명</b>, <b>기수</b>, <b>실매출</b>, <b>일예산</b>, <b>이전DB</b>, <b>이전광고비</b>, <b>이전매출</b>, <b>강사정산비율</b>, <b>광고분담비율</b>
-            </div>
-            <div class="batchActions">
-              <a class="btnLinkLike" href="./templates/project-extra-input-template.csv" download>CSV 템플릿</a>
-              <a class="btnLinkLike" href="./templates/project-extra-input-template.xlsx" download>XLSX 템플릿</a>
-              <button id="btnImportProjectMetaBatch" class="btn-primary">추가입력값 파일 업로드</button>
-            </div>
-            <div class="sep"></div>
-            <div class="note">
-              예시 1) <b>프로젝트명</b>에 <b>호스텔부업/1기</b>만 적어도 기존 프로젝트와 맞으면 반영돼.<br/>
-              예시 2) 프로젝트가 아직 없으면 <b>강사명 + 아이템명 + 기수</b>가 같이 있을 때 자동 생성 가능.
-            </div>
-          </div>
           </div>
         </div>
       </div>
@@ -581,6 +549,40 @@
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button id="btnZipPreviewCancel">취소</button>
         <button id="btnZipPreviewApply" class="btn-primary">등록 실행</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="prevManualModal" class="modalOverlay" aria-hidden="true">
+  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="prevManualTitle">
+    <div class="modalHead">
+      <div>
+        <h3 id="prevManualTitle" class="modalTitle">이전기수 수동값 입력</h3>
+        <div class="modalSub">자동/프로젝트 연결 대신 직접 이전 모집DB, 이전 광고비, 이전 실매출을 넣을 때만 사용해줘.</div>
+      </div>
+      <button id="btnPrevManualClose" class="iconBtn" style="width:36px;height:36px;font-size:16px" title="닫기">✕</button>
+    </div>
+    <div class="modalBody">
+      <div class="row">
+        <label class="small" style="min-width:110px">이전 모집DB</label>
+        <input type="number" id="prevDb" placeholder="이전기수 모집DB(최종=Owned+Paid)" min="0" step="1"/>
+      </div>
+      <div class="row">
+        <label class="small" style="min-width:110px">이전 광고비</label>
+        <input type="number" id="prevSpend" placeholder="이전기수 총예산(참고)" min="0" step="1"/>
+      </div>
+      <div class="row">
+        <label class="small" style="min-width:110px">이전 실매출</label>
+        <input type="number" id="prevRevenue" placeholder="이전기수 실매출(참고)" min="0" step="1"/>
+      </div>
+    </div>
+    <div class="previewFoot">
+      <div class="previewHint">수동값 저장 시 자동 이전기수 연결은 해당 프로젝트에서 해제돼.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="btnPrevManualCancel">취소</button>
+        <button id="btnSavePrevManual" class="btn-primary">수동값 저장</button>
       </div>
     </div>
   </div>

@@ -534,11 +534,6 @@ function renderComparePickers(){
     saveState();
     renderCompare();
   };
-  cmpRightInstructor.onchange = ()=>{
-    syncCompareSide('right');
-    saveState();
-    renderCompare();
-  };
   cmpLeftProject.onchange = ()=>{
     state.compare.leftId = cmpLeftProject.value || '';
     saveState();

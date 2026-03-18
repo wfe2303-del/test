@@ -26,6 +26,17 @@ function openMetaBatchUpload(){
   fileInput.click();
 }
 
+function openPrevManualModal(){
+  if(!prevManualModal) return;
+  prevManualModal.classList.add('open');
+  prevManualModal.setAttribute('aria-hidden','false');
+}
+function closePrevManualModal(){
+  if(!prevManualModal) return;
+  prevManualModal.classList.remove('open');
+  prevManualModal.setAttribute('aria-hidden','true');
+}
+
 /** =========================
  *  General events
  *  ========================= */
@@ -171,6 +182,15 @@ btnUnlinkPrev.addEventListener('click', async ()=>{
     alert(err?.message || '이전기수 해제 실패');
   }
 });
+btnOpenPrevManual?.addEventListener('click', ()=>{
+  const p=getProj();
+  if(!p) return alert('프로젝트를 먼저 선택해줘');
+  openPrevManualModal();
+});
+btnPrevManualClose?.addEventListener('click', closePrevManualModal);
+btnPrevManualCancel?.addEventListener('click', closePrevManualModal);
+prevManualModal?.addEventListener('click', (e)=>{ if(e.target===prevManualModal) closePrevManualModal(); });
+
 btnSavePrevManual.addEventListener('click', async ()=>{
   const p=getProj();
   if(!p) return alert('프로젝트를 먼저 선택해줘');
@@ -189,6 +209,7 @@ btnSavePrevManual.addEventListener('click', async ()=>{
   try{
     await updateProjectMetaOnDb(p);
     renderAll();
+    closePrevManualModal();
     showToast('이전기수 수동값 저장 완료');
   }catch(err){
     console.error(err);
