@@ -9,19 +9,58 @@
   <link rel="stylesheet" href="./styles/landing-dashboard.css"/>
 </head>
 <body data-page="landing-dashboard">
-  <div class="portalShell">
+  <section id="landingLoginScreen" class="loginScreen">
+    <div class="loginCardWrap">
+      <div class="loginBrandRow">
+        <div class="loginBrandMark">CA</div>
+        <div>
+          <div class="loginBrandName">ClassAround</div>
+          <div class="loginBrandSub">Instructor Dashboard</div>
+        </div>
+      </div>
+
+      <div class="loginCardMain">
+        <div class="loginCopy">
+          <span class="loginKicker">운영 대시보드</span>
+          <h1>강사별 성과를<br/>한눈에 확인하는 허브</h1>
+          <p>광고비 대비 매출 랭킹, 카테고리별 강사 탐색, 강사별 상세 페이지 진입까지 한 화면에서 관리할 수 있게 정리했어.</p>
+        </div>
+
+        <div class="loginPanel">
+          <div class="loginPanelHead">
+            <h2>로그인</h2>
+            <p>등록된 계정으로 로그인하면 대시보드가 바로 열려.</p>
+          </div>
+          <div class="loginFormGrid">
+            <label>
+              <span>아이디</span>
+              <input id="landingLoginId" type="text" placeholder="아이디" value="classaround" autocomplete="username"/>
+            </label>
+            <label>
+              <span>비밀번호</span>
+              <input id="landingLoginPw" type="password" placeholder="비밀번호" autocomplete="current-password"/>
+            </label>
+            <button id="landingLoginBtn" type="button" class="loginSubmitBtn">로그인</button>
+          </div>
+          <div id="landingLoginMsg" class="loginInlineError"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="landingApp" class="portalShell" style="display:none">
     <aside class="portalSidebar">
       <div class="portalSidebarTop">
         <div class="portalBrand">
           <div class="portalBrandMark">CA</div>
           <div>
             <div class="portalBrandName">ClassAround</div>
-            <div class="portalBrandSub">Instructor Intelligence</div>
+            <div class="portalBrandSub">Performance Dashboard</div>
           </div>
         </div>
-        <div class="portalSidebarHint">운영 대시보드</div>
       </div>
 
+      <div class="portalSidebarSectionTitle">카테고리</div>
       <div class="portalSidebarGroup">
         <button type="button" class="portalCategoryHeader is-open" id="sidebarRootToggle">
           <span class="portalCategoryHeaderLeft">
@@ -38,16 +77,16 @@
       </div>
 
       <div class="portalSidebarFooter">
-        <div class="portalSidebarFooterLabel">현재 카테고리</div>
+        <div class="portalSidebarFooterLabel">현재 폴더</div>
         <div class="portalSidebarFooterValue">부업</div>
-        <div class="portalSidebarFooterSub">추후 폴더 기준 확장 가능</div>
+        <div class="portalSidebarFooterSub">추후 카테고리 폴더는 여기서 확장하면 돼.</div>
       </div>
     </aside>
 
     <main class="portalMain">
       <header class="portalTopbar">
         <div>
-          <div class="portalTopbarEyebrow">Instructor Dashboard</div>
+          <div class="portalTopbarEyebrow">운영 대시보드</div>
           <h1>강사 랭킹 · 카테고리 허브</h1>
         </div>
         <div class="portalTopbarRight">
@@ -58,17 +97,16 @@
               <div class="portalUserValue" id="landingAuthStatus">미로그인</div>
             </div>
           </div>
-          <button id="landingLogout" type="button" class="ghostBtn" style="display:none">로그아웃</button>
+          <button id="landingLogout" type="button" class="ghostBtn">로그아웃</button>
         </div>
       </header>
 
-      <section class="portalHero">
+      <section class="portalHeroSlim">
         <div>
-          <div class="portalHeroEyebrow">Operations Overview</div>
-          <h2>광고비 대비 매출 기준으로<br/>강사 성과를 한눈에 보는 메인 허브</h2>
-          <p>좌측 카테고리에서 강사를 고르고, 우측 대시보드에서 강사별 실매출·광고비·ROAS를 빠르게 확인한 뒤 상세 페이지로 바로 이동할 수 있게 구성했어.</p>
+          <h2>광고비 대비 매출 흐름을 빠르게 보고 강사별 상세 페이지로 이동할 수 있는 메인 허브</h2>
+          <p>랭킹 기준 광고비는 구글·메타 집계가 아니라 각 프로젝트에 저장한 <b>일예산</b>을 기준으로 계산해 보여줘.</p>
         </div>
-        <div class="portalHeroMeta">
+        <div class="portalHeroQuickInfo">
           <div class="portalHeroMetaCard">
             <span>선택 강사</span>
             <b id="heroSelectedInstructor">-</b>
@@ -80,26 +118,10 @@
         </div>
       </section>
 
-      <section id="landingLoginCard" class="portalPanel portalLoginCard">
-        <div class="portalSectionHead compact">
-          <div>
-            <div class="portalSectionEyebrow">AUTH</div>
-            <h3>로그인</h3>
-            <p>대시보드와 강사 상세 화면을 사용하려면 먼저 로그인해줘.</p>
-          </div>
-        </div>
-        <div class="portalLoginGrid">
-          <input id="landingLoginId" type="text" placeholder="아이디" value="classaround"/>
-          <input id="landingLoginPw" type="password" placeholder="비밀번호"/>
-          <button id="landingLoginBtn" type="button" class="primaryBtn">로그인</button>
-        </div>
-        <div id="landingLoginMsg" class="portalInlineError"></div>
-      </section>
-
-      <section id="landingContent" class="portalContent" style="display:none">
+      <section id="landingContent" class="portalContent">
         <div class="portalUtilityRow">
           <div class="portalSearchBlock">
-            <label class="portalFieldLabel" for="landingInstructorSearch">대시보드 강사 검색</label>
+            <label class="portalFieldLabel" for="landingInstructorSearch">대시보드 검색</label>
             <input id="landingInstructorSearch" type="text" placeholder="강사명 / 아이템 / 기수 검색"/>
           </div>
           <div class="portalChipRow" id="landingMetaChips">
@@ -116,9 +138,9 @@
             <article class="portalPanel portalRankingPanel">
               <div class="portalSectionHead">
                 <div>
-                  <div class="portalSectionEyebrow">RANKING BOARD</div>
+                  <div class="portalSectionEyebrow">RANKING</div>
                   <h3>광고비 대비 매출 강사 랭킹</h3>
-                  <p>기본 정렬은 ROAS 높은 순이야. 행을 클릭하면 우측 하이라이트가 바뀌고, 열기 버튼으로 강사 상세 페이지로 이동할 수 있어.</p>
+                  <p>기본 정렬은 ROAS 높은 순이야. 광고비는 각 프로젝트에 저장된 일예산 기준으로 합산해서 보여줘.</p>
                 </div>
               </div>
               <div id="landingRankingTableWrap"></div>
@@ -151,6 +173,7 @@
       </section>
     </main>
   </div>
+
   <script src="./js/landing.js"></script>
 </body>
 </html>

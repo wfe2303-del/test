@@ -13,10 +13,10 @@ const CATEGORY_CONFIG = [
 
 const $ = (id) => document.getElementById(id);
 const els = {
+  loginScreen: $('landingLoginScreen'),
+  app: $('landingApp'),
   authStatus: $('landingAuthStatus'),
   logoutBtn: $('landingLogout'),
-  loginCard: $('landingLoginCard'),
-  content: $('landingContent'),
   loginId: $('landingLoginId'),
   loginPw: $('landingLoginPw'),
   loginBtn: $('landingLoginBtn'),
@@ -40,7 +40,6 @@ const els = {
 
 let authSession = null;
 let projectRows = [];
-let adsRows = [];
 let instructorStats = [];
 let selectedInstructor = '';
 let selectedCategoryId = CATEGORY_CONFIG[0].id;
@@ -54,44 +53,29 @@ function esc(s) {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
 }
-
 function fmtInt(n) {
   const x = Number(n);
   return Number.isFinite(x) ? Math.round(x).toLocaleString('ko-KR') : '0';
 }
-
 function fmtWon(n) {
   const x = Number(n);
   return `₩${Number.isFinite(x) ? Math.round(x).toLocaleString('ko-KR') : '0'}`;
 }
-
 function fmtRoas(n) {
   const x = Number(n);
   return Number.isFinite(x) && x > 0 ? `${x.toFixed(2)}배` : '-';
 }
-
 function fmtDate(v) {
   if (!v) return '-';
   const d = new Date(v);
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
-
-function getLoginAlias(email) {
-  const found = Object.entries(LOGIN_ID_MAP).find(([, mappedEmail]) => mappedEmail === email);
-  return found?.[0] || email || '미로그인';
-}
-
-function getLoginEmailFromId(id) {
-  return LOGIN_ID_MAP[String(id || '').trim().toLowerCase()] || '';
-}
-
 function parseCohortLabel(label) {
   const raw = String(label || '').trim();
   if (!raw) return { item: '', cohortText: '', cohortNo: NaN };
 
   let item = '';
   let cohortText = raw;
-
   if (raw.includes('/')) {
     const idx = raw.lastIndexOf('/');
     item = raw.slice(0, idx).trim();
@@ -111,24 +95,27 @@ function parseCohortLabel(label) {
     cohortNo: numberMatch ? Number(numberMatch[1]) : NaN
   };
 }
-
+function getLoginAlias(email) {
+  const found = Object.entries(LOGIN_ID_MAP).find(([, mappedEmail]) => mappedEmail === email);
+  return found?.[0] || email || '미로그인';
+}
+function getLoginEmailFromId(id) {
+  return LOGIN_ID_MAP[String(id || '').trim().toLowerCase()] || '';
+}
 function openInstructorPage(name) {
   if (!name) return;
   const url = `./instructor.html?instructor=${encodeURIComponent(name)}`;
   window.open(url, '_blank');
 }
-
 async function ensureAuth() {
   const { data: { session }, error } = await sb.auth.getSession();
   if (error) throw error;
   authSession = session || null;
   return authSession;
 }
-
 function isLoggedIn() {
   return Boolean(authSession?.user?.id);
 }
-
 async function loginWithIdPassword(id, password) {
   const key = String(id || '').trim().toLowerCase();
   const email = getLoginEmailFromId(key);
@@ -154,7 +141,6 @@ async function loginWithIdPassword(id, password) {
   if (authSession) return signUpData;
   throw new Error('test 계정 생성 후 이메일 인증이 필요할 수 있어. Supabase Auth 설정을 확인해줘.');
 }
-
 async function logout() {
   const { error } = await sb.auth.signOut();
   if (error) throw error;
@@ -162,65 +148,43 @@ async function logout() {
 }
 
 function updateAuthUi() {
-  if (!els.authStatus || !els.loginCard || !els.content || !els.logoutBtn) return;
-
-  if (isLoggedIn()) {
-    els.authStatus.textContent = getLoginAlias(authSession.user.email);
-    els.loginCard.style.display = 'none';
-    els.content.style.display = '';
-    els.logoutBtn.style.display = '';
-  } else {
-    els.authStatus.textContent = '미로그인';
-    els.loginCard.style.display = '';
-    els.content.style.display = 'none';
-    els.logoutBtn.style.display = 'none';
-  }
+  if (els.authStatus) els.authStatus.textContent = getLoginAlias(authSession?.user?.email || '');
+  if (els.loginScreen) els.loginScreen.style.display = isLoggedIn() ? 'none' : '';
+  if (els.app) els.app.style.display = isLoggedIn() ? '' : 'none';
 }
 
 async function loadDashboardData() {
   if (!isLoggedIn()) return;
 
-  const { data: projects, error: projErr } = await sb
+  const { data: projects, error } = await sb
     .from('projects')
-    .select('id,instructor,cohort,actual_revenue,created_at')
+    .select('id,instructor,cohort,daily_budget,actual_revenue,created_at')
     .order('instructor', { ascending: true })
     .order('cohort', { ascending: true });
-  if (projErr) throw projErr;
 
-  const { data: ads, error: adsErr } = await sb
-    .from('ads_entries')
-    .select('project_id,spend');
-  if (adsErr) throw adsErr;
-
+  if (error) throw error;
   projectRows = Array.isArray(projects) ? projects : [];
-  adsRows = Array.isArray(ads) ? ads : [];
   buildInstructorStats();
   renderAll();
 }
 
 function buildInstructorStats() {
-  const spendByProjectId = new Map();
-  for (const row of adsRows) {
-    const projectId = String(row.project_id || '');
-    if (!projectId) continue;
-    spendByProjectId.set(projectId, (spendByProjectId.get(projectId) || 0) + Number(row.spend || 0));
-  }
-
   const map = new Map();
+
   for (const row of projectRows) {
     const name = String(row.instructor || '').trim();
     if (!name) continue;
 
     const parsed = parseCohortLabel(row.cohort);
     const item = parsed.item || '기타';
-    const spend = Number(spendByProjectId.get(String(row.id)) || 0);
+    const spend = Number(row.daily_budget || 0);
     const revenue = Number(row.actual_revenue || 0);
     const createdAt = row.created_at || '';
 
     if (!map.has(name)) {
       map.set(name, {
         name,
-        categoryId: selectedCategoryId,
+        categoryId: CATEGORY_CONFIG[0].id,
         projectCount: 0,
         spend: 0,
         revenue: 0,
@@ -238,30 +202,24 @@ function buildInstructorStats() {
     acc.cohorts.push(String(row.cohort || '').trim());
     acc.itemCountMap.set(item, (acc.itemCountMap.get(item) || 0) + 1);
 
-    if (!acc.latestCreatedAt || new Date(createdAt).getTime() > new Date(acc.latestCreatedAt).getTime()) {
+    if (!acc.latestCreatedAt || new Date(createdAt) > new Date(acc.latestCreatedAt)) {
       acc.latestCreatedAt = createdAt;
       acc.latestProject = row;
     }
   }
 
-  instructorStats = [...map.values()].map((item) => {
-    const sortedItems = [...item.itemCountMap.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ko'));
-    const topItem = sortedItems[0]?.[0] || '기타';
-    return {
-      ...item,
-      topItem,
-      itemCount: sortedItems.length,
-      roas: item.spend > 0 ? item.revenue / item.spend : 0
-    };
-  }).sort((a, b) => {
-    if (b.roas !== a.roas) return b.roas - a.roas;
-    if (b.revenue !== a.revenue) return b.revenue - a.revenue;
-    return a.name.localeCompare(b.name, 'ko');
-  });
+  instructorStats = [...map.values()]
+    .map((item) => {
+      const topItem = [...item.itemCountMap.entries()].sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0]), 'ko'))[0]?.[0] || '기타';
+      return {
+        ...item,
+        topItem,
+        roas: item.spend > 0 ? item.revenue / item.spend : 0
+      };
+    })
+    .sort((a, b) => (b.roas - a.roas) || (b.revenue - a.revenue) || String(a.name).localeCompare(String(b.name), 'ko'));
 
-  if (!selectedInstructor && instructorStats.length) {
-    selectedInstructor = instructorStats[0].name;
-  }
+  if (!selectedInstructor && instructorStats.length) selectedInstructor = instructorStats[0].name;
   if (selectedInstructor && !instructorStats.find((row) => row.name === selectedInstructor)) {
     selectedInstructor = instructorStats[0]?.name || '';
   }
@@ -284,12 +242,10 @@ function getFilteredInstructorStats() {
   }
   return list;
 }
-
 function getSelectedInstructorStat() {
   const filtered = getFilteredInstructorStats();
   return filtered.find((item) => item.name === selectedInstructor) || filtered[0] || instructorStats.find((item) => item.name === selectedInstructor) || null;
 }
-
 function syncHero() {
   const selected = getSelectedInstructorStat();
   if (els.heroSelectedInstructor) els.heroSelectedInstructor.textContent = selected?.name || '-';
@@ -298,8 +254,7 @@ function syncHero() {
 
 function renderSidebar() {
   if (!els.sidebarNav) return;
-
-  const filtered = getFilteredInstructorStats();
+  const filtered = getFilteredInstructorStats().slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'ko'));
   const selected = getSelectedInstructorStat();
 
   const rows = filtered.map((item) => `
@@ -312,10 +267,7 @@ function renderSidebar() {
     </button>
   `).join('');
 
-  els.sidebarNav.innerHTML = categoryOpen
-    ? rows || '<div class="portalEmptyState" style="min-height:120px">검색 결과가 없어.</div>'
-    : '';
-
+  els.sidebarNav.innerHTML = categoryOpen ? (rows || '<div class="portalEmptyState" style="min-height:120px">검색 결과가 없어.</div>') : '';
   els.sidebarNav.querySelectorAll('[data-inst]').forEach((button) => {
     button.addEventListener('click', () => {
       selectedInstructor = button.dataset.inst || '';
@@ -340,8 +292,8 @@ function renderStats() {
   const cards = [
     { label: '등록 강사', value: `${fmtInt(filtered.length)}명`, sub: '현재 카테고리 기준' },
     { label: '등록 프로젝트', value: `${fmtInt(totalProjects)}개`, sub: '강사별 전체 기수 합산' },
-    { label: '총 광고비', value: fmtWon(totalSpend), sub: 'ads_entries 집계' },
-    { label: '총 실매출', value: fmtWon(totalRevenue), sub: 'actual_revenue 합산' },
+    { label: '총 광고비', value: fmtWon(totalSpend), sub: '일예산 합산 기준' },
+    { label: '총 실매출', value: fmtWon(totalRevenue), sub: '실매출 합산' },
     { label: '1위 강사', value: best?.name || '-', sub: best ? `ROAS ${fmtRoas(best.roas)}` : '선택 가능한 강사 없음' }
   ];
 
@@ -356,7 +308,6 @@ function renderStats() {
 
 function renderSpotlight() {
   if (!els.spotlight) return;
-
   const selected = getSelectedInstructorStat();
   syncHero();
 
@@ -367,12 +318,7 @@ function renderSpotlight() {
   }
 
   if (els.spotlightOpenBtn) els.spotlightOpenBtn.disabled = false;
-  selectedInstructor = selected.name;
-
-  const recentCohorts = [...selected.cohorts]
-    .filter(Boolean)
-    .sort((a, b) => String(b).localeCompare(String(a), 'ko'))
-    .slice(0, 6);
+  const recentCohorts = [...selected.cohorts].filter(Boolean).sort((a, b) => String(b).localeCompare(String(a), 'ko')).slice(0, 6);
 
   els.spotlight.innerHTML = `
     <div class="portalSpotlightHead">
@@ -391,16 +337,13 @@ function renderSpotlight() {
     </div>
 
     <div class="portalChipList">
-      ${recentCohorts.length
-        ? recentCohorts.map((cohort) => `<span class="portalChip">${esc(cohort)}</span>`).join('')
-        : '<span class="portalChip">등록된 기수가 없어</span>'}
+      ${recentCohorts.length ? recentCohorts.map((cohort) => `<span class="portalChip">${esc(cohort)}</span>`).join('') : '<span class="portalChip">등록된 기수가 없어</span>'}
     </div>
   `;
 }
 
 function renderCategorySummary() {
   if (!els.categorySummary) return;
-
   const filtered = getFilteredInstructorStats();
   const totalSpend = filtered.reduce((sum, item) => sum + Number(item.spend || 0), 0);
   const totalRevenue = filtered.reduce((sum, item) => sum + Number(item.revenue || 0), 0);
@@ -438,7 +381,6 @@ function renderCategorySummary() {
 
 function renderRankingTable() {
   if (!els.rankingWrap) return;
-
   const filtered = getFilteredInstructorStats();
   const rows = filtered.map((item, index) => `
     <tr class="${selectedInstructor === item.name ? 'is-active' : ''}" data-rank-inst="${esc(item.name)}">
@@ -459,18 +401,18 @@ function renderRankingTable() {
   els.rankingWrap.innerHTML = `
     <div class="portalRankingHint">
       <span>기본 정렬: ROAS 높은 순</span>
-      <span>강사 클릭 시 우측 하이라이트 변경</span>
+      <span>광고비 기준: 일예산 합산</span>
     </div>
     <div class="portalRankingTableWrap">
       <table class="portalRankingTable">
         <thead>
           <tr>
-            <th style="width:72px">순위</th>
+            <th class="center" style="width:72px">순위</th>
             <th>강사</th>
-            <th style="width:180px">총 광고비</th>
-            <th style="width:180px">총 실매출</th>
-            <th style="width:120px">ROAS</th>
-            <th style="width:100px">상세</th>
+            <th style="width:180px">광고비</th>
+            <th style="width:180px">실매출</th>
+            <th class="center" style="width:120px">ROAS</th>
+            <th class="center" style="width:100px">상세</th>
           </tr>
         </thead>
         <tbody>
@@ -487,7 +429,6 @@ function renderRankingTable() {
       renderAll();
     });
   });
-
   els.rankingWrap.querySelectorAll('[data-open-inst]').forEach((button) => {
     button.addEventListener('click', (event) => {
       event.stopPropagation();
@@ -517,20 +458,16 @@ function wireEvents() {
       if (els.loginMsg) els.loginMsg.textContent = err?.message || '로그인 실패';
     }
   });
-
   els.loginPw?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') els.loginBtn?.click();
   });
-
   els.logoutBtn?.addEventListener('click', async () => {
     try {
       await logout();
       projectRows = [];
-      adsRows = [];
       instructorStats = [];
       selectedInstructor = '';
       updateAuthUi();
-      renderAll();
     } catch (err) {
       console.error(err);
       alert(err?.message || '로그아웃 실패');
@@ -541,7 +478,6 @@ function wireEvents() {
   els.searchMain?.addEventListener('input', searchHandler);
   els.searchSidebar?.addEventListener('input', searchHandler);
   els.spotlightOpenBtn?.addEventListener('click', () => openInstructorPage(selectedInstructor));
-
   els.sidebarRootToggle?.addEventListener('click', () => {
     categoryOpen = !categoryOpen;
     els.sidebarRootToggle.classList.toggle('is-open', categoryOpen);
@@ -555,11 +491,9 @@ function wireEvents() {
   try {
     await ensureAuth();
     updateAuthUi();
-    if (isLoggedIn()) {
-      await loadDashboardData();
-    }
+    if (isLoggedIn()) await loadDashboardData();
   } catch (err) {
     console.error(err);
-    alert('초기 로딩 실패: Supabase 연결 상태를 확인해줘.');
+    if (els.loginMsg) els.loginMsg.textContent = '초기 로딩 실패. Supabase 연결 상태를 확인해줘.';
   }
 })();

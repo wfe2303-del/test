@@ -1,3 +1,19 @@
-156  index.html
-565  js/landing.js
-776  styles/landing-dashboard.css
+Line counts:
+   179 ./index.html
+    17 ./instructor.html
+    50 ./js/00-bootstrap.js
+   356 ./js/01-core-utils-state-auth.js
+   520 ./js/02-core-db-mapping.js
+   527 ./js/03-core-dom-ui.js
+   369 ./js/04-data.js
+   544 ./js/05-render-shell.js
+   902 ./js/06-project-import-management.js
+   664 ./js/07-charts-compare.js
+   523 ./js/08-events-init.js
+   151 ./js/09-instructor-pages.js
+   499 ./js/landing.js
+   297 ./styles/landing-dashboard.css
+  1110 ./styles/main.css
+    81 ./supabase/project_extra_configs.sql
+   643 ./views/app-shell.html
+  7432 total

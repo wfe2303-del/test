@@ -41,10 +41,70 @@ function groupRowsByProjectId(rows){
   return map;
 }
 
+async function fetchProjectExtraCfgRows(){
+  await ensureAuth();
+  requireLogin();
+  try{
+    const { data, error } = await sb
+      .from('project_extra_configs')
+      .select('project_id,instructor_rate,ad_share_rate,auto_prev_opt_out')
+      .eq('owner_id', ownerId());
+    if(error) throw error;
+    return { available:true, rows:Array.isArray(data) ? data : [] };
+  }catch(err){
+    const msg = String(err?.message || '').toLowerCase();
+    if(msg.includes('project_extra_configs') || msg.includes('relation') || msg.includes('schema cache')){
+      return { available:false, rows:[] };
+    }
+    throw err;
+  }
+}
+
+async function upsertProjectExtraCfgOnDb(project){
+  await ensureAuth();
+  requireLogin();
+  const extra = getExtraCfg(project?.id);
+  try{
+    const { error } = await sb
+      .from('project_extra_configs')
+      .upsert({
+        project_id: project.id,
+        owner_id: ownerId(),
+        instructor_rate: Number(extra.instructorRate || 0),
+        ad_share_rate: Number(extra.adShareRate || 0),
+        auto_prev_opt_out: !!extra.autoPrevOptOut
+      }, { onConflict:'project_id' });
+    if(error) throw error;
+    return true;
+  }catch(err){
+    const msg = String(err?.message || '').toLowerCase();
+    if(msg.includes('project_extra_configs') || msg.includes('relation') || msg.includes('schema cache')) return false;
+    throw err;
+  }
+}
+
+async function deleteProjectExtraCfgOnDb(projectId){
+  await ensureAuth();
+  requireLogin();
+  try{
+    const { error } = await sb
+      .from('project_extra_configs')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('owner_id', ownerId());
+    if(error) throw error;
+    return true;
+  }catch(err){
+    const msg = String(err?.message || '').toLowerCase();
+    if(msg.includes('project_extra_configs') || msg.includes('relation') || msg.includes('schema cache')) return false;
+    throw err;
+  }
+}
+
 /** =========================
  *  DB 매핑
  *  ========================= */
-function mapProjectRowToState(projectRow, ownedRows, adsRows){
+function mapProjectRowToState(projectRow, ownedRows, adsRows, serverExtraCfg){
   return {
     id: projectRow.id,
     instructor: projectRow.instructor,
@@ -78,9 +138,9 @@ function mapProjectRowToState(projectRow, ownedRows, adsRows){
         revenue: Number(projectRow.prev_manual_revenue || 0)
       }
     },
-    settlement: (()=>{ const extra = getExtraCfg(projectRow.id); return {
-      instructorRate: Number(extra.instructorRate || 0),
-      adShareRate: Number(extra.adShareRate ?? extra.adShareRate ?? 0)
+    settlement: (()=>{ const localExtra = getExtraCfg(projectRow.id); const extra = serverExtraCfg || localExtra || {}; if(serverExtraCfg){ setExtraCfg(projectRow.id, { instructorRate:Number(extra.instructor_rate || 0), adShareRate:Number(extra.ad_share_rate || 0), autoPrevOptOut:!!extra.auto_prev_opt_out }); } return {
+      instructorRate: Number((serverExtraCfg ? extra.instructor_rate : extra.instructorRate) || 0),
+      adShareRate: Number((serverExtraCfg ? extra.ad_share_rate : extra.adShareRate) || 0)
     }; })()
   };
 }
@@ -137,13 +197,15 @@ async function loadStateFromDb(){
 
   if(pErr) throw pErr;
 
-  const [ownedRows, adsRows] = await Promise.all([
+  const [ownedRows, adsRows, extraCfgResult] = await Promise.all([
     fetchAllRows('owned_entries', 'entry_date', true, 1000),
-    fetchAllRows('ads_entries', 'entry_date', true, 1000)
+    fetchAllRows('ads_entries', 'entry_date', true, 1000),
+    fetchProjectExtraCfgRows()
   ]);
 
   const ownedMap = groupRowsByProjectId(ownedRows);
   const adsMap = groupRowsByProjectId(adsRows);
+  const extraCfgMap = new Map((extraCfgResult?.rows || []).map(row => [String(row.project_id || ''), row]));
 
   state.projects = {};
 
@@ -156,7 +218,8 @@ async function loadStateFromDb(){
     state.projects[row.id] = mapProjectRowToState(
       row,
       ownedMap.get(row.id) || [],
-      adsMap.get(row.id) || []
+      adsMap.get(row.id) || [],
+      extraCfgMap.get(String(row.id)) || null
     );
   }
 
@@ -201,6 +264,7 @@ async function createProjectOnDb(instructor, cohort, silent=false){
 
   state.projects[data.id] = mapProjectRowToState(data, [], []);
   setExtraCfg(data.id, { instructorRate:0, adShareRate:0, autoPrevOptOut:false });
+  await upsertProjectExtraCfgOnDb(state.projects[data.id]);
   state.currentProjectId = data.id;
 
   if(!state.compare) state.compare = defaultCompare(data.id);
@@ -235,6 +299,7 @@ async function updateProjectMetaOnDb(project){
     .eq('id', project.id);
 
   if(error) throw error;
+  await upsertProjectExtraCfgOnDb(project);
 }
 async function deleteProjectOnDb(projectId){
   await ensureAuth();
@@ -247,6 +312,7 @@ async function deleteProjectOnDb(projectId){
 
   if(error) throw error;
 
+  await deleteProjectExtraCfgOnDb(projectId);
   delete state.projects[projectId];
 
   const ids = Object.keys(state.projects);
