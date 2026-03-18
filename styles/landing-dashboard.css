@@ -295,3 +295,111 @@ button,input{font:inherit;}
   .portalPanel{padding:18px;}
   .portalSectionHead{flex-direction:column;}
 }
+
+/* v7d polish overrides */
+body[data-page="landing-dashboard"]{font-family:"Pretendard Variable","Pretendard",system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#eef1f6;color:#121826;}
+.brandLogoImg{display:block;object-fit:contain;}
+.loginScreen{padding:32px;background:linear-gradient(180deg,#eef2f8 0%,#e9edf5 100%);}
+.loginSimpleCard{width:min(460px,100%);margin:40px auto;padding:28px;border-radius:24px;background:#fff;border:1px solid #dde3ef;box-shadow:0 24px 60px rgba(15,23,42,.08);}
+.loginSimpleBrand{display:flex;align-items:center;gap:14px;padding-bottom:20px;border-bottom:1px solid #eef2f8;}
+.loginSimpleName{font-size:24px;font-weight:800;letter-spacing:-.04em;color:#171e2d;}
+.loginSimpleSub{margin-top:2px;font-size:12px;color:#707a8d;}
+.loginSimpleHead{padding:24px 0 12px;display:grid;gap:10px;}
+.loginSimpleHead .loginKicker{display:inline-flex;width:max-content;min-height:28px;padding:0 10px;border-radius:999px;background:#eff4ff;color:#3b61e0;font-size:11px;font-weight:700;align-items:center;}
+.loginSimpleHead h1{margin:0;font-size:30px;letter-spacing:-.04em;line-height:1.1;color:#161d2b;}
+.loginSimpleHead p{margin:0;font-size:14px;line-height:1.65;color:#687386;}
+.loginSimpleForm{display:grid;gap:14px;}
+.loginSimpleForm label{display:grid;gap:8px;}
+.loginSimpleForm label span{font-size:12px;font-weight:700;color:#4d596f;}
+.loginSimpleForm input{height:48px;border-radius:14px;border:1px solid #d7deea;background:#fff;padding:0 14px;font-size:14px;}
+.loginSubmitBtn{height:48px;border-radius:14px;font-size:14px;font-weight:800;}
+.loginInlineError{margin-top:12px;font-size:12px;min-height:18px;}
+.portalSidebar{padding:18px 16px 18px;background:#232838;border-right:none;}
+.portalBrandWithImage{gap:12px;align-items:center;}
+.sidebarBrandImg{width:132px;height:28px;}
+.portalSidebarTop{padding-bottom:16px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);}
+.portalSidebarSectionTitle{font-size:11px;margin-bottom:10px;}
+.portalCategoryHeader{min-height:44px;padding:0 14px;border-radius:14px;font-size:14px;}
+.portalFieldLabel{font-size:11px;}
+.portalSidebarSearchWrap input,
+.portalSearchBlock input,
+.inlineField select{height:42px;border-radius:14px;font-size:13px;}
+.portalNavTree{padding-right:4px;max-height:calc(100vh - 250px);}
+.portalInstructorNavButton{min-height:48px;padding:9px 10px;border-radius:12px;}
+.portalInstructorNavMain strong{font-size:13px;}
+.portalInstructorNavMain span{font-size:11px;}
+.portalInstructorNavMetric{font-size:11px;}
+.portalSidebarFooter{display:none;}
+.portalMain{padding:0 20px 24px;gap:14px;}
+.compactTopbar{margin:0 -20px;padding:12px 20px;min-height:64px;}
+.portalTopbarEyebrow{font-size:10px;}
+.portalTopbar h1{font-size:16px;margin-top:4px;letter-spacing:-.03em;}
+.portalUserCard{padding:7px 10px;border-radius:14px;}
+.portalUserAvatar{width:34px;height:34px;font-size:11px;}
+.portalUserLabel{font-size:10px;}
+.portalUserValue{font-size:12px;}
+.ghostBtn,.primaryBtn,.portalRowAction{min-height:34px;padding:0 12px;font-size:12px;border-radius:11px;}
+.portalHeroCompact{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:stretch;background:#fff;border:1px solid #dee5f1;border-radius:22px;padding:18px 20px;box-shadow:0 12px 34px rgba(15,23,42,.04);}
+.portalHeroTitleRow{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.portalHeroText h2{margin:0;font-size:20px;letter-spacing:-.04em;color:#161d2b;}
+.portalHeroText p{margin:8px 0 0;font-size:13px;color:#6b7486;line-height:1.6;}
+.portalHeroTag{display:inline-flex;min-height:30px;padding:0 10px;border-radius:999px;background:#f4f7fc;color:#52627c;font-size:11px;font-weight:700;align-items:center;white-space:nowrap;}
+.portalHeroQuickInfo.compact{grid-template-columns:1fr;}
+.portalHeroMetaCard{padding:13px 14px;border-radius:16px;gap:6px;}
+.portalHeroMetaCard span{font-size:11px;}
+.portalHeroMetaCard b{font-size:18px;}
+.portalContent.tightened{gap:14px;}
+.compactUtility{align-items:center;}
+.compactSearchBlock{max-width:340px;gap:6px;}
+.portalMetaChip{min-height:34px;padding:0 12px;font-size:12px;}
+.portalStatsGrid.compact{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;}
+.portalStatCard{padding:15px 16px 14px;border-radius:18px;box-shadow:0 10px 30px rgba(15,23,42,.04);}
+.portalStatLabel{font-size:11px;}
+.portalStatValue{margin-top:8px;font-size:18px;line-height:1.2;}
+.portalStatSub{margin-top:6px;font-size:11px;}
+.simplifiedDashboardGrid{grid-template-columns:minmax(0,1.6fr) 320px;gap:14px;}
+.compactPanel{padding:18px;border-radius:22px;}
+.rankingHeadBar{align-items:end;}
+.portalSectionHead h3{font-size:16px;margin-top:5px;}
+.portalSectionHead p{display:none;}
+.rankingControlGroup{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;}
+.inlineField{display:grid;gap:6px;min-width:128px;}
+.inlineField span{font-size:11px;font-weight:700;color:#64748b;}
+.portalRankingHint.compactHint{font-size:11px;margin-bottom:10px;}
+.portalRankingTableWrap{border-radius:16px;}
+.portalRankingTable.compactTable{min-width:640px;}
+.portalRankingTable th,.portalRankingTable td{padding:11px 12px;font-size:12px;}
+.portalRankingTable th{font-size:11px;}
+.portalRankBadge{width:26px;height:26px;font-size:11px;}
+.portalInstructorCell strong{font-size:13px;}
+.portalInstructorCell span{font-size:11px;}
+.portalRoasValue{font-size:12px;}
+.narrowerSideColumn{width:100%;}
+.portalSpotlightName{font-size:18px;}
+.portalSpotlightSub{font-size:12px;line-height:1.6;margin-top:6px;}
+.compactMetricGrid{margin-top:14px;gap:10px;}
+.portalMetricCard{padding:14px;border-radius:16px;gap:6px;}
+.portalMetricCard span{font-size:11px;}
+.portalMetricCard b{font-size:16px;line-height:1.3;}
+.compactChipList{margin-top:14px;}
+.portalChip{min-height:28px;padding:0 10px;font-size:11px;border-radius:999px;}
+@media (max-width:1360px){
+  .portalStatsGrid.compact{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media (max-width:1120px){
+  .portalHeroCompact,.simplifiedDashboardGrid{grid-template-columns:1fr;}
+  .portalStatsGrid.compact{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:900px){
+  .portalShell{grid-template-columns:1fr;}
+  .portalSidebar{position:static;min-height:auto;}
+}
+@media (max-width:640px){
+  .loginSimpleCard{margin:12px auto;padding:20px;}
+  .portalMain{padding:0 14px 18px;}
+  .compactTopbar{margin:0 -14px;padding:12px 14px;flex-direction:column;align-items:flex-start;}
+  .portalHeroTitleRow,.compactUtility{flex-direction:column;align-items:flex-start;}
+  .portalStatsGrid.compact,.compactMetricGrid{grid-template-columns:1fr;}
+  .rankingControlGroup{width:100%;justify-content:stretch;}
+  .inlineField{min-width:0;width:100%;}
+}

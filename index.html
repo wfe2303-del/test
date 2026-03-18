@@ -5,54 +5,46 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>강사별 DB보고서 · 운영 대시보드</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"/>
   <link rel="stylesheet" href="./styles/main.css"/>
   <link rel="stylesheet" href="./styles/landing-dashboard.css"/>
 </head>
 <body data-page="landing-dashboard">
   <section id="landingLoginScreen" class="loginScreen">
-    <div class="loginCardWrap">
-      <div class="loginBrandRow">
-        <div class="loginBrandMark">CA</div>
+    <div class="loginSimpleCard">
+      <div class="loginSimpleBrand">
+        <img src="./assets/classaround-logo.png" alt="ClassAround" class="brandLogoImg"/>
         <div>
-          <div class="loginBrandName">ClassAround</div>
-          <div class="loginBrandSub">Instructor Dashboard</div>
+          <div class="loginSimpleName">ClassAround</div>
+          <div class="loginSimpleSub">Performance Dashboard</div>
         </div>
       </div>
-
-      <div class="loginCardMain">
-        <div class="loginCopy">
-          <span class="loginKicker">운영 대시보드</span>
-          <h1>강사별 성과를<br/>한눈에 확인하는 허브</h1>
-          <p>광고비 대비 매출 랭킹, 카테고리별 강사 탐색, 강사별 상세 페이지 진입까지 한 화면에서 관리할 수 있게 정리했어.</p>
-        </div>
-
-        <div class="loginPanel">
-          <div class="loginPanelHead">
-            <h2>로그인</h2>
-            <p>등록된 계정으로 로그인하면 대시보드가 바로 열려.</p>
-          </div>
-          <div class="loginFormGrid">
-            <label>
-              <span>아이디</span>
-              <input id="landingLoginId" type="text" placeholder="아이디" value="classaround" autocomplete="username"/>
-            </label>
-            <label>
-              <span>비밀번호</span>
-              <input id="landingLoginPw" type="password" placeholder="비밀번호" autocomplete="current-password"/>
-            </label>
-            <button id="landingLoginBtn" type="button" class="loginSubmitBtn">로그인</button>
-          </div>
-          <div id="landingLoginMsg" class="loginInlineError"></div>
-        </div>
+      <div class="loginSimpleHead">
+        <span class="loginKicker">운영 대시보드</span>
+        <h1>로그인</h1>
+        <p>등록된 계정으로 로그인하면 강사 랭킹 대시보드가 열려.</p>
       </div>
+      <div class="loginSimpleForm">
+        <label>
+          <span>아이디</span>
+          <input id="landingLoginId" type="text" placeholder="아이디" value="classaround" autocomplete="username"/>
+        </label>
+        <label>
+          <span>비밀번호</span>
+          <input id="landingLoginPw" type="password" placeholder="비밀번호" autocomplete="current-password"/>
+        </label>
+        <button id="landingLoginBtn" type="button" class="loginSubmitBtn">로그인</button>
+      </div>
+      <div id="landingLoginMsg" class="loginInlineError"></div>
     </div>
   </section>
 
   <div id="landingApp" class="portalShell" style="display:none">
     <aside class="portalSidebar">
       <div class="portalSidebarTop">
-        <div class="portalBrand">
-          <div class="portalBrandMark">CA</div>
+        <div class="portalBrand portalBrandWithImage">
+          <img src="./assets/classaround-logo.png" alt="ClassAround" class="brandLogoImg sidebarBrandImg"/>
           <div>
             <div class="portalBrandName">ClassAround</div>
             <div class="portalBrandSub">Performance Dashboard</div>
@@ -75,16 +67,10 @@
         </div>
         <nav id="sidebarCategoryNav" class="portalNavTree"></nav>
       </div>
-
-      <div class="portalSidebarFooter">
-        <div class="portalSidebarFooterLabel">현재 폴더</div>
-        <div class="portalSidebarFooterValue">부업</div>
-        <div class="portalSidebarFooterSub">추후 카테고리 폴더는 여기서 확장하면 돼.</div>
-      </div>
     </aside>
 
     <main class="portalMain">
-      <header class="portalTopbar">
+      <header class="portalTopbar compactTopbar">
         <div>
           <div class="portalTopbarEyebrow">운영 대시보드</div>
           <h1>강사 랭킹 · 카테고리 허브</h1>
@@ -101,12 +87,15 @@
         </div>
       </header>
 
-      <section class="portalHeroSlim">
-        <div>
-          <h2>광고비 대비 매출 흐름을 빠르게 보고 강사별 상세 페이지로 이동할 수 있는 메인 허브</h2>
-          <p>랭킹 기준 광고비는 구글·메타 집계가 아니라 각 프로젝트에 저장한 <b>일예산</b>을 기준으로 계산해 보여줘.</p>
+      <section class="portalHeroCompact">
+        <div class="portalHeroText">
+          <div class="portalHeroTitleRow">
+            <h2>강사 성과 대시보드</h2>
+            <div class="portalHeroTag">광고비 기준: 일예산 합산</div>
+          </div>
+          <p>필요한 지표만 남기고, 랭킹과 강사 상세 진입에 집중한 메인 허브.</p>
         </div>
-        <div class="portalHeroQuickInfo">
+        <div class="portalHeroQuickInfo compact">
           <div class="portalHeroMetaCard">
             <span>선택 강사</span>
             <b id="heroSelectedInstructor">-</b>
@@ -118,9 +107,9 @@
         </div>
       </section>
 
-      <section id="landingContent" class="portalContent">
-        <div class="portalUtilityRow">
-          <div class="portalSearchBlock">
+      <section id="landingContent" class="portalContent tightened">
+        <div class="portalUtilityRow compactUtility">
+          <div class="portalSearchBlock compactSearchBlock">
             <label class="portalFieldLabel" for="landingInstructorSearch">대시보드 검색</label>
             <input id="landingInstructorSearch" type="text" placeholder="강사명 / 아이템 / 기수 검색"/>
           </div>
@@ -131,42 +120,50 @@
           </div>
         </div>
 
-        <section id="landingStatsGrid" class="portalStatsGrid"></section>
+        <section id="landingStatsGrid" class="portalStatsGrid compact"></section>
 
-        <section class="portalDashboardGrid">
+        <section class="portalDashboardGrid simplifiedDashboardGrid">
           <div class="portalMainColumn">
-            <article class="portalPanel portalRankingPanel">
-              <div class="portalSectionHead">
+            <article class="portalPanel portalRankingPanel compactPanel">
+              <div class="portalSectionHead compact rankingHeadBar">
                 <div>
                   <div class="portalSectionEyebrow">RANKING</div>
-                  <h3>광고비 대비 매출 강사 랭킹</h3>
-                  <p>기본 정렬은 ROAS 높은 순이야. 광고비는 각 프로젝트에 저장된 일예산 기준으로 합산해서 보여줘.</p>
+                  <h3>강사 랭킹</h3>
+                </div>
+                <div class="rankingControlGroup">
+                  <label class="inlineField">
+                    <span>정렬 기준</span>
+                    <select id="landingSortMetric">
+                      <option value="roas">ROAS</option>
+                      <option value="spend">광고비</option>
+                      <option value="revenue">실매출</option>
+                      <option value="projects">프로젝트 수</option>
+                      <option value="name">가나다순</option>
+                    </select>
+                  </label>
+                  <label class="inlineField">
+                    <span>순서</span>
+                    <select id="landingSortOrder">
+                      <option value="desc">내림차순</option>
+                      <option value="asc">오름차순</option>
+                    </select>
+                  </label>
                 </div>
               </div>
               <div id="landingRankingTableWrap"></div>
             </article>
           </div>
 
-          <div class="portalSideColumn">
-            <article class="portalPanel portalSpotlightPanel">
-              <div class="portalSectionHead compact">
+          <div class="portalSideColumn narrowerSideColumn">
+            <article class="portalPanel portalSpotlightPanel compactPanel">
+              <div class="portalSectionHead compact spotlightHeadCompact">
                 <div>
                   <div class="portalSectionEyebrow">SPOTLIGHT</div>
-                  <h3>선택 강사 요약</h3>
+                  <h3>선택 강사</h3>
                 </div>
                 <button id="spotlightOpenBtn" type="button" class="primaryBtn">강사 페이지 열기</button>
               </div>
               <div id="landingSpotlight"></div>
-            </article>
-
-            <article class="portalPanel">
-              <div class="portalSectionHead compact">
-                <div>
-                  <div class="portalSectionEyebrow">CATEGORY</div>
-                  <h3>부업 카테고리 요약</h3>
-                </div>
-              </div>
-              <div id="landingCategorySummary"></div>
             </article>
           </div>
         </section>
