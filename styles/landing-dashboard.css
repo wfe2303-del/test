@@ -731,3 +731,171 @@ body[data-page="landing-dashboard"]{
   .portalHeroTag{justify-self:start;}
   .portalHeroQuickInfo.compact{grid-template-columns:1fr 1fr;}
 }
+
+
+/* v7g ranking-focused redesign */
+.topbarPanel{
+  margin:14px 0 14px;
+  padding:14px 18px;
+  min-height:68px;
+  background:var(--surface);
+  border:1px solid #dee5f1;
+  border-radius:22px;
+  box-shadow:0 10px 28px rgba(15,23,42,.04);
+}
+.topbarPanel h1{font-size:18px;letter-spacing:-.035em;color:#111827;}
+.portalHeroMetricsPanel{
+  grid-template-columns:minmax(0,1fr) 292px;
+  align-items:stretch;
+  min-height:auto;
+  padding:14px;
+  gap:14px;
+  border-radius:22px;
+}
+.portalHeroMetricsGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.heroMetricTile{
+  display:grid;
+  align-content:center;
+  gap:6px;
+  min-height:108px;
+  padding:16px 18px;
+  border:1px solid #e3e8f4;
+  border-radius:18px;
+  background:linear-gradient(180deg,#ffffff 0%, #f8faff 100%);
+}
+.heroMetricTile span{
+  font-size:11px;
+  font-weight:700;
+  color:#7c89a5;
+  letter-spacing:.01em;
+}
+.heroMetricTile b{
+  font-size:clamp(24px,2vw,32px);
+  line-height:1.06;
+  letter-spacing:-.04em;
+  color:#111827;
+  font-variant-numeric:tabular-nums;
+  word-break:break-all;
+}
+.heroMetricTile small{
+  font-size:11px;
+  color:#8b96ab;
+}
+.heroMetricPrimary b{color:#111827;}
+.heroMetricAccent{
+  background:linear-gradient(180deg,#f5f8ff 0%, #eef3ff 100%);
+  border-color:#d7e2ff;
+}
+.heroMetricAccent b{color:#2f5de3;}
+.heroSelectionCards{
+  align-self:stretch;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+.heroSelectionCards .portalHeroMetaCard{
+  min-height:calc((108px - 12px) / 1.0);
+  justify-content:center;
+  border-radius:18px;
+}
+.slimCountGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px;
+}
+.slimStatCard{
+  min-height:82px !important;
+  padding:14px 16px !important;
+}
+.slimStatCard .portalStatValue{
+  font-size:clamp(18px,1.5vw,24px);
+}
+.emphasisDashboardGrid{
+  grid-template-columns:minmax(0,1fr) 300px;
+  gap:14px;
+}
+.emphasisRankingPanel{
+  padding:16px 18px 18px;
+}
+.rankingHeadBar{
+  margin-bottom:8px;
+}
+.entityTable.emphasisTable{
+  min-width:860px;
+  table-layout:fixed;
+}
+.entityTable.emphasisTable th,
+.entityTable.emphasisTable td{
+  padding:12px 10px;
+}
+.entityTable.emphasisTable th{
+  font-size:11px;
+  color:#7a86a0;
+}
+.entityTable.emphasisTable .cellInstructor{
+  font-size:13px;
+  font-weight:700;
+  color:#182233;
+}
+.entityTable.emphasisTable .cellItem{
+  max-width:120px;
+  font-size:12px;
+  color:#5b667d;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.entityTable.emphasisTable .cellProjects{
+  font-size:12px;
+  color:#667085;
+  font-weight:600;
+}
+.entityTable.emphasisTable .spendCell,
+.entityTable.emphasisTable .revenueCell{
+  font-size:15px;
+  font-weight:800;
+  color:#111827;
+  letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.entityTable.emphasisTable .revenueCell{
+  color:#0f172a;
+}
+.emphasisRoas{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:72px;
+  min-height:32px;
+  padding:0 12px;
+  border-radius:999px;
+  background:#eef3ff;
+  color:#2f5de3;
+  font-size:13px;
+  font-weight:800;
+}
+.portalRankingTable tbody tr.is-active{
+  background:#f2f6ff;
+}
+.portalRankingHint.compactHint{
+  margin-bottom:10px;
+}
+.portalSpotlightPanel.compactPanel{
+  padding:16px;
+}
+@media (max-width:1320px){
+  .portalHeroMetricsPanel{grid-template-columns:1fr 280px;}
+}
+@media (max-width:1180px){
+  .portalHeroMetricsPanel,
+  .emphasisDashboardGrid{grid-template-columns:1fr;}
+  .portalHeroMetricsGrid,
+  .slimCountGrid{grid-template-columns:1fr 1fr !important;}
+}
+@media (max-width:760px){
+  .portalHeroMetricsGrid,
+  .slimCountGrid{grid-template-columns:1fr !important;}
+  .heroMetricTile b{font-size:24px;}
+}

@@ -70,7 +70,7 @@
     </aside>
 
     <main class="portalMain">
-      <header class="portalTopbar compactTopbar">
+      <header class="portalTopbar compactTopbar topbarPanel">
         <div>
           <h1>부업 대시보드</h1>
         </div>
@@ -86,22 +86,32 @@
         </div>
       </header>
 
-      <section class="portalHeroCompact portalHeroPanel">
-        <div class="portalHeroPanelLeft">
-          <div class="portalHeroSmallLabel">강사/아이템 기준 랭킹</div>
-          <h2>부업 카테고리 성과 보드</h2>
+      <section class="portalHeroPanel portalHeroMetricsPanel">
+        <div class="portalHeroMetricsGrid">
+          <article class="heroMetricTile heroMetricPrimary">
+            <span>광고비</span>
+            <b id="heroTotalSpend">₩0</b>
+            <small>일예산 합산</small>
+          </article>
+          <article class="heroMetricTile heroMetricPrimary">
+            <span>실매출</span>
+            <b id="heroTotalRevenue">₩0</b>
+            <small>강사·아이템 합산</small>
+          </article>
+          <article class="heroMetricTile heroMetricAccent">
+            <span>평균 ROAS</span>
+            <b id="heroAvgRoas">-</b>
+            <small id="heroBestLabel">표시할 항목 없음</small>
+          </article>
         </div>
-        <div class="portalHeroPanelRight">
-          <div class="portalHeroTag">광고비 기준: 일예산 합산</div>
-          <div class="portalHeroQuickInfo compact">
-            <div class="portalHeroMetaCard">
-              <span>선택 강사</span>
-              <b id="heroSelectedInstructor">-</b>
-            </div>
-            <div class="portalHeroMetaCard">
-              <span>아이템</span>
-              <b id="heroSelectedItem">-</b>
-            </div>
+        <div class="portalHeroQuickInfo compact heroSelectionCards">
+          <div class="portalHeroMetaCard">
+            <span>선택 강사</span>
+            <b id="heroSelectedInstructor">-</b>
+          </div>
+          <div class="portalHeroMetaCard">
+            <span>아이템</span>
+            <b id="heroSelectedItem">-</b>
           </div>
         </div>
       </section>
@@ -115,11 +125,11 @@
           </div>
         </div>
 
-        <section id="landingStatsGrid" class="portalStatsGrid compact"></section>
+        <section id="landingStatsGrid" class="portalStatsGrid compact slimCountGrid"></section>
 
-        <section class="portalDashboardGrid simplifiedDashboardGrid">
+        <section class="portalDashboardGrid simplifiedDashboardGrid emphasisDashboardGrid">
           <div class="portalMainColumn">
-            <article class="portalPanel portalRankingPanel compactPanel">
+            <article class="portalPanel portalRankingPanel compactPanel emphasisRankingPanel">
               <div class="portalSectionHead compact rankingHeadBar">
                 <div>
                   <div class="portalSectionEyebrow">RANKING</div>

@@ -25,6 +25,10 @@ const els = {
   categoryCount: $('landingCategoryCount'),
   heroSelectedInstructor: $('heroSelectedInstructor'),
   heroSelectedItem: $('heroSelectedItem'),
+  heroTotalSpend: $('heroTotalSpend'),
+  heroTotalRevenue: $('heroTotalRevenue'),
+  heroAvgRoas: $('heroAvgRoas'),
+  heroBestLabel: $('heroBestLabel'),
   sidebarNav: $('sidebarCategoryNav'),
   statsGrid: $('landingStatsGrid'),
   spotlight: $('landingSpotlight'),
@@ -283,15 +287,17 @@ function renderStats() {
   if (els.instructorCount) els.instructorCount.textContent = fmtInt(filtered.length);
   if (els.projectCount) els.projectCount.textContent = fmtInt(totalProjects);
   if (els.categoryCount) els.categoryCount.textContent = fmtInt(CATEGORY_CONFIG.length);
+  if (els.heroTotalSpend) els.heroTotalSpend.textContent = fmtWon(totalSpend);
+  if (els.heroTotalRevenue) els.heroTotalRevenue.textContent = fmtWon(totalRevenue);
+  if (els.heroAvgRoas) els.heroAvgRoas.textContent = fmtRoas(avgRoas);
+  if (els.heroBestLabel) els.heroBestLabel.textContent = best ? `1위 ${best.instructor} · ${best.item}` : '표시할 항목 없음';
   const cards = [
     { label: '항목', value: `${fmtInt(filtered.length)}개`, sub: '강사·아이템 단위' },
     { label: '프로젝트', value: `${fmtInt(totalProjects)}개`, sub: '등록 기수 합산' },
-    { label: '광고비', value: fmtWon(totalSpend), sub: '일예산 합산' },
-    { label: '실매출', value: fmtWon(totalRevenue), sub: '강사·아이템 합산' },
-    { label: '평균 ROAS', value: fmtRoas(avgRoas), sub: best ? `현재 1위 ${best.instructor} · ${best.item}` : '표시할 항목 없음' }
+    { label: '현재 1위', value: best ? `${best.instructor}` : '-', sub: best ? best.item : '표시할 항목 없음' }
   ];
   els.statsGrid.innerHTML = cards.map((card) => `
-    <article class="portalStatCard">
+    <article class="portalStatCard slimStatCard">
       <div class="portalStatLabel">${esc(card.label)}</div>
       <div class="portalStatValue">${esc(card.value)}</div>
       <div class="portalStatSub">${esc(card.sub)}</div>
@@ -346,11 +352,11 @@ function renderRankingTable() {
     <tr class="${selectedEntityKey === item.key ? 'is-active' : ''}" data-rank-key="${esc(item.key)}">
       <td class="center"><span class="portalRankBadge ${index < 3 ? 'top3' : ''}">${index + 1}</span></td>
       <td class="cellInstructor">${esc(item.instructor)}</td>
-      <td class="cellItem">${esc(item.item)}</td>
-      <td class="center">${fmtInt(item.projectCount)}개</td>
-      <td class="num">${fmtWon(item.spend)}</td>
-      <td class="num">${fmtWon(item.revenue)}</td>
-      <td class="center"><span class="portalRoasValue">${esc(fmtRoas(item.roas))}</span></td>
+      <td class="cellItem" title="${esc(item.item)}">${esc(item.item)}</td>
+      <td class="center cellProjects">${fmtInt(item.projectCount)}개</td>
+      <td class="num spendCell">${fmtWon(item.spend)}</td>
+      <td class="num revenueCell">${fmtWon(item.revenue)}</td>
+      <td class="center roasCell"><span class="portalRoasValue emphasisRoas">${esc(fmtRoas(item.roas))}</span></td>
       <td class="center"><button type="button" class="portalRowAction" data-open-inst="${esc(item.instructor)}" data-open-item="${esc(item.item)}">열기</button></td>
     </tr>
   `).join('');
@@ -360,16 +366,16 @@ function renderRankingTable() {
       <span>광고비 기준: 일예산 합산</span>
     </div>
     <div class="portalRankingTableWrap">
-      <table class="portalRankingTable compactTable entityTable">
+      <table class="portalRankingTable compactTable entityTable emphasisTable">
         <thead>
           <tr>
-            <th class="center" style="width:60px">순위</th>
-            <th style="width:110px">강사</th>
-            <th>아이템</th>
-            <th class="center" style="width:84px">기수</th>
-            <th style="width:150px">광고비</th>
-            <th style="width:160px">실매출</th>
-            <th class="center" style="width:90px">ROAS</th>
+            <th class="center" style="width:56px">순위</th>
+            <th style="width:104px">강사</th>
+            <th style="width:120px">아이템</th>
+            <th class="center" style="width:72px">기수</th>
+            <th style="width:176px">광고비</th>
+            <th style="width:188px">실매출</th>
+            <th class="center" style="width:96px">ROAS</th>
             <th class="center" style="width:78px">상세</th>
           </tr>
         </thead>

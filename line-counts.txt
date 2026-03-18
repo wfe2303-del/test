@@ -8,10 +8,10 @@
    523 ./js/08-events-init.js
     50 ./js/00-bootstrap.js
    153 ./js/09-instructor-pages.js
-   464 ./js/landing.js
+   470 ./js/landing.js
   1110 ./styles/main.css
-   733 ./styles/landing-dashboard.css
+   901 ./styles/landing-dashboard.css
    643 ./views/app-shell.html
-   171 ./index.html
+   181 ./index.html
     17 ./instructor.html
-  7751 total
+  7935 total
