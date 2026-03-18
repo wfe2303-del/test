@@ -1,4 +1,3 @@
-
 const SUPABASE_URL = 'https://eaukbojyuygwhkaxdvnx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhdWtib2p5dXlnd2hrYXhkdm54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTk0OTMsImV4cCI6MjA4ODc3NTQ5M30.0IAiljx47666xWxJq5N_kDmjPUpESmibPqEjDtb2TRc';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -20,7 +19,6 @@ const els = {
   loginPw: $('landingLoginPw'),
   loginBtn: $('landingLoginBtn'),
   loginMsg: $('landingLoginMsg'),
-  searchMain: $('landingInstructorSearch'),
   searchSidebar: $('sidebarInstructorSearch'),
   instructorCount: $('landingInstructorCount'),
   projectCount: $('landingProjectCount'),
@@ -40,8 +38,8 @@ const els = {
 
 let authSession = null;
 let projectRows = [];
-let instructorStats = [];
-let selectedInstructor = '';
+let entityStats = [];
+let selectedEntityKey = '';
 let selectedCategoryId = CATEGORY_CONFIG[0].id;
 let categoryOpen = true;
 let rankingSortMetric = 'roas';
@@ -91,6 +89,9 @@ function parseCohortLabel(label) {
   const numberMatch = cohortText.match(/(\d+)/);
   return { item, cohortText, cohortNo: numberMatch ? Number(numberMatch[1]) : NaN };
 }
+function makeEntityKey(instructor, item) {
+  return `${String(instructor || '').trim()}||${String(item || '기타').trim()}`;
+}
 function getLoginAlias(email) {
   const found = Object.entries(LOGIN_ID_MAP).find(([, mappedEmail]) => mappedEmail === email);
   return found?.[0] || email || '미로그인';
@@ -98,10 +99,12 @@ function getLoginAlias(email) {
 function getLoginEmailFromId(id) {
   return LOGIN_ID_MAP[String(id || '').trim().toLowerCase()] || '';
 }
-function openInstructorPage(name) {
-  if (!name) return;
-  const url = `./instructor.html?instructor=${encodeURIComponent(name)}`;
-  window.open(url, '_blank');
+function openInstructorPage(instructor, item = '') {
+  if (!instructor) return;
+  const params = new URLSearchParams();
+  params.set('instructor', instructor);
+  if (item) params.set('item', item);
+  window.open(`./instructor.html?${params.toString()}`, '_blank');
 }
 async function ensureAuth() {
   const { data: { session }, error } = await sb.auth.getSession();
@@ -152,73 +155,73 @@ async function loadDashboardData() {
     .order('cohort', { ascending: true });
   if (error) throw error;
   projectRows = Array.isArray(projects) ? projects : [];
-  buildInstructorStats();
+  buildEntityStats();
   renderAll();
 }
-function buildInstructorStats() {
+function buildEntityStats() {
   const map = new Map();
   for (const row of projectRows) {
-    const name = String(row.instructor || '').trim();
-    if (!name) continue;
+    const instructor = String(row.instructor || '').trim();
+    if (!instructor) continue;
     const parsed = parseCohortLabel(row.cohort);
     const item = parsed.item || '기타';
     const spend = Number(row.daily_budget || 0);
     const revenue = Number(row.actual_revenue || 0);
     const createdAt = row.created_at || '';
-    if (!map.has(name)) {
-      map.set(name, {
-        name,
+    const key = makeEntityKey(instructor, item);
+    if (!map.has(key)) {
+      map.set(key, {
+        key,
+        instructor,
+        item,
         categoryId: CATEGORY_CONFIG[0].id,
         projectCount: 0,
         spend: 0,
         revenue: 0,
         cohorts: [],
-        itemCountMap: new Map(),
         latestCreatedAt: '',
         latestProject: null
       });
     }
-    const acc = map.get(name);
+    const acc = map.get(key);
     acc.projectCount += 1;
     acc.spend += spend;
     acc.revenue += revenue;
     acc.cohorts.push(String(row.cohort || '').trim());
-    acc.itemCountMap.set(item, (acc.itemCountMap.get(item) || 0) + 1);
     if (!acc.latestCreatedAt || new Date(createdAt) > new Date(acc.latestCreatedAt)) {
       acc.latestCreatedAt = createdAt;
       acc.latestProject = row;
     }
   }
-  instructorStats = [...map.values()].map((item) => {
-    const topItem = [...item.itemCountMap.entries()].sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0]), 'ko'))[0]?.[0] || '기타';
-    return { ...item, topItem, roas: item.spend > 0 ? item.revenue / item.spend : 0 };
-  });
-  if (!selectedInstructor && instructorStats.length) selectedInstructor = getSortedInstructorStats()[0]?.name || instructorStats[0].name;
-  if (selectedInstructor && !instructorStats.find((row) => row.name === selectedInstructor)) {
-    selectedInstructor = getSortedInstructorStats()[0]?.name || '';
+  entityStats = [...map.values()].map((item) => ({
+    ...item,
+    roas: item.spend > 0 ? item.revenue / item.spend : 0
+  }));
+  const sorted = getSortedEntityStats();
+  if (!selectedEntityKey && sorted.length) selectedEntityKey = sorted[0].key;
+  if (selectedEntityKey && !entityStats.find((row) => row.key === selectedEntityKey)) {
+    selectedEntityKey = sorted[0]?.key || '';
   }
 }
-function getCombinedSearch() {
-  const side = String(els.searchSidebar?.value || '').trim();
-  const main = String(els.searchMain?.value || '').trim();
-  return `${side} ${main}`.trim().toLowerCase();
+function getSearchKeyword() {
+  return String(els.searchSidebar?.value || '').trim().toLowerCase();
 }
-function getFilteredInstructorStats() {
-  const keyword = getCombinedSearch();
-  let list = instructorStats.filter((item) => item.categoryId === selectedCategoryId);
+function getFilteredEntityStats() {
+  const keyword = getSearchKeyword();
+  let list = entityStats.filter((item) => item.categoryId === selectedCategoryId);
   if (keyword) {
     list = list.filter((item) => {
-      const haystack = [item.name, item.topItem, ...(item.cohorts || [])].join(' ').toLowerCase();
+      const haystack = [item.instructor, item.item, ...(item.cohorts || [])].join(' ').toLowerCase();
       return haystack.includes(keyword);
     });
   }
   return list;
 }
-function compareInstructor(a, b, metric = rankingSortMetric, order = rankingSortOrder) {
+function compareEntity(a, b, metric = rankingSortMetric, order = rankingSortOrder) {
   const direction = order === 'asc' ? 1 : -1;
   let result = 0;
   if (metric === 'name') {
-    result = String(a.name).localeCompare(String(b.name), 'ko');
+    result = String(`${a.instructor} ${a.item}`).localeCompare(String(`${b.instructor} ${b.item}`), 'ko');
   } else if (metric === 'spend') {
     result = Number(a.spend || 0) - Number(b.spend || 0);
   } else if (metric === 'revenue') {
@@ -228,59 +231,64 @@ function compareInstructor(a, b, metric = rankingSortMetric, order = rankingSort
   } else {
     result = Number(a.roas || 0) - Number(b.roas || 0);
   }
-  if (result === 0 && metric !== 'name') result = String(a.name).localeCompare(String(b.name), 'ko');
+  if (result === 0 && metric !== 'name') {
+    result = String(`${a.instructor} ${a.item}`).localeCompare(String(`${b.instructor} ${b.item}`), 'ko');
+  }
   return result * direction;
 }
-function getSortedInstructorStats() {
-  return getFilteredInstructorStats().slice().sort((a, b) => compareInstructor(a, b));
+function getSortedEntityStats() {
+  return getFilteredEntityStats().slice().sort((a, b) => compareEntity(a, b));
 }
-function getSelectedInstructorStat() {
-  const filtered = getSortedInstructorStats();
-  return filtered.find((item) => item.name === selectedInstructor) || filtered[0] || instructorStats.find((item) => item.name === selectedInstructor) || null;
+function getSelectedEntity() {
+  const filtered = getSortedEntityStats();
+  return filtered.find((item) => item.key === selectedEntityKey) || filtered[0] || entityStats.find((item) => item.key === selectedEntityKey) || null;
 }
 function syncHero() {
-  const selected = getSelectedInstructorStat();
-  if (els.heroSelectedInstructor) els.heroSelectedInstructor.textContent = selected?.name || '-';
-  if (els.heroSelectedItem) els.heroSelectedItem.textContent = selected?.topItem || '-';
+  const selected = getSelectedEntity();
+  if (els.heroSelectedInstructor) els.heroSelectedInstructor.textContent = selected?.instructor || '-';
+  if (els.heroSelectedItem) els.heroSelectedItem.textContent = selected?.item || '-';
 }
 function renderSidebar() {
   if (!els.sidebarNav) return;
-  const filtered = getFilteredInstructorStats().slice().sort((a, b) => String(a.name).localeCompare(String(b.name), 'ko'));
-  const selected = getSelectedInstructorStat();
+  const filtered = getFilteredEntityStats().slice().sort((a, b) => {
+    const byName = String(a.instructor).localeCompare(String(b.instructor), 'ko');
+    if (byName !== 0) return byName;
+    return String(a.item).localeCompare(String(b.item), 'ko');
+  });
   const rows = filtered.map((item) => `
-    <button type="button" class="portalInstructorNavButton ${selected?.name === item.name ? 'is-active' : ''}" data-inst="${esc(item.name)}">
+    <button type="button" class="portalInstructorNavButton ${selectedEntityKey === item.key ? 'is-active' : ''}" data-entity-key="${esc(item.key)}">
       <span class="portalInstructorNavMain">
-        <strong>${esc(item.name)}</strong>
-        <span>${esc(item.topItem)} · ${fmtInt(item.projectCount)}기수</span>
+        <strong>${esc(item.instructor)}</strong>
+        <span>${esc(item.item)} · ${fmtInt(item.projectCount)}기수</span>
       </span>
       <span class="portalInstructorNavMetric">${esc(fmtRoas(item.roas))}</span>
     </button>
   `).join('');
   els.sidebarNav.innerHTML = categoryOpen ? (rows || '<div class="portalEmptyState" style="min-height:120px">검색 결과가 없어.</div>') : '';
-  els.sidebarNav.querySelectorAll('[data-inst]').forEach((button) => {
+  els.sidebarNav.querySelectorAll('[data-entity-key]').forEach((button) => {
     button.addEventListener('click', () => {
-      selectedInstructor = button.dataset.inst || '';
+      selectedEntityKey = button.dataset.entityKey || '';
       renderAll();
     });
   });
 }
 function renderStats() {
   if (!els.statsGrid) return;
-  const filtered = getFilteredInstructorStats();
+  const filtered = getFilteredEntityStats();
   const totalProjects = filtered.reduce((sum, item) => sum + Number(item.projectCount || 0), 0);
   const totalSpend = filtered.reduce((sum, item) => sum + Number(item.spend || 0), 0);
   const totalRevenue = filtered.reduce((sum, item) => sum + Number(item.revenue || 0), 0);
   const avgRoas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
-  const best = getSortedInstructorStats()[0] || null;
+  const best = getSortedEntityStats()[0] || null;
   if (els.instructorCount) els.instructorCount.textContent = fmtInt(filtered.length);
   if (els.projectCount) els.projectCount.textContent = fmtInt(totalProjects);
   if (els.categoryCount) els.categoryCount.textContent = fmtInt(CATEGORY_CONFIG.length);
   const cards = [
-    { label: '강사', value: `${fmtInt(filtered.length)}명`, sub: '현재 카테고리' },
-    { label: '프로젝트', value: `${fmtInt(totalProjects)}개`, sub: '전체 기수 합산' },
+    { label: '항목', value: `${fmtInt(filtered.length)}개`, sub: '강사·아이템 단위' },
+    { label: '프로젝트', value: `${fmtInt(totalProjects)}개`, sub: '등록 기수 합산' },
     { label: '광고비', value: fmtWon(totalSpend), sub: '일예산 합산' },
-    { label: '실매출', value: fmtWon(totalRevenue), sub: '강사 전체 합산' },
-    { label: '평균 ROAS', value: fmtRoas(avgRoas), sub: best ? `현재 1위 ${best.name}` : '표시할 강사 없음' }
+    { label: '실매출', value: fmtWon(totalRevenue), sub: '강사·아이템 합산' },
+    { label: '평균 ROAS', value: fmtRoas(avgRoas), sub: best ? `현재 1위 ${best.instructor} · ${best.item}` : '표시할 항목 없음' }
   ];
   els.statsGrid.innerHTML = cards.map((card) => `
     <article class="portalStatCard">
@@ -292,10 +300,10 @@ function renderStats() {
 }
 function renderSpotlight() {
   if (!els.spotlight) return;
-  const selected = getSelectedInstructorStat();
+  const selected = getSelectedEntity();
   syncHero();
   if (!selected) {
-    els.spotlight.innerHTML = '<div class="portalEmptyState">선택 가능한 강사가 없어.</div>';
+    els.spotlight.innerHTML = '<div class="portalEmptyState">선택 가능한 항목이 없어.</div>';
     if (els.spotlightOpenBtn) els.spotlightOpenBtn.disabled = true;
     return;
   }
@@ -304,15 +312,15 @@ function renderSpotlight() {
   els.spotlight.innerHTML = `
     <div class="portalSpotlightHead compactSpotlightHead">
       <div>
-        <div class="portalSpotlightName">${esc(selected.name)}</div>
-        <div class="portalSpotlightSub">대표 아이템 ${esc(selected.topItem)} · 등록 기수 ${fmtInt(selected.projectCount)}개 · 최근 ${esc(fmtDate(selected.latestCreatedAt))}</div>
+        <div class="portalSpotlightName">${esc(selected.instructor)}</div>
+        <div class="portalSpotlightSub">${esc(selected.item)} · 등록 기수 ${fmtInt(selected.projectCount)}개 · 최근 ${esc(fmtDate(selected.latestCreatedAt))}</div>
       </div>
       <div class="portalRoasPill">ROAS ${esc(fmtRoas(selected.roas))}</div>
     </div>
     <div class="portalMetricGrid compactMetricGrid">
       <div class="portalMetricCard"><span>총 광고비</span><b>${fmtWon(selected.spend)}</b></div>
       <div class="portalMetricCard"><span>총 실매출</span><b>${fmtWon(selected.revenue)}</b></div>
-      <div class="portalMetricCard"><span>대표 아이템</span><b>${esc(selected.topItem)}</b></div>
+      <div class="portalMetricCard"><span>아이템</span><b>${esc(selected.item)}</b></div>
       <div class="portalMetricCard"><span>기수 수</span><b>${fmtInt(selected.projectCount)}개</b></div>
     </div>
     <div class="portalChipList compactChipList">
@@ -325,7 +333,7 @@ function getSortLabel() {
     roas: 'ROAS',
     spend: '광고비',
     revenue: '실매출',
-    projects: '프로젝트 수',
+    projects: '기수 수',
     name: '가나다순'
   };
   const orderMap = { asc: '오름차순', desc: '내림차순' };
@@ -333,20 +341,17 @@ function getSortLabel() {
 }
 function renderRankingTable() {
   if (!els.rankingWrap) return;
-  const filtered = getSortedInstructorStats();
+  const filtered = getSortedEntityStats();
   const rows = filtered.map((item, index) => `
-    <tr class="${selectedInstructor === item.name ? 'is-active' : ''}" data-rank-inst="${esc(item.name)}">
+    <tr class="${selectedEntityKey === item.key ? 'is-active' : ''}" data-rank-key="${esc(item.key)}">
       <td class="center"><span class="portalRankBadge ${index < 3 ? 'top3' : ''}">${index + 1}</span></td>
-      <td>
-        <div class="portalInstructorCell">
-          <strong>${esc(item.name)}</strong>
-          <span>${esc(item.topItem)} · ${fmtInt(item.projectCount)}기수</span>
-        </div>
-      </td>
+      <td class="cellInstructor">${esc(item.instructor)}</td>
+      <td class="cellItem">${esc(item.item)}</td>
+      <td class="center">${fmtInt(item.projectCount)}개</td>
       <td class="num">${fmtWon(item.spend)}</td>
       <td class="num">${fmtWon(item.revenue)}</td>
       <td class="center"><span class="portalRoasValue">${esc(fmtRoas(item.roas))}</span></td>
-      <td class="center"><button type="button" class="portalRowAction" data-open-inst="${esc(item.name)}">열기</button></td>
+      <td class="center"><button type="button" class="portalRowAction" data-open-inst="${esc(item.instructor)}" data-open-item="${esc(item.item)}">열기</button></td>
     </tr>
   `).join('');
   els.rankingWrap.innerHTML = `
@@ -355,34 +360,36 @@ function renderRankingTable() {
       <span>광고비 기준: 일예산 합산</span>
     </div>
     <div class="portalRankingTableWrap">
-      <table class="portalRankingTable compactTable">
+      <table class="portalRankingTable compactTable entityTable">
         <thead>
           <tr>
-            <th class="center" style="width:64px">순위</th>
-            <th>강사</th>
-            <th style="width:160px">광고비</th>
+            <th class="center" style="width:60px">순위</th>
+            <th style="width:110px">강사</th>
+            <th>아이템</th>
+            <th class="center" style="width:84px">기수</th>
+            <th style="width:150px">광고비</th>
             <th style="width:160px">실매출</th>
-            <th class="center" style="width:108px">ROAS</th>
-            <th class="center" style="width:92px">상세</th>
+            <th class="center" style="width:90px">ROAS</th>
+            <th class="center" style="width:78px">상세</th>
           </tr>
         </thead>
         <tbody>
-          ${rows || '<tr><td colspan="6"><div class="portalEmptyState">표시할 강사가 없어.</div></td></tr>'}
+          ${rows || '<tr><td colspan="8"><div class="portalEmptyState">표시할 항목이 없어.</div></td></tr>'}
         </tbody>
       </table>
     </div>
   `;
-  els.rankingWrap.querySelectorAll('[data-rank-inst]').forEach((row) => {
+  els.rankingWrap.querySelectorAll('[data-rank-key]').forEach((row) => {
     row.addEventListener('click', (event) => {
       if (event.target?.closest?.('[data-open-inst]')) return;
-      selectedInstructor = row.dataset.rankInst || '';
+      selectedEntityKey = row.dataset.rankKey || '';
       renderAll();
     });
   });
   els.rankingWrap.querySelectorAll('[data-open-inst]').forEach((button) => {
     button.addEventListener('click', (event) => {
       event.stopPropagation();
-      openInstructorPage(button.dataset.openInst || '');
+      openInstructorPage(button.dataset.openInst || '', button.dataset.openItem || '');
     });
   });
 }
@@ -412,17 +419,15 @@ function wireEvents() {
     try {
       await logout();
       projectRows = [];
-      instructorStats = [];
-      selectedInstructor = '';
+      entityStats = [];
+      selectedEntityKey = '';
       updateAuthUi();
     } catch (err) {
       console.error(err);
       alert(err?.message || '로그아웃 실패');
     }
   });
-  const searchHandler = () => renderAll();
-  els.searchMain?.addEventListener('input', searchHandler);
-  els.searchSidebar?.addEventListener('input', searchHandler);
+  els.searchSidebar?.addEventListener('input', () => renderAll());
   els.sortMetric?.addEventListener('change', () => {
     rankingSortMetric = els.sortMetric.value || 'roas';
     if (rankingSortMetric === 'name') rankingSortOrder = 'asc';
@@ -433,7 +438,10 @@ function wireEvents() {
     rankingSortOrder = els.sortOrder.value || 'desc';
     renderAll();
   });
-  els.spotlightOpenBtn?.addEventListener('click', () => openInstructorPage(selectedInstructor));
+  els.spotlightOpenBtn?.addEventListener('click', () => {
+    const selected = getSelectedEntity();
+    openInstructorPage(selected?.instructor || '', selected?.item || '');
+  });
   els.sidebarRootToggle?.addEventListener('click', () => {
     categoryOpen = !categoryOpen;
     els.sidebarRootToggle.classList.toggle('is-open', categoryOpen);

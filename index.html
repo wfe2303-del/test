@@ -72,8 +72,7 @@
     <main class="portalMain">
       <header class="portalTopbar compactTopbar">
         <div>
-          <div class="portalTopbarEyebrow">운영 대시보드</div>
-          <h1>강사 랭킹 · 카테고리 허브</h1>
+          <h1>부업 대시보드</h1>
         </div>
         <div class="portalTopbarRight">
           <div class="portalUserCard">
@@ -87,34 +86,30 @@
         </div>
       </header>
 
-      <section class="portalHeroCompact">
-        <div class="portalHeroText">
-          <div class="portalHeroTitleRow">
-            <h2>강사 성과 대시보드</h2>
-            <div class="portalHeroTag">광고비 기준: 일예산 합산</div>
-          </div>
-          <p>필요한 지표만 남기고, 랭킹과 강사 상세 진입에 집중한 메인 허브.</p>
+      <section class="portalHeroCompact portalHeroPanel">
+        <div class="portalHeroPanelLeft">
+          <div class="portalHeroSmallLabel">강사/아이템 기준 랭킹</div>
+          <h2>부업 카테고리 성과 보드</h2>
         </div>
-        <div class="portalHeroQuickInfo compact">
-          <div class="portalHeroMetaCard">
-            <span>선택 강사</span>
-            <b id="heroSelectedInstructor">-</b>
-          </div>
-          <div class="portalHeroMetaCard">
-            <span>대표 아이템</span>
-            <b id="heroSelectedItem">-</b>
+        <div class="portalHeroPanelRight">
+          <div class="portalHeroTag">광고비 기준: 일예산 합산</div>
+          <div class="portalHeroQuickInfo compact">
+            <div class="portalHeroMetaCard">
+              <span>선택 강사</span>
+              <b id="heroSelectedInstructor">-</b>
+            </div>
+            <div class="portalHeroMetaCard">
+              <span>아이템</span>
+              <b id="heroSelectedItem">-</b>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="landingContent" class="portalContent tightened">
-        <div class="portalUtilityRow compactUtility">
-          <div class="portalSearchBlock compactSearchBlock">
-            <label class="portalFieldLabel" for="landingInstructorSearch">대시보드 검색</label>
-            <input id="landingInstructorSearch" type="text" placeholder="강사명 / 아이템 / 기수 검색"/>
-          </div>
+        <div class="portalUtilityRow compactUtility utilityNoSearch">
           <div class="portalChipRow" id="landingMetaChips">
-            <span class="portalMetaChip">강사 <b id="landingInstructorCount">0</b></span>
+            <span class="portalMetaChip">항목 <b id="landingInstructorCount">0</b></span>
             <span class="portalMetaChip">프로젝트 <b id="landingProjectCount">0</b></span>
             <span class="portalMetaChip">카테고리 <b id="landingCategoryCount">0</b></span>
           </div>
@@ -128,7 +123,7 @@
               <div class="portalSectionHead compact rankingHeadBar">
                 <div>
                   <div class="portalSectionEyebrow">RANKING</div>
-                  <h3>강사 랭킹</h3>
+                  <h3>강사 · 아이템 랭킹</h3>
                 </div>
                 <div class="rankingControlGroup">
                   <label class="inlineField">
@@ -159,7 +154,7 @@
               <div class="portalSectionHead compact spotlightHeadCompact">
                 <div>
                   <div class="portalSectionEyebrow">SPOTLIGHT</div>
-                  <h3>선택 강사</h3>
+                  <h3>선택 항목</h3>
                 </div>
                 <button id="spotlightOpenBtn" type="button" class="primaryBtn">강사 페이지 열기</button>
               </div>

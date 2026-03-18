@@ -18,14 +18,19 @@ const LOGIN_ID_MAP = {
 const PAGE_CONTEXT = (() => {
   const params = new URLSearchParams(window.location.search || '');
   const instructor = decodeURIComponent(params.get('instructor') || '').trim();
+  const item = decodeURIComponent(params.get('item') || '').trim();
   const page = document.body?.dataset?.page || '';
   return {
     page,
-    instructorFilter: instructor
+    instructorFilter: instructor,
+    itemFilter: item
   };
 })();
 function getPageInstructorFilter(){
   return PAGE_CONTEXT.instructorFilter || '';
+}
+function getPageItemFilter(){
+  return PAGE_CONTEXT.itemFilter || '';
 }
 function isInstructorPage(){
   return !!getPageInstructorFilter();

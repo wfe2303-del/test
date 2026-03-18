@@ -44,6 +44,7 @@
   function renderInstructorHero(){
     if(!instructorHero) return;
     const inst = getPageInstructorFilter ? getPageInstructorFilter() : '';
+    const itemFilter = getPageItemFilter ? getPageItemFilter() : '';
     if(!inst){
       instructorHero.style.display = 'none';
       return;
@@ -52,8 +53,9 @@
     ensureInstructorScopedCurrentProject();
     const scoped = sortProjectsForInstructor(listProjects());
     instructorHero.style.display = '';
-    pageInstructorTitle.textContent = `${inst} 강사 페이지`;
-    document.title = `${inst} · 강사별 DB보고서`;
+    const scopeTitle = itemFilter ? `${inst} · ${itemFilter}` : inst;
+    pageInstructorTitle.textContent = `${scopeTitle} 페이지`;
+    document.title = `${scopeTitle} · 강사별 DB보고서`;
     pageInstructorSub.textContent = scoped.length
       ? `등록 기수 ${fmtInt(scoped.length)}개 · 기수를 누르면 현재 프로젝트가 바로 바뀌어.`
       : '아직 등록된 기수가 없어.';
