@@ -3,45 +3,111 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>강사별 DB보고서 · 강사 목록</title>
+  <title>강사별 DB보고서 · 운영 대시보드</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="./styles/main.css"/>
 </head>
-<body data-page="landing">
-  <div class="landingWrap">
-    <header class="landingHeader">
-      <div>
-        <div class="landingEyebrow">ClassAround · Instructor Hub</div>
-        <h1>등록된 강사 목록</h1>
-        <p>강사를 누르면 새 창으로 해당 강사의 기수 목록과 비교 화면이 열려. 각 강사 페이지에서 기존 기능과 다음 기수 광고비 증액 예상 매출 계산기를 같이 볼 수 있어.</p>
-      </div>
-      <div class="landingAuth">
-        <span class="pill">로그인: <b id="landingAuthStatus">미로그인</b></span>
-        <button id="landingLogout" style="display:none">로그아웃</button>
-      </div>
-    </header>
-
-    <section id="landingLoginCard" class="landingCard">
-      <h2>로그인</h2>
-      <p class="landingMuted">프로젝트 목록을 보려면 먼저 로그인해야 해.</p>
-      <div class="landingLoginGrid">
-        <input id="landingLoginId" type="text" placeholder="아이디" value="classaround"/>
-        <input id="landingLoginPw" type="password" placeholder="비밀번호"/>
-        <button id="landingLoginBtn" class="btn-primary">로그인</button>
-      </div>
-      <div id="landingLoginMsg" class="landingError"></div>
-    </section>
-
-    <section id="landingContent" style="display:none">
-      <div class="landingToolbar">
-        <input id="landingInstructorSearch" type="text" placeholder="강사명 검색"/>
-        <div class="landingMeta">
-          <span class="badge">강사 <b id="landingInstructorCount">0</b>명</span>
-          <span class="badge">프로젝트 <b id="landingProjectCount">0</b>개</span>
+<body data-page="landing-dashboard">
+  <div class="dashShell">
+    <aside class="dashSidebar">
+      <div class="dashBrand">
+        <div class="dashBrandLogo">CA</div>
+        <div>
+          <div class="dashBrandName">ClassAround</div>
+          <div class="dashBrandSub">Instructor Dashboard</div>
         </div>
       </div>
-      <div id="landingInstructorGrid" class="landingInstructorGrid"></div>
-    </section>
+
+      <div class="dashSidebarBlock">
+        <label class="dashSidebarLabel" for="sidebarInstructorSearch">강사 검색</label>
+        <input id="sidebarInstructorSearch" type="text" placeholder="강사명 검색"/>
+      </div>
+
+      <nav id="sidebarCategoryNav" class="dashSidebarNav"></nav>
+    </aside>
+
+    <main class="dashMain">
+      <header class="dashTopbar">
+        <div>
+          <div class="dashEyebrow">운영 대시보드</div>
+          <h1>강사 랭킹 · 카테고리 허브</h1>
+          <p>광고비 대비 매출 중심으로 강사별 성과를 빠르게 보고, 좌측 카테고리에서 강사를 골라 상세 페이지로 이동할 수 있어.</p>
+        </div>
+        <div class="dashAuthBox">
+          <span class="pill">로그인: <b id="landingAuthStatus">미로그인</b></span>
+          <button id="landingLogout" style="display:none">로그아웃</button>
+        </div>
+      </header>
+
+      <section id="landingLoginCard" class="dashCard dashLoginCard">
+        <div class="dashSectionHead">
+          <div>
+            <div class="dashSectionEyebrow">AUTH</div>
+            <h2>로그인</h2>
+            <p>대시보드와 강사 상세 화면을 보려면 먼저 로그인해야 해.</p>
+          </div>
+        </div>
+        <div class="landingLoginGrid">
+          <input id="landingLoginId" type="text" placeholder="아이디" value="classaround"/>
+          <input id="landingLoginPw" type="password" placeholder="비밀번호"/>
+          <button id="landingLoginBtn" class="btn-primary">로그인</button>
+        </div>
+        <div id="landingLoginMsg" class="landingError"></div>
+      </section>
+
+      <section id="landingContent" class="dashContent" style="display:none">
+        <div class="dashContentTop">
+          <div class="dashSearchWrap">
+            <input id="landingInstructorSearch" type="text" placeholder="대시보드 강사 검색"/>
+          </div>
+          <div class="dashMeta">
+            <span class="badge">강사 <b id="landingInstructorCount">0</b>명</span>
+            <span class="badge">프로젝트 <b id="landingProjectCount">0</b>개</span>
+            <span class="badge">카테고리 <b id="landingCategoryCount">0</b>개</span>
+          </div>
+        </div>
+
+        <section id="landingStatsGrid" class="dashStatsGrid"></section>
+
+        <section class="dashBoardGrid">
+          <article class="dashCard dashPrimaryCard">
+            <div class="dashSectionHead">
+              <div>
+                <div class="dashSectionEyebrow">SPOTLIGHT</div>
+                <h2>선택 강사 요약</h2>
+                <p>좌측 메뉴나 랭킹에서 강사를 고르면 대표 지표를 바로 볼 수 있어.</p>
+              </div>
+              <div class="dashSectionActions">
+                <button id="spotlightOpenBtn" type="button" class="btn-primary">강사 페이지 열기</button>
+              </div>
+            </div>
+            <div id="landingSpotlight" class="dashSpotlight"></div>
+          </article>
+
+          <article class="dashCard">
+            <div class="dashSectionHead">
+              <div>
+                <div class="dashSectionEyebrow">CATEGORY</div>
+                <h2>카테고리 요약</h2>
+                <p>지금은 부업 카테고리만 먼저 적용해뒀고, 추후 폴더를 더 늘릴 수 있어.</p>
+              </div>
+            </div>
+            <div id="landingCategorySummary" class="dashCategorySummary"></div>
+          </article>
+        </section>
+
+        <section class="dashCard">
+          <div class="dashSectionHead">
+            <div>
+              <div class="dashSectionEyebrow">RANKING</div>
+              <h2>광고비 대비 매출 강사 랭킹</h2>
+              <p>기본 정렬은 ROAS 기준이야. 강사 행을 누르면 우측 요약이 바뀌고, 열기 버튼으로 상세 페이지로 이동할 수 있어.</p>
+            </div>
+          </div>
+          <div id="landingRankingTableWrap" class="dashTableWrap"></div>
+        </section>
+      </section>
+    </main>
   </div>
   <script src="./js/landing.js"></script>
 </body>
