@@ -521,3 +521,93 @@ button, input, select { max-width: 100%; }
   .card .hd h2{font-size:14px}
   .metricPickGrid{grid-template-columns:1fr}
 }
+
+
+/* ===== Responsive patch v6: tighter mobile sizing ===== */
+#view-main .table-wrap, #view-owned .table-wrap, #view-ads .table-wrap, #view-compare .table-wrap { overscroll-behavior-x: contain; }
+#view-main tbody td:nth-child(8), #view-main thead th:nth-child(8) { white-space: normal; min-width: 92px; }
+
+@media (max-width: 768px){
+  button, .btnLinkLike{padding:7px 9px;font-size:12px;border-radius:9px}
+  input[type="date"], input[type="number"], input[type="text"], input[type="password"], select{padding:8px 9px;font-size:12px;min-height:34px;border-radius:9px}
+  .card{border-radius:14px}
+  .card .hd{padding:11px 11px 0 11px}
+  .card .bd{padding:11px}
+  .card .hd h2{font-size:13px}
+  .card .hd .hint, .small, .legend, .note, .badge, .pill{font-size:11px}
+  .sep{margin:10px 0}
+  .kpi{gap:7px}
+  .kpi .box{padding:9px}
+  .kpi .box .lbl{font-size:11px;margin-bottom:4px}
+  .kpi .box .val{font-size:15px}
+  .kpi .box .sub{font-size:10.5px;margin-top:4px}
+  .chartBox{padding:8px;border-radius:12px}
+  .chartHead{margin-bottom:6px}
+  canvas{height:185px}
+  #chartCompare{height:205px}
+  .table-wrap{border-radius:12px}
+  table{min-width:840px}
+  thead th{padding:8px 8px;font-size:11px}
+  tbody td{padding:7px 8px;font-size:12px}
+  .vsTable thead th{padding:8px 8px;font-size:11px}
+  .vsTable tbody td{padding:8px 8px;font-size:12px}
+  .previewTable th,.previewTable td{padding:8px 9px;font-size:11px}
+  .choiceOpt{padding:10px}
+  .calendarTitle{font-size:13px}
+  .calCell{padding:6px;min-height:84px}
+  .calDate b{font-size:12px}
+  .calItem{font-size:10px;padding:4px 5px}
+
+  #view-main table{min-width:700px}
+  #view-owned table{min-width:620px !important}
+  #view-ads table{min-width:900px !important}
+  #view-compare .vsTable{min-width:760px}
+  #view-main thead th:first-child,
+  #view-main tbody td:first-child,
+  #view-owned thead th:first-child,
+  #view-owned tbody td:first-child,
+  #view-ads thead th:first-child,
+  #view-ads tbody td:first-child{min-width:82px}
+}
+
+@media (max-width: 480px){
+  .wrap, main{padding-left:8px;padding-right:8px}
+  .topbar{gap:8px}
+  .title h1{font-size:13px}
+  .tabs{gap:5px;padding-bottom:6px}
+  .tab{font-size:11px;padding:7px 9px;border-radius:9px;min-height:36px}
+  .projectMenuPanel{left:8px;right:8px;top:64px;padding:9px}
+  .menuTitle{font-size:13px}
+  .menuHint,.recentLabel,.menuResultMeta{font-size:10.5px}
+
+  .card .hd{padding:10px 10px 0 10px}
+  .card .bd{padding:10px}
+  .row{gap:7px}
+  .badge,.pill{padding:5px 7px;font-size:10.5px}
+
+  .kpi .box{padding:8px}
+  .kpi .box .val{font-size:14px}
+  .kpi .box .sub{font-size:10px}
+  canvas{height:170px}
+  #chartCompare{height:190px}
+
+  .table-wrap{margin:0 -2px}
+  thead th{padding:7px 7px;font-size:10.5px}
+  tbody td{padding:6px 7px;font-size:11px}
+  td.num{letter-spacing:-0.2px}
+  .vsTable thead th{padding:7px 7px;font-size:10.5px}
+  .vsTable tbody td{padding:7px 7px;font-size:11px}
+
+  #view-main table{min-width:640px}
+  #view-owned table{min-width:560px !important}
+  #view-ads table{min-width:820px !important}
+  #view-compare .vsTable{min-width:700px}
+  #view-main thead th:first-child,
+  #view-main tbody td:first-child,
+  #view-owned thead th:first-child,
+  #view-owned tbody td:first-child,
+  #view-ads thead th:first-child,
+  #view-ads tbody td:first-child{min-width:76px}
+  #view-main tbody td:nth-child(8), #view-main thead th:nth-child(8){min-width:80px}
+  .note{padding:8px 9px;line-height:1.4}
+}
