@@ -43,7 +43,6 @@ btnDupProj.addEventListener('click', duplicateProject);
 btnRenameProj?.addEventListener('click', renameProject);
 btnDelProj.addEventListener('click', deleteProject);
 btnImportProjectMetaBatch?.addEventListener('click', openMetaBatchUpload);
-btnImportProjectMetaBatchMenu?.addEventListener('click', openMetaBatchUpload);
 btnQuickMetaBatch?.addEventListener('click', openMetaBatchUpload);
 btnMobileMetaBatch?.addEventListener('click', openMetaBatchUpload);
 btnMobileMenu?.addEventListener('click', ()=> toggleProjectMenu());
@@ -139,11 +138,6 @@ btnLinkPrev.addEventListener('click', async ()=>{
 
   const id=(prevProjSelect.value||'').trim();
   if(!id) return alert('이전기수 프로젝트를 선택해줘');
-  const target = state.projects?.[id];
-  if(!target) return alert('선택한 이전기수 프로젝트를 찾지 못했어');
-  if(String(target.instructor||'').trim() !== String(p.instructor||'').trim()){
-    return alert('이전기수 연결은 같은 강사 내부 프로젝트끼리만 가능해');
-  }
 
   p.prevLink = { mode:'linked', prevProjectId:id, manual:{db:0,spend:0,revenue:0} };
 
@@ -287,7 +281,7 @@ fileInput.addEventListener('change', async ()=>{
         alert('ZIP 일괄등록은 .zip 파일만 지원');
         return;
       }
-      await importProjectsFromZip(f, ({ percent, text })=>updateLoadingProgress(percent, text));
+      await importProjectsFromZip(f);
       return;
     }
   } finally {
@@ -302,15 +296,14 @@ zipFileInput?.addEventListener('change', async (e)=>{
   const f = e.target?.files?.[0];
   try{
     if(!f) return;
-    showLoading('ZIP 광고DB 분석 중', 'ZIP 안의 CSV 파일을 읽어서 미리보기를 만들고 있어.');
-    updateLoadingProgress(2, 'ZIP 파일을 준비하는 중...');
+    showLoading('ZIP 광고DB 분석 중', 'ZIP 안의 구글/메타 파일을 읽어서 미리보기를 만들고 있어.');
     const name = String(f.name || '').toLowerCase();
     if(!name.endsWith('.zip')){
       alert('ZIP 일괄등록은 .zip 파일만 지원');
       return;
     }
     showToast('ZIP 광고DB 분석 중', `${f.name} 파일을 읽는 중이야. 잠시만.`);
-    await importProjectsFromZip(f, ({ percent, text })=>updateLoadingProgress(percent, text));
+    await importProjectsFromZip(f);
   }catch(err){
     console.error(err);
     alert(err?.message || 'ZIP 광고DB 미리보기 생성 실패');
@@ -326,9 +319,8 @@ btnZipPreviewCancel?.addEventListener('click', closeZipPreview);
 btnZipPreviewApply?.addEventListener('click', async ()=>{
   try{
     btnZipPreviewApply.disabled = true;
-    showLoading('광고DB 반영 중', '프로젝트를 만들고 ZIP 안의 CSV 광고DB를 서버에 저장하고 있어.');
-    updateLoadingProgress(3, '반영 준비 중...');
-    await applyZipAdsPreview(getZipDuplicateMode(), ({ percent, text })=>updateLoadingProgress(percent, text));
+    showLoading('광고DB 반영 중', '프로젝트를 만들고 ZIP 안의 구글/메타 광고DB를 서버에 저장하고 있어.');
+    await applyZipAdsPreview(getZipDuplicateMode());
   }catch(err){
     console.error(err);
     alert((err?.message || 'ZIP 광고DB 반영 실패') + (err?.details ? `\n\n상세: ${err.details}` : '') + (err?.hint ? `\n힌트: ${err.hint}` : ''));

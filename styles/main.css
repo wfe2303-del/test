@@ -448,17 +448,11 @@ button, input, select { max-width: 100%; }
 .batchActions > *{flex:1 1 180px}
 .batchCard{border:1px solid #dbeafe;background:linear-gradient(180deg,#f8fbff,#fff)}
 .batchGuide b{color:#0f172a}
-.mobileQuickBar{
-  display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:95;
-  gap:8px;padding:10px;border-radius:18px;background:rgba(255,255,255,.96);
-  border:1px solid rgba(203,213,225,.9);box-shadow:0 18px 40px rgba(15,23,42,.16);backdrop-filter:blur(10px)
-}
-.mobileQuickBar button{flex:1;min-height:44px;border-radius:12px}
 .projectMenuPanel.open{animation:menuIn .18s ease-out}
 @keyframes menuIn{from{transform:translateY(8px);opacity:.5}to{transform:translateY(0);opacity:1}}
 
 @media (max-width: 980px){
-  main{padding-bottom:90px}
+  main{padding-bottom:12px}
   header{position:static}
   .wrap{padding-bottom:8px}
   .topbar{gap:10px}
@@ -471,13 +465,13 @@ button, input, select { max-width: 100%; }
   }
   .actions .pill:first-child{grid-column:1 / -1}
   .projectMenuPanel{
-    top:auto;
-    bottom:78px;
+    position:fixed;
+    top:76px;
     left:10px;
     right:10px;
     width:auto;
     max-height:78vh;
-    border-radius:20px;
+    border-radius:16px;
   }
   .menuHead{position:sticky;top:0;background:#fff;z-index:2;padding-bottom:8px}
   .menuActions{grid-template-columns:1fr 1fr}
@@ -502,15 +496,14 @@ button, input, select { max-width: 100%; }
   .metricChip{width:100%}
   .calendarGrid{grid-template-columns:1fr}
   .calCell{min-height:86px}
-  .mobileQuickBar{display:flex}
 }
 @media (max-width: 640px){
-  main{padding:10px 10px 96px 10px}
+  main{padding:10px}
   .actions{grid-template-columns:1fr 1fr}
   .actions .pill:nth-child(2),
   .actions .pill:nth-child(3){grid-column:auto}
   .projectMenuPanel{
-    left:8px;right:8px;bottom:74px;max-height:80vh;padding:10px
+    top:68px;left:8px;right:8px;max-height:80vh;padding:10px
   }
   .menuActions{grid-template-columns:1fr}
   .tabs{top:0}
@@ -520,8 +513,6 @@ button, input, select { max-width: 100%; }
   canvas,#chartCompare{height:220px}
   table{min-width:760px}
   .batchActions{display:grid;grid-template-columns:1fr}
-  .mobileQuickBar{left:8px;right:8px;bottom:8px;padding:8px}
-  .mobileQuickBar button{font-size:12px;padding:10px 8px}
 }
 @media (max-width: 420px){
   .actions{grid-template-columns:1fr}
@@ -531,90 +522,92 @@ button, input, select { max-width: 100%; }
   .metricPickGrid{grid-template-columns:1fr}
 }
 
-/* ===== Mobile hotfix v6c: actually tighten layout on phone widths ===== */
+
+/* ===== Responsive patch v6: tighter mobile sizing ===== */
+#view-main .table-wrap, #view-owned .table-wrap, #view-ads .table-wrap, #view-compare .table-wrap { overscroll-behavior-x: contain; }
+#view-main tbody td:nth-child(8), #view-main thead th:nth-child(8) { white-space: normal; min-width: 92px; }
+
 @media (max-width: 768px){
-  html{-webkit-text-size-adjust:100%}
-  .wrap, main{padding-left:8px !important;padding-right:8px !important}
-  .wrap{padding-top:8px !important;padding-bottom:8px !important}
-  main{padding-top:8px !important;padding-bottom:8px !important}
+  button, .btnLinkLike{padding:7px 9px;font-size:12px;border-radius:9px}
+  input[type="date"], input[type="number"], input[type="text"], input[type="password"], select{padding:8px 9px;font-size:12px;min-height:34px;border-radius:9px}
+  .card{border-radius:14px}
+  .card .hd{padding:11px 11px 0 11px}
+  .card .bd{padding:11px}
+  .card .hd h2{font-size:13px}
+  .card .hd .hint, .small, .legend, .note, .badge, .pill{font-size:11px}
+  .sep{margin:10px 0}
+  .kpi{gap:7px}
+  .kpi .box{padding:9px}
+  .kpi .box .lbl{font-size:11px;margin-bottom:4px}
+  .kpi .box .val{font-size:15px}
+  .kpi .box .sub{font-size:10.5px;margin-top:4px}
+  .chartBox{padding:8px;border-radius:12px}
+  .chartHead{margin-bottom:6px}
+  canvas{height:185px}
+  #chartCompare{height:205px}
+  .table-wrap{border-radius:12px}
+  table{min-width:840px}
+  thead th{padding:8px 8px;font-size:11px}
+  tbody td{padding:7px 8px;font-size:12px}
+  .vsTable thead th{padding:8px 8px;font-size:11px}
+  .vsTable tbody td{padding:8px 8px;font-size:12px}
+  .previewTable th,.previewTable td{padding:8px 9px;font-size:11px}
+  .choiceOpt{padding:10px}
+  .calendarTitle{font-size:13px}
+  .calCell{padding:6px;min-height:84px}
+  .calDate b{font-size:12px}
+  .calItem{font-size:10px;padding:4px 5px}
 
-  .tabs{gap:5px !important;margin-bottom:8px !important;padding-bottom:4px !important}
-  .tab{padding:7px 9px !important;min-height:34px !important;font-size:11px !important;border-radius:10px !important;line-height:1.15 !important}
-
-  .card{border-radius:12px !important}
-  .card .hd{padding:9px 9px 0 9px !important;gap:6px !important}
-  .card .bd{padding:9px !important}
-  .card .hd h2{font-size:12.5px !important;line-height:1.25 !important}
-  .card .hd .hint,.small,.legend,.note,.badge,.pill{font-size:10px !important;line-height:1.35 !important}
-
-  button,.btnLinkLike{padding:7px 8px !important;font-size:11px !important;border-radius:8px !important;min-height:32px !important}
-  input[type="date"],input[type="number"],input[type="text"],input[type="password"],select{padding:7px 8px !important;font-size:11px !important;min-height:32px !important;border-radius:8px !important}
-  label{font-size:11px !important}
-  .row{gap:6px !important}
-  .sep{margin:8px 0 !important}
-
-  .kpi{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:6px !important}
-  .kpi .box{padding:7px !important;border-radius:10px !important}
-  .kpi .box .lbl{font-size:10px !important;margin-bottom:3px !important;line-height:1.25 !important}
-  .kpi .box .val{font-size:13px !important;line-height:1.15 !important}
-  .kpi .box .sub{font-size:9.5px !important;margin-top:3px !important;line-height:1.25 !important}
-
-  .chartBox{padding:6px !important;border-radius:10px !important}
-  .chartHead{margin-bottom:4px !important}
-  canvas{height:155px !important}
-  #chartCompare{height:170px !important}
-
-  .table-wrap{margin:0 -2px !important;border-radius:10px !important}
-  table{min-width:680px !important}
-  #view-main table{min-width:560px !important}
-  #view-owned table{min-width:520px !important}
-  #view-ads table{min-width:700px !important}
-  #view-compare .vsTable{min-width:620px !important}
-  thead th,.vsTable thead th{padding:6px 6px !important;font-size:10px !important;line-height:1.2 !important}
-  tbody td,.vsTable tbody td{padding:6px 6px !important;font-size:10.5px !important;line-height:1.25 !important}
-  th.sticky,td.sticky{left:0 !important}
-
+  #view-main table{min-width:700px}
+  #view-owned table{min-width:620px !important}
+  #view-ads table{min-width:900px !important}
+  #view-compare .vsTable{min-width:760px}
   #view-main thead th:first-child,
   #view-main tbody td:first-child,
   #view-owned thead th:first-child,
   #view-owned tbody td:first-child,
   #view-ads thead th:first-child,
-  #view-ads tbody td:first-child{min-width:64px !important}
-
-  #view-main tbody td:nth-child(8),
-  #view-main thead th:nth-child(8){min-width:72px !important;white-space:normal !important}
+  #view-ads tbody td:first-child{min-width:82px}
 }
 
 @media (max-width: 480px){
-  .wrap, main{padding-left:6px !important;padding-right:6px !important}
-  .tabs{gap:4px !important}
-  .tab{padding:6px 8px !important;font-size:10.5px !important;min-height:32px !important}
-  .card .hd{padding:8px 8px 0 8px !important}
-  .card .bd{padding:8px !important}
-  .card .hd h2{font-size:12px !important}
+  .wrap, main{padding-left:8px;padding-right:8px}
+  .topbar{gap:8px}
+  .title h1{font-size:13px}
+  .tabs{gap:5px;padding-bottom:6px}
+  .tab{font-size:11px;padding:7px 9px;border-radius:9px;min-height:36px}
+  .projectMenuPanel{left:8px;right:8px;top:64px;padding:9px}
+  .menuTitle{font-size:13px}
+  .menuHint,.recentLabel,.menuResultMeta{font-size:10.5px}
 
-  .kpi{gap:5px !important}
-  .kpi .box{padding:6px !important}
-  .kpi .box .val{font-size:12px !important}
-  .kpi .box .sub{font-size:9px !important}
+  .card .hd{padding:10px 10px 0 10px}
+  .card .bd{padding:10px}
+  .row{gap:7px}
+  .badge,.pill{padding:5px 7px;font-size:10.5px}
 
-  button,.btnLinkLike{padding:6px 7px !important;font-size:10.5px !important;min-height:30px !important}
-  input[type="date"],input[type="number"],input[type="text"],input[type="password"],select{padding:6px 7px !important;font-size:10.5px !important;min-height:30px !important}
+  .kpi .box{padding:8px}
+  .kpi .box .val{font-size:14px}
+  .kpi .box .sub{font-size:10px}
+  canvas{height:170px}
+  #chartCompare{height:190px}
 
-  canvas{height:145px !important}
-  #chartCompare{height:160px !important}
+  .table-wrap{margin:0 -2px}
+  thead th{padding:7px 7px;font-size:10.5px}
+  tbody td{padding:6px 7px;font-size:11px}
+  td.num{letter-spacing:-0.2px}
+  .vsTable thead th{padding:7px 7px;font-size:10.5px}
+  .vsTable tbody td{padding:7px 7px;font-size:11px}
 
-  #view-main table{min-width:520px !important}
-  #view-owned table{min-width:500px !important}
-  #view-ads table{min-width:660px !important}
-  #view-compare .vsTable{min-width:580px !important}
-  thead th,.vsTable thead th{padding:5px 5px !important;font-size:9.5px !important}
-  tbody td,.vsTable tbody td{padding:5px 5px !important;font-size:10px !important}
-
+  #view-main table{min-width:640px}
+  #view-owned table{min-width:560px !important}
+  #view-ads table{min-width:820px !important}
+  #view-compare .vsTable{min-width:700px}
   #view-main thead th:first-child,
   #view-main tbody td:first-child,
   #view-owned thead th:first-child,
   #view-owned tbody td:first-child,
   #view-ads thead th:first-child,
-  #view-ads tbody td:first-child{min-width:58px !important}
+  #view-ads tbody td:first-child{min-width:76px}
+  #view-main tbody td:nth-child(8), #view-main thead th:nth-child(8){min-width:80px}
+  .note{padding:8px 9px;line-height:1.4}
 }
