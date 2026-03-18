@@ -403,3 +403,245 @@ body[data-page="landing-dashboard"]{font-family:"Pretendard Variable","Pretendar
   .rankingControlGroup{width:100%;justify-content:stretch;}
   .inlineField{min-width:0;width:100%;}
 }
+
+/* v7e visual tightening */
+body[data-page="landing-dashboard"]{
+  background:#edf1f6;
+  letter-spacing:-.01em;
+}
+.portalShell{
+  grid-template-columns:236px minmax(0,1fr);
+}
+.portalSidebar{
+  padding:16px 14px 16px;
+  background:linear-gradient(180deg,#252b3b 0%, #212739 100%);
+}
+.portalSidebar .portalBrandWithImage{
+  justify-content:flex-start;
+}
+.portalSidebar .portalBrandWithImage > div{
+  display:none;
+}
+.sidebarBrandImg{
+  width:118px;
+  height:20px;
+  object-position:left center;
+}
+.portalSidebarTop{
+  padding-bottom:12px;
+  margin-bottom:8px;
+}
+.portalSidebarSectionTitle{
+  margin-bottom:8px;
+  color:#bfc7d8;
+}
+.portalCategoryHeader{
+  min-height:42px;
+  border-radius:13px;
+  font-size:13px;
+}
+.portalSidebarSearchWrap{gap:6px;}
+.portalSidebarSearchWrap input{height:40px; border-radius:13px; font-size:12px;}
+.portalNavTree{max-height:calc(100vh - 230px); gap:4px;}
+.portalInstructorNavButton{min-height:44px; padding:8px 10px; border-radius:12px;}
+.portalInstructorNavMain strong{font-size:12px;}
+.portalInstructorNavMain span{font-size:10px;}
+.portalInstructorNavMetric{font-size:10px;}
+
+.portalMain{
+  padding:0 14px 18px 10px;
+  gap:12px;
+}
+.compactTopbar{
+  margin:0 -14px 0 -10px;
+  padding:10px 14px 10px 10px;
+  min-height:58px;
+}
+.portalTopbar h1{
+  font-size:14px;
+  margin-top:2px;
+}
+.portalTopbarEyebrow{font-size:10px;}
+.portalTopbarRight{gap:10px;}
+.portalUserCard{padding:6px 9px; border-radius:14px;}
+.portalUserAvatar{width:32px; height:32px; font-size:10px;}
+.portalUserValue{font-size:11px;}
+.ghostBtn,.primaryBtn,.portalRowAction{min-height:32px; padding:0 11px; font-size:11px; border-radius:10px;}
+
+.portalHeroCompact{
+  grid-template-columns:minmax(0,1fr) 260px;
+  gap:12px;
+  padding:16px 18px;
+  border-radius:20px;
+  box-shadow:0 8px 20px rgba(15,23,42,.035);
+}
+.portalHeroTitleRow{
+  align-items:flex-start;
+}
+.portalHeroText h2{
+  font-size:16px;
+  line-height:1.35;
+}
+.portalHeroText p{
+  display:none;
+}
+.portalHeroTag{
+  min-height:26px;
+  padding:0 9px;
+  font-size:10px;
+}
+.portalHeroQuickInfo.compact{
+  gap:10px;
+  align-content:start;
+}
+.portalHeroMetaCard{
+  min-height:68px;
+  padding:12px 14px;
+  border-radius:15px;
+}
+.portalHeroMetaCard span{font-size:10px;}
+.portalHeroMetaCard b{font-size:14px; line-height:1.2;}
+
+.portalContent.tightened{gap:12px;}
+.compactSearchBlock{max-width:300px; gap:5px;}
+.portalSearchBlock input{height:40px; font-size:12px;}
+.portalMetaChip{
+  min-height:32px;
+  padding:0 11px;
+  font-size:11px;
+  border-radius:999px;
+}
+.portalMetaChip b{font-size:12px;}
+
+.portalStatsGrid.compact{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+.portalStatCard{
+  min-height:94px;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  align-items:start;
+  padding:14px 15px 13px;
+  border-radius:18px;
+  box-shadow:0 8px 22px rgba(15,23,42,.03);
+}
+.portalStatLabel{font-size:10px;}
+.portalStatValue{
+  margin-top:8px;
+  font-size:clamp(14px,1.55vw,18px);
+  line-height:1.15;
+  letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.portalStatSub{margin-top:6px; font-size:10px; line-height:1.4;}
+
+.simplifiedDashboardGrid{
+  grid-template-columns:minmax(0,1.68fr) 300px;
+  gap:12px;
+}
+.compactPanel{
+  padding:16px;
+  border-radius:20px;
+  box-shadow:0 8px 22px rgba(15,23,42,.03);
+}
+.portalSectionHead h3{
+  font-size:14px;
+  margin-top:4px;
+}
+.portalSectionEyebrow{font-size:10px;}
+.rankingControlGroup{gap:8px;}
+.inlineField{gap:4px; min-width:112px;}
+.inlineField span{font-size:10px;}
+.inlineField select{
+  height:40px;
+  font-size:12px;
+  border-radius:12px;
+  border:1px solid #d7deea;
+  background:#fff;
+  padding:0 12px;
+}
+.portalRankingHint.compactHint{
+  margin-bottom:8px;
+  font-size:10px;
+}
+.portalRankingTableWrap{border-radius:14px;}
+.portalRankingTable.compactTable{min-width:620px;}
+.portalRankingTable th,
+.portalRankingTable td{
+  padding:10px 11px;
+  font-size:11px;
+}
+.portalRankingTable th{font-size:10px;}
+.portalRankBadge{width:24px; height:24px; font-size:10px;}
+.portalInstructorCell strong{font-size:12px;}
+.portalInstructorCell span{font-size:10px;}
+.portalRoasValue{font-size:11px;}
+.portalRowAction{min-width:42px;}
+
+.portalSpotlightPanel{
+  align-self:start;
+}
+.spotlightHeadCompact{
+  align-items:center;
+}
+.portalSpotlightName{
+  font-size:14px;
+  line-height:1.25;
+}
+.portalSpotlightSub{
+  margin-top:4px;
+  font-size:11px;
+  line-height:1.5;
+}
+.portalRoasPill{
+  min-height:30px;
+  padding:0 10px;
+  font-size:10px;
+}
+.compactMetricGrid{
+  margin-top:12px;
+  gap:8px;
+}
+.portalMetricCard{
+  min-height:70px;
+  padding:12px;
+  border-radius:15px;
+}
+.portalMetricCard span{font-size:10px;}
+.portalMetricCard b{
+  font-size:clamp(12px,1.3vw,15px);
+  line-height:1.2;
+  letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.compactChipList{
+  margin-top:12px;
+  gap:6px;
+}
+.portalChip{min-height:26px; padding:0 9px; font-size:10px;}
+
+@media (max-width:1320px){
+  .portalShell{grid-template-columns:220px minmax(0,1fr);}
+  .portalHeroCompact{grid-template-columns:minmax(0,1fr) 232px;}
+}
+@media (max-width:1180px){
+  .portalHeroCompact,
+  .simplifiedDashboardGrid{grid-template-columns:1fr;}
+  .portalStatsGrid.compact{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media (max-width:900px){
+  .portalShell{grid-template-columns:1fr;}
+  .portalMain{padding:0 12px 16px;}
+  .compactTopbar{margin:0 -12px; padding:10px 12px;}
+}
+.portalMain,
+.portalContent,
+.portalHeroCompact,
+.portalTopbar{
+  width:100%;
+  max-width:none;
+}
