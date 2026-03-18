@@ -124,10 +124,27 @@ const zipPreviewModal = $('zipPreviewModal');
 const loadingOverlay = $('loadingOverlay');
 const loadingTitleEl = $('loadingTitle');
 const loadingSubEl = $('loadingSub');
+const loadingProgressWrap = $('loadingProgressWrap');
+const loadingProgressBar = $('loadingProgressBar');
+const loadingProgressText = $('loadingProgressText');
 
+function updateLoadingProgress(percent=null, text=''){
+  if(!loadingProgressWrap || !loadingProgressBar || !loadingProgressText) return;
+  if(percent === null || percent === undefined || Number.isNaN(Number(percent))){
+    loadingProgressWrap.style.display = 'none';
+    loadingProgressBar.style.width = '0%';
+    loadingProgressText.textContent = '';
+    return;
+  }
+  const safe = Math.max(0, Math.min(100, Math.round(Number(percent))));
+  loadingProgressWrap.style.display = '';
+  loadingProgressBar.style.width = `${safe}%`;
+  loadingProgressText.textContent = text || `${safe}%`;
+}
 function showLoading(title='로딩 중', sub='파일을 읽고 데이터를 반영하고 있어. 잠시만 기다려줘.') {
   if(loadingTitleEl) loadingTitleEl.textContent = title;
   if(loadingSubEl) loadingSubEl.textContent = sub;
+  updateLoadingProgress(null, '');
   if(loadingOverlay){
     loadingOverlay.classList.add('open');
     loadingOverlay.setAttribute('aria-hidden','false');
@@ -135,6 +152,7 @@ function showLoading(title='로딩 중', sub='파일을 읽고 데이터를 반�
   document.body.style.overflow = 'hidden';
 }
 function hideLoading(){
+  updateLoadingProgress(null, '');
   if(loadingOverlay){
     loadingOverlay.classList.remove('open');
     loadingOverlay.setAttribute('aria-hidden','true');
@@ -189,7 +207,7 @@ function parseZipProjectFilename(base){
   if(!rawBase || /^파일목록_매니페스트/i.test(rawBase)) return null;
   const extMatch = rawBase.match(/\.([^.]+)$/);
   const ext = (extMatch?.[1] || '').toLowerCase();
-  if(!['csv','xlsx','xls'].includes(ext)) return null;
+  if(ext !== 'csv') return null;
   const stem = rawBase.replace(/\.[^.]+$/,'');
   let parts = stem.split('_').map(v=>String(v || '').trim()).filter(Boolean);
   if(!parts.length) return null;
@@ -284,33 +302,31 @@ function collectAdsAggRowsFromMatrix(rows, platform){
   }));
 }
 async function readZipAdsRows(entry, ext, platform){
-  if(ext === 'csv'){
-    const text = await entry.async('string');
-    return collectAdsAggRowsFromMatrix(parseCSV(text), platform);
-  }
-  if(ext === 'xlsx' || ext === 'xls'){
-    if(typeof XLSX === 'undefined') throw new Error('XLSX 로드 실패(CDN 차단 가능).');
-    const ab = await entry.async('arraybuffer');
-    const wb = XLSX.read(ab, { type:'array', cellDates:true });
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:true, defval:'' });
-    return collectAdsAggRowsFromMatrix(rows, platform);
-  }
-  return [];
+  if(ext !== 'csv') return [];
+  const text = await entry.async('string');
+  return collectAdsAggRowsFromMatrix(parseCSV(text), platform);
 }
-async function buildZipAdsPreview(file){
+async function buildZipAdsPreview(file, onProgress){
   if(typeof JSZip === 'undefined') throw new Error('ZIP 라이브러리 로드 실패(CDN 차단 가능). 잠시 후 다시 시도하거나 압축을 풀어서 사용해줘.');
+  onProgress?.({ percent:2, text:'ZIP 파일을 여는 중...' });
   const ab = await file.arrayBuffer();
+  onProgress?.({ percent:8, text:'압축 목록을 읽는 중...' });
   const zip = await JSZip.loadAsync(ab);
   const existingMap = new Map(listProjects().map(p => [makeProjectKey(p.instructor, p.cohort), p]));
   const grouped = new Map();
   const unmatched = [];
   const missingProjectSamples = [];
   let scannedFiles = 0;
+  const zipEntries = Object.entries(zip.files).filter(([entryName, entry]) => !entry.dir && String(entryName || '').split('/').pop());
+  const totalEntryCount = zipEntries.length || 1;
 
-  for(const [entryName, entry] of Object.entries(zip.files)){
-    if(entry.dir) continue;
+  for(let entryIndex=0; entryIndex<zipEntries.length; entryIndex++){
+    const [entryName, entry] = zipEntries[entryIndex];
     const base = String(entryName).split('/').pop();
+    onProgress?.({
+      percent: 10 + Math.round((entryIndex / totalEntryCount) * 82),
+      text: `ZIP 읽는 중 ${entryIndex+1}/${totalEntryCount} · ${base || '파일'}`
+    });
     if(!base) continue;
     const parsed = parseZipProjectFilename(base);
     if(!parsed){
@@ -353,6 +369,7 @@ async function buildZipAdsPreview(file){
     }
   }
 
+  onProgress?.({ percent:94, text:'프로젝트별로 묶고 중복을 계산하는 중...' });
   const items = Array.from(grouped.values()).map(item=>{
     const rows = Array.from(item.rowsMap.values()).sort((a,b)=> `${a.date} ${a.platform}`.localeCompare(`${b.date} ${b.platform}`,'ko'));
     let duplicateRows = 0;
@@ -375,6 +392,7 @@ async function buildZipAdsPreview(file){
     };
   }).sort((a,b)=>`${a.instructor} ${a.cohortLabel}`.localeCompare(`${b.instructor} ${b.cohortLabel}`,'ko'));
 
+  onProgress?.({ percent:100, text:`분석 완료 · 인식 파일 ${fmtInt(scannedFiles)}개` });
   return {
     scannedFiles,
     items,
@@ -386,7 +404,7 @@ async function buildZipAdsPreview(file){
     unmatchedSamples: unmatched,
   };
 }
-async function applyZipAdsPreview(mode='skip'){
+async function applyZipAdsPreview(mode='skip', onProgress){
   const payload = pendingZipPreview;
   if(!payload || !Array.isArray(payload.items) || !payload.items.length){
     closeZipPreview();
@@ -398,7 +416,13 @@ async function applyZipAdsPreview(mode='skip'){
   let lastId = state.currentProjectId || '';
   const touchedProjectIds = new Set();
 
-  for(const item of payload.items){
+  const totalItems = payload.items.length || 1;
+  for(let itemIndex=0; itemIndex<payload.items.length; itemIndex++){
+    const item = payload.items[itemIndex];
+    onProgress?.({
+      percent: 6 + Math.round((itemIndex / totalItems) * 88),
+      text: `서버 반영 중 ${itemIndex+1}/${totalItems} · ${item.instructor} / ${item.cohortLabel}`
+    });
     const normalizedRows = Array.isArray(item.rows)
       ? item.rows.filter(r => r && r.date && (r.platform==='google' || r.platform==='meta'))
       : [];
@@ -450,6 +474,7 @@ async function applyZipAdsPreview(mode='skip'){
   }else if(lastId && state.projects[lastId]){
     state.currentProjectId = lastId;
   }
+  onProgress?.({ percent:100, text:'저장 완료 · 화면을 갱신하는 중...' });
   saveState();
   renderAll();
   closeZipPreview();

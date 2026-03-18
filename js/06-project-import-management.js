@@ -167,12 +167,12 @@ async function importProjectWorkbook(file){
 }
 
 
-async function importProjectsFromZip(file){
-  const payload = await buildZipAdsPreview(file);
+async function importProjectsFromZip(file, onProgress){
+  const payload = await buildZipAdsPreview(file, onProgress);
   if(!payload.items.length){
     const extra = payload.unmatchedSamples?.length ? `
 예시: ${payload.unmatchedSamples.join(', ')}` : '';
-    alert('ZIP 안에서 광고DB로 반영할 파일을 찾지 못했어. 파일명은 "번호_강사명_아이템_기수_구글/메타.csv" 형식이어야 해.' + extra);
+    alert('ZIP 안에서 광고DB로 반영할 파일을 찾지 못했어. 파일명은 "번호_강사명_아이템_기수_구글/메타.csv" 형식이어야 해. (ZIP 내부는 CSV만 지원)' + extra);
     return;
   }
   renderZipPreviewModal(payload);
