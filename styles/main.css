@@ -448,17 +448,11 @@ button, input, select { max-width: 100%; }
 .batchActions > *{flex:1 1 180px}
 .batchCard{border:1px solid #dbeafe;background:linear-gradient(180deg,#f8fbff,#fff)}
 .batchGuide b{color:#0f172a}
-.mobileQuickBar{
-  display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:95;
-  gap:8px;padding:10px;border-radius:18px;background:rgba(255,255,255,.96);
-  border:1px solid rgba(203,213,225,.9);box-shadow:0 18px 40px rgba(15,23,42,.16);backdrop-filter:blur(10px)
-}
-.mobileQuickBar button{flex:1;min-height:44px;border-radius:12px}
 .projectMenuPanel.open{animation:menuIn .18s ease-out}
 @keyframes menuIn{from{transform:translateY(8px);opacity:.5}to{transform:translateY(0);opacity:1}}
 
 @media (max-width: 980px){
-  main{padding-bottom:90px}
+  main{padding-bottom:12px}
   header{position:static}
   .wrap{padding-bottom:8px}
   .topbar{gap:10px}
@@ -471,13 +465,13 @@ button, input, select { max-width: 100%; }
   }
   .actions .pill:first-child{grid-column:1 / -1}
   .projectMenuPanel{
-    top:auto;
-    bottom:78px;
+    position:fixed;
+    top:76px;
     left:10px;
     right:10px;
     width:auto;
     max-height:78vh;
-    border-radius:20px;
+    border-radius:16px;
   }
   .menuHead{position:sticky;top:0;background:#fff;z-index:2;padding-bottom:8px}
   .menuActions{grid-template-columns:1fr 1fr}
@@ -502,15 +496,14 @@ button, input, select { max-width: 100%; }
   .metricChip{width:100%}
   .calendarGrid{grid-template-columns:1fr}
   .calCell{min-height:86px}
-  .mobileQuickBar{display:flex}
 }
 @media (max-width: 640px){
-  main{padding:10px 10px 96px 10px}
+  main{padding:10px}
   .actions{grid-template-columns:1fr 1fr}
   .actions .pill:nth-child(2),
   .actions .pill:nth-child(3){grid-column:auto}
   .projectMenuPanel{
-    left:8px;right:8px;bottom:74px;max-height:80vh;padding:10px
+    top:68px;left:8px;right:8px;max-height:80vh;padding:10px
   }
   .menuActions{grid-template-columns:1fr}
   .tabs{top:0}
@@ -520,8 +513,6 @@ button, input, select { max-width: 100%; }
   canvas,#chartCompare{height:220px}
   table{min-width:760px}
   .batchActions{display:grid;grid-template-columns:1fr}
-  .mobileQuickBar{left:8px;right:8px;bottom:8px;padding:8px}
-  .mobileQuickBar button{font-size:12px;padding:10px 8px}
 }
 @media (max-width: 420px){
   .actions{grid-template-columns:1fr}

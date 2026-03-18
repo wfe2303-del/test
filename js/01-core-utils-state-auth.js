@@ -11,7 +11,8 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let authSession = null;
 
 const LOGIN_ID_MAP = {
-  classaround: 'classaround@gmail.com'
+  classaround: 'classaround@gmail.com',
+  test: 'test@gmail.com'
 };
 
 /** =========================
@@ -175,15 +176,33 @@ function getLoginEmailFromId(id){
   return LOGIN_ID_MAP[key] || '';
 }
 async function loginWithIdPassword(id, password){
-  const email = getLoginEmailFromId(id);
+  const key = String(id || '').trim().toLowerCase();
+  const email = getLoginEmailFromId(key);
   if(!email) throw new Error('존재하지 않는 아이디야.');
   if(!password) throw new Error('비밀번호를 입력해줘.');
 
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
-  if(error) throw error;
+  if(!error){
+    authSession = data.session || null;
+    return data;
+  }
 
-  authSession = data.session || null;
-  return data;
+  const canAutoCreate = (key === 'test');
+  if(!canAutoCreate) throw error;
+
+  const { data:signUpData, error:signUpError } = await sb.auth.signUp({ email, password });
+  if(signUpError){
+    const msg = String(signUpError?.message || '').toLowerCase();
+    if(msg.includes('already') || msg.includes('registered') || msg.includes('exists')){
+      throw error;
+    }
+    throw signUpError;
+  }
+
+  authSession = signUpData?.session || null;
+  if(authSession) return signUpData;
+
+  throw new Error('test 계정은 생성됐지만 이메일 인증이 필요해. Supabase Auth에서 Email 인증 설정을 확인해줘.');
 }
 async function logout(){
   const { error } = await sb.auth.signOut();
