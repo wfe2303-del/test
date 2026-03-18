@@ -899,3 +899,280 @@ body[data-page="landing-dashboard"]{
   .slimCountGrid{grid-template-columns:1fr !important;}
   .heroMetricTile b{font-size:24px;}
 }
+
+/* v7h sidebar/category ranking redesign */
+:root{
+  --sidebar-light-bg:#ffffff;
+  --sidebar-light-line:#e5e9f2;
+  --sidebar-light-soft:#f5f7fb;
+  --sidebar-light-text:#172133;
+  --sidebar-light-muted:#697388;
+}
+body[data-page="landing-dashboard"]{
+  background:#eff3f8;
+}
+.portalShell{
+  grid-template-columns:244px minmax(0,1fr);
+  gap:12px;
+}
+.portalSidebarLight{
+  background:var(--sidebar-light-bg) !important;
+  color:var(--sidebar-light-text);
+  border-right:1px solid var(--sidebar-light-line);
+  box-shadow:0 10px 28px rgba(15,23,42,.04);
+}
+.portalSidebarTopLight{
+  border-bottom:1px solid var(--sidebar-light-line) !important;
+  margin-bottom:12px;
+  padding-bottom:14px;
+}
+.sidebarBrandImgLight{
+  width:132px;
+  height:24px;
+  object-fit:contain;
+  object-position:left center;
+}
+.sidebarLightTitle{
+  color:#8a93a7;
+  margin-bottom:8px;
+}
+.portalSidebarCategoryList{
+  display:grid;
+  gap:8px;
+  margin-bottom:10px;
+}
+.portalSidebarCategoryButton{
+  min-height:42px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--sidebar-light-line);
+  background:#fff;
+  color:var(--sidebar-light-text);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+.portalSidebarCategoryButton b{
+  font-size:12px;
+  color:#7c869b;
+}
+.portalSidebarCategoryButton.is-active{
+  border-color:#cfe0ff;
+  background:#edf4ff;
+  color:#2456db;
+}
+.portalSidebarSearchWrapLight .portalFieldLabel{
+  color:#8b93a8;
+}
+.portalSidebarSearchWrapLight input{
+  background:var(--sidebar-light-soft) !important;
+  border:1px solid var(--sidebar-light-line) !important;
+  color:var(--sidebar-light-text) !important;
+}
+.portalSidebarSearchWrapLight input::placeholder{
+  color:#98a2b6 !important;
+}
+.portalNavTreeLight::-webkit-scrollbar-thumb{
+  background:#d7ddea;
+}
+.portalInstructorNavButtonLight{
+  color:var(--sidebar-light-text) !important;
+}
+.portalInstructorNavButtonLight:hover{
+  background:#f6f8fc !important;
+}
+.portalInstructorNavButtonLight.is-active{
+  background:#eff5ff !important;
+  color:#123060 !important;
+  border:1px solid #d6e3ff;
+  box-shadow:none;
+}
+.portalInstructorNavButtonLight .portalInstructorNavMain span{
+  color:#7a8497;
+  opacity:1;
+}
+.portalInstructorNavButtonLight .portalInstructorNavMetric{
+  color:#2f5de3;
+}
+.sidebarEmptyState{
+  min-height:120px;
+  border:1px dashed var(--sidebar-light-line);
+  border-radius:14px;
+  background:#fafbfe;
+}
+.portalMainTight{
+  padding:0 16px 22px 0 !important;
+}
+.topbarPanel{
+  margin:10px 0 0;
+  padding:12px 18px;
+}
+.rankingControlPanel{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) 220px;
+  gap:14px;
+  align-items:center;
+  padding:16px 18px;
+  border-radius:22px;
+}
+.rankingScopeSection,
+.rankingCategorySection{
+  display:grid;
+  gap:8px;
+}
+.rankingScopeLabel{
+  font-size:11px;
+  font-weight:800;
+  color:#7f8aa0;
+  letter-spacing:.02em;
+}
+.portalSegmentedTabs,
+.portalCategoryPills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.portalSegmentedButton,
+.portalCategoryPill{
+  min-height:36px;
+  padding:0 14px;
+  border-radius:999px;
+  border:1px solid #d9e0ec;
+  background:#fff;
+  color:#445066;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.portalSegmentedButton.is-active,
+.portalCategoryPill.is-active{
+  background:#edf4ff;
+  border-color:#cfe0ff;
+  color:#2456db;
+}
+.rankingSelectionCompact{
+  min-height:76px;
+  border:1px solid #dde5f2;
+  border-radius:18px;
+  background:#fbfcff;
+  padding:12px 14px;
+  display:grid;
+  align-content:center;
+  gap:4px;
+}
+.rankingSelectionCompact span{
+  font-size:11px;
+  font-weight:700;
+  color:#8792a8;
+}
+.rankingSelectionCompact b{
+  font-size:17px;
+  line-height:1.2;
+  color:#111827;
+}
+.rankingSelectionCompact small{
+  font-size:12px;
+  color:#5e6a80;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.rankingOverviewStats{
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+.rankingOverviewStats .portalStatCard{
+  min-height:96px;
+}
+.statCardEmphasis .portalStatValue{
+  font-size:clamp(17px,1.5vw,22px);
+}
+.statCardRoas{
+  background:linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);
+  border-color:#d5e2ff;
+}
+.statCardRoas .portalStatValue{
+  color:#2456db;
+}
+.rankingFocusLayout{
+  grid-template-columns:minmax(0,1fr) 292px;
+}
+.rankingCompactTable{
+  min-width:760px !important;
+}
+.rankingCompactTable th:nth-child(2),
+.rankingCompactTable td:nth-child(2){
+  width:180px;
+}
+.comboEntityCell{
+  min-width:0;
+}
+.comboEntityName{
+  font-size:13px;
+  font-weight:800;
+  color:#172133;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.comboEntitySub{
+  margin-top:4px;
+  font-size:11px;
+  color:#697388;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.rankingCompactTable .cellProjects{
+  font-size:12px;
+  font-weight:700;
+  color:#6a7488;
+}
+.rankingCompactTable .spendCell,
+.rankingCompactTable .revenueCell{
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.rankingCompactTable .revenueCell{color:#111827;}
+.rankingCompactTable .spendCell{color:#334155;}
+.emphasisRoas{
+  min-width:74px;
+  min-height:30px;
+  font-size:12px;
+}
+.portalSpotlightPanel{
+  padding:16px !important;
+}
+.portalSpotlightPanel .portalMetricCard b{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:14px !important;
+}
+.spotlightMetricGrid .portalMetricCard{
+  min-height:72px;
+}
+.portalChipList .portalChip{
+  max-width:120px;
+}
+@media (max-width:1280px){
+  .portalShell{grid-template-columns:224px minmax(0,1fr);}
+  .rankingControlPanel{grid-template-columns:1fr;}
+  .rankingSelectionCompact{width:100%;}
+  .rankingOverviewStats{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+}
+@media (max-width:960px){
+  .portalShell{grid-template-columns:1fr;gap:0;}
+  .portalMainTight{padding:0 12px 18px !important;}
+  .rankingFocusLayout{grid-template-columns:1fr;}
+  .rankingOverviewStats{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+}
+@media (max-width:640px){
+  .rankingOverviewStats{grid-template-columns:1fr !important;}
+  .portalSegmentedTabs,.portalCategoryPills{gap:6px;}
+  .portalSegmentedButton,.portalCategoryPill{min-height:34px;padding:0 12px;}
+}
