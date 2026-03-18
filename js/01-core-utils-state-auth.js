@@ -86,14 +86,118 @@ function addMonths(ym, delta){
 function getDaysInMonth(ym){ const [y,m]=ym.split('-').map(Number); return new Date(y,m,0).getDate(); }
 function getExtraCfgMap(){ try{return JSON.parse(localStorage.getItem(EXTRA_CFG_LS_KEY)||'{}')}catch{return {}} }
 function saveExtraCfgMap(map){ localStorage.setItem(EXTRA_CFG_LS_KEY, JSON.stringify(map||{})); }
-function getExtraCfg(projectId){ const m=getExtraCfgMap(); return m[projectId] || { instructorRate:0, adShareRate:0 }; }
-function setExtraCfg(projectId, cfg){ const m=getExtraCfgMap(); m[projectId] = { instructorRate:Number(cfg?.instructorRate||0), adShareRate:Number(cfg?.adShareRate ?? cfg?.adShareRate ?? 0) }; saveExtraCfgMap(m); }
+function getExtraCfg(projectId){
+  const m=getExtraCfgMap();
+  const raw = m[projectId] || {};
+  return {
+    instructorRate:Number(raw.instructorRate || 0),
+    adShareRate:Number(raw.adShareRate ?? 0),
+    autoPrevOptOut: !!raw.autoPrevOptOut
+  };
+}
+function setExtraCfg(projectId, cfg){
+  const m=getExtraCfgMap();
+  const prev = m[projectId] || {};
+  const merged = { ...prev, ...(cfg || {}) };
+  m[projectId] = {
+    instructorRate:Number(merged.instructorRate || 0),
+    adShareRate:Number(merged.adShareRate ?? 0),
+    autoPrevOptOut: !!merged.autoPrevOptOut
+  };
+  saveExtraCfgMap(m);
+}
 function toggleDateSelection(list, iso){
   const arr = Array.isArray(list) ? [...list] : [];
   const idx = arr.indexOf(iso);
   if(idx>=0) arr.splice(idx,1); else arr.push(iso);
   arr.sort();
   return arr;
+}
+
+function normalizeAutoPrevKey(v){
+  return String(v || '').replace(/[\s_\-]+/g,'').trim().toLowerCase();
+}
+function splitProjectCohortLabel(label){
+  const raw = String(label || '').trim();
+  if(!raw) return { item:'', cohortText:'', cohortNo:NaN };
+
+  let item = '';
+  let cohortText = raw;
+
+  if(raw.includes('/')){
+    const idx = raw.lastIndexOf('/');
+    item = raw.slice(0, idx).trim();
+    cohortText = raw.slice(idx + 1).trim();
+  }else{
+    const m = raw.match(/^(.*?)(\d+\s*기.*)$/);
+    if(m){
+      item = String(m[1] || '').replace(/[\/_-]+$/,'').trim();
+      cohortText = String(m[2] || '').trim();
+    }
+  }
+
+  const numMatch = String(cohortText || '').match(/(\d+)/);
+  const cohortNo = numMatch ? Number(numMatch[1]) : NaN;
+  return { item, cohortText, cohortNo };
+}
+function getProjectItemName(project){
+  return splitProjectCohortLabel(project?.cohort).item || '';
+}
+function getProjectCohortNo(project){
+  return splitProjectCohortLabel(project?.cohort).cohortNo;
+}
+function hasPrevManualNumbers(project){
+  const manual = project?.prevLink?.manual || {};
+  return Number(manual.db || 0) > 0 || Number(manual.spend || 0) > 0 || Number(manual.revenue || 0) > 0;
+}
+function isAutoPrevOptOut(projectId){
+  return !!getExtraCfg(projectId)?.autoPrevOptOut;
+}
+function setAutoPrevOptOut(projectId, value){
+  const extra = getExtraCfg(projectId);
+  setExtraCfg(projectId, { ...extra, autoPrevOptOut: !!value });
+}
+function findAutoPrevProjectCandidate(project, projects){
+  const current = project || null;
+  if(!current) return null;
+
+  const instKey = normalizeAutoPrevKey(current.instructor);
+  const parsed = splitProjectCohortLabel(current.cohort);
+  const itemKey = normalizeAutoPrevKey(parsed.item);
+  const currentNo = parsed.cohortNo;
+  if(!instKey || !Number.isFinite(currentNo)) return null;
+
+  const pool = Array.isArray(projects) ? projects : Object.values(state?.projects || {});
+  const sameInstructor = pool
+    .filter(x => x && x.id !== current.id)
+    .map(x => ({ project:x, item:getProjectItemName(x), cohortNo:getProjectCohortNo(x) }))
+    .filter(x => normalizeAutoPrevKey(x.project.instructor) === instKey)
+    .filter(x => Number.isFinite(x.cohortNo) && x.cohortNo < currentNo);
+
+  let candidates = [];
+  if(itemKey){
+    candidates = sameInstructor.filter(x => normalizeAutoPrevKey(x.item) === itemKey);
+  }else{
+    const cohortNoCounts = new Map();
+    for(const row of sameInstructor){
+      cohortNoCounts.set(row.cohortNo, (cohortNoCounts.get(row.cohortNo) || 0) + 1);
+    }
+    const ambiguous = [...cohortNoCounts.values()].some(v => v > 1);
+    if(!ambiguous) candidates = sameInstructor.slice();
+  }
+
+  candidates.sort((a,b) => b.cohortNo - a.cohortNo || String(a.project.cohort || '').localeCompare(String(b.project.cohort || ''), 'ko'));
+  if(!candidates.length) return null;
+  const exact = candidates.find(x => x.cohortNo === currentNo - 1);
+  return (exact || candidates[0] || {}).project || null;
+}
+function canAutoPrevLinkProject(project){
+  if(!project) return false;
+  const mode = project?.prevLink?.mode || 'none';
+  if(mode === 'linked' || mode === 'manual') return false;
+  if(isAutoPrevOptOut(project.id)) return false;
+  if(hasPrevManualNumbers(project)) return false;
+  return !!findAutoPrevProjectCandidate(project);
 }
 
 /** =========================

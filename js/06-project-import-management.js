@@ -167,12 +167,12 @@ async function importProjectWorkbook(file){
 }
 
 
-async function importProjectsFromZip(file){
-  const payload = await buildZipAdsPreview(file);
+async function importProjectsFromZip(file, onProgress){
+  const payload = await buildZipAdsPreview(file, onProgress);
   if(!payload.items.length){
     const extra = payload.unmatchedSamples?.length ? `
 예시: ${payload.unmatchedSamples.join(', ')}` : '';
-    alert('ZIP 안에서 광고DB로 반영할 파일을 찾지 못했어. 파일명은 "번호_강사명_아이템_기수_구글/메타.csv" 형식이어야 해.' + extra);
+    alert('ZIP 안에서 광고DB로 반영할 파일을 찾지 못했어. 파일명은 "번호_강사명_아이템_기수_구글/메타.csv" 형식이어야 해. (ZIP 내부는 CSV만 지원)' + extra);
     return;
   }
   renderZipPreviewModal(payload);
@@ -831,6 +831,10 @@ async function renameProject(){
   try{
     p.instructor = nextInstructor;
     p.cohort = nextCohort;
+    if((p.prevLink?.mode || 'none') !== 'manual' && !isAutoPrevOptOut(p.id)){
+      p.prevLink = { mode:'none', prevProjectId:'', manual:{db:0,spend:0,revenue:0} };
+      await maybeAutoLinkPrevProject(p, { persist:false, force:true });
+    }
     await updateProjectMetaOnDb(p);
     renderAll();
     toast('프로젝트 이름을 변경했어');
@@ -855,7 +859,13 @@ async function duplicateProject(){
     newProj.actualRevenue = Number(p.actualRevenue || 0);
     newProj.prevLink = deepClone(p.prevLink);
     newProj.settlement = deepClone(p.settlement || { instructorRate:0, adShareRate:0 });
-    setExtraCfg(newProj.id, newProj.settlement);
+    const sourceExtra = getExtraCfg(p.id);
+    setExtraCfg(newProj.id, { ...newProj.settlement, autoPrevOptOut: !!sourceExtra.autoPrevOptOut });
+
+    if((newProj.prevLink?.mode || 'none') !== 'manual'){
+      newProj.prevLink = { mode:'none', prevProjectId:'', manual:{db:0,spend:0,revenue:0} };
+      await maybeAutoLinkPrevProject(newProj, { persist:false, force:true });
+    }
 
     await updateProjectMetaOnDb(newProj);
     await bulkUpsertOwnedOnDb(newProj.id, p.ownedEntries.map(x => ({

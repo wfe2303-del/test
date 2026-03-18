@@ -85,6 +85,39 @@ function mapProjectRowToState(projectRow, ownedRows, adsRows){
   };
 }
 
+async function maybeAutoLinkPrevProject(project, { persist=false, force=false } = {}){
+  const p = project || null;
+  if(!p) return false;
+
+  if(!force){
+    const mode = p.prevLink?.mode || 'none';
+    if(mode === 'linked' || mode === 'manual') return false;
+    if(isAutoPrevOptOut(p.id)) return false;
+    if(hasPrevManualNumbers(p)) return false;
+  }
+
+  const candidate = findAutoPrevProjectCandidate(p, Object.values(state.projects || {}));
+  if(!candidate) return false;
+  if(p.prevLink?.mode === 'linked' && p.prevLink?.prevProjectId === candidate.id) return false;
+
+  p.prevLink = { mode:'linked', prevProjectId:candidate.id, manual:{ db:0, spend:0, revenue:0 } };
+  if(persist) await updateProjectMetaOnDb(p);
+  return true;
+}
+async function applyAutoPrevLinksForLoadedProjects(){
+  const projects = Object.values(state.projects || {}).sort((a,b)=>{
+    const ai = String(a.instructor || '').localeCompare(String(b.instructor || ''), 'ko');
+    if(ai !== 0) return ai;
+    const ii = String(getProjectItemName(a) || '').localeCompare(String(getProjectItemName(b) || ''), 'ko');
+    if(ii !== 0) return ii;
+    return (getProjectCohortNo(a) || 0) - (getProjectCohortNo(b) || 0);
+  });
+
+  for(const project of projects){
+    await maybeAutoLinkPrevProject(project, { persist:false });
+  }
+}
+
 /** =========================
  *  DB 로드 / CRUD
  *  ========================= */
@@ -127,6 +160,8 @@ async function loadStateFromDb(){
     );
   }
 
+  await applyAutoPrevLinksForLoadedProjects();
+
   const firstId = projects[0].id;
   const wantedId = state.currentProjectId;
   state.currentProjectId = state.projects[wantedId] ? wantedId : firstId;
@@ -165,12 +200,14 @@ async function createProjectOnDb(instructor, cohort, silent=false){
   if(error) throw error;
 
   state.projects[data.id] = mapProjectRowToState(data, [], []);
-  setExtraCfg(data.id, { instructorRate:0, adShareRate:0 });
+  setExtraCfg(data.id, { instructorRate:0, adShareRate:0, autoPrevOptOut:false });
   state.currentProjectId = data.id;
 
   if(!state.compare) state.compare = defaultCompare(data.id);
   state.compare.leftId = data.id;
   state.compare.rightId = data.id;
+
+  await maybeAutoLinkPrevProject(state.projects[data.id], { persist:true });
 
   saveState();
   if(!silent) renderAll();

@@ -264,9 +264,17 @@ function formatMetric(val, type){
 function ensureCompareIds(){
   const ps=listProjects();
   if(ps.length===0) return;
-  if(!state.compare) state.compare = defaultCompare(ps[0].id);
-  if(!state.projects[state.compare.leftId]) state.compare.leftId = ps[0].id;
-  if(!state.projects[state.compare.rightId]) state.compare.rightId = ps[0].id;
+  const currentId = state.currentProjectId && state.projects[state.currentProjectId] ? state.currentProjectId : ps[0].id;
+  if(!state.compare) state.compare = defaultCompare(currentId);
+  state.compare.rightId = currentId;
+  if(!state.projects[state.compare.leftId]){
+    const fallback = ps.find(p=>p.id !== currentId) || state.projects[currentId] || ps[0];
+    state.compare.leftId = fallback?.id || currentId;
+  }
+  if(state.compare.leftId === state.compare.rightId && ps.length > 1){
+    const fallback = ps.find(p=>p.id !== currentId);
+    if(fallback) state.compare.leftId = fallback.id;
+  }
 }
 function instructorList(){
   const ps=listProjects();
@@ -458,19 +466,37 @@ function projectsForInstructor(inst){
 }
 function syncCompareSide(which){
   ensureCompareIds();
-  const projectKey = which==='left' ? 'leftId' : 'rightId';
-  const instEl = which==='left' ? cmpLeftInstructor : cmpRightInstructor;
-  const projEl = which==='left' ? cmpLeftProject : cmpRightProject;
+  const isLeft = which==='left';
+  const projectKey = isLeft ? 'leftId' : 'rightId';
+  const instEl = isLeft ? cmpLeftInstructor : cmpRightInstructor;
+  const projEl = isLeft ? cmpLeftProject : cmpRightProject;
+  const instructors = [...new Set(listProjects().map(p=>p.instructor).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+
+  if(!isLeft){
+    const fixed = state.projects[state.currentProjectId] || state.projects[state.compare.rightId] || listProjects()[0] || null;
+    const fixedInst = fixed?.instructor || instructors[0] || '';
+    setOptionsPreserve(instEl, fixedInst ? [{value:fixedInst,label:fixedInst}] : [], fixedInst);
+    setOptionsPreserve(projEl, fixed ? [{value:fixed.id,label:fixed.cohort}] : [], fixed?.id || '');
+    state.compare.rightId = fixed?.id || '';
+    if(instEl) instEl.disabled = true;
+    if(projEl) projEl.disabled = true;
+    return;
+  }
+
   const currentId = state.compare[projectKey];
   const currentProj = state.projects[currentId];
-  const instructors = [...new Set(listProjects().map(p=>p.instructor).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-  const wantedInst = instEl.value || currentProj?.instructor || instructors[0] || '';
-  setOptionsPreserve(instEl, instructors.map(x=>({value:x,label:x})), wantedInst);
-  const ps = projectsForInstructor(instEl.value || wantedInst);
+  const searchTerm = String(cmpLeftInstructorSearch?.value || '').trim().toLowerCase();
+  let filteredInstructors = instructors.filter(name => String(name || '').toLowerCase().includes(searchTerm));
+  if(!filteredInstructors.length) filteredInstructors = instructors.slice();
+  const wantedInst = filteredInstructors.includes(instEl.value) ? instEl.value : (filteredInstructors.includes(currentProj?.instructor) ? currentProj.instructor : (filteredInstructors[0] || ''));
+  setOptionsPreserve(instEl, filteredInstructors.map(x=>({value:x,label:x})), wantedInst);
+  const ps = projectsForInstructor(instEl.value || wantedInst).filter(p=>p.id !== state.currentProjectId);
   let wantedId = currentId;
   if(!ps.some(p=>p.id===wantedId)) wantedId = ps[0]?.id || '';
   setOptionsPreserve(projEl, ps.map(p=>({value:p.id,label:p.cohort})), wantedId);
   state.compare[projectKey] = projEl.value || wantedId || '';
+  if(instEl) instEl.disabled = false;
+  if(projEl) projEl.disabled = false;
 }
 function renderComparePickers(){
   ensureCompareIds();
@@ -494,6 +520,14 @@ function renderComparePickers(){
     });
   });
 
+  if(cmpLeftInstructorSearch){
+    cmpLeftInstructorSearch.oninput = ()=>{
+      state.compare.leftId = '';
+      syncCompareSide('left');
+      saveState();
+      renderCompare();
+    };
+  }
   cmpLeftInstructor.onchange = ()=>{
     state.compare.leftId = '';
     syncCompareSide('left');
@@ -501,7 +535,6 @@ function renderComparePickers(){
     renderCompare();
   };
   cmpRightInstructor.onchange = ()=>{
-    state.compare.rightId = '';
     syncCompareSide('right');
     saveState();
     renderCompare();
@@ -512,7 +545,7 @@ function renderComparePickers(){
     renderCompare();
   };
   cmpRightProject.onchange = ()=>{
-    state.compare.rightId = cmpRightProject.value || '';
+    syncCompareSide('right');
     saveState();
     renderCompare();
   };

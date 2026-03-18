@@ -471,10 +471,19 @@ function refreshSettingsUI(){
   const valuePerDbAuto = getValuePerDbAuto(p, recruitFinal);
   cfgValuePerDb.value = Math.round(valuePerDbAuto || 0);
 
-  const ps=listProjects().filter(x=>x.id!==p.id).sort((a,b)=>projLabel(a).localeCompare(projLabel(b)));
+  const sameInstructorProjects = listProjects()
+    .filter(x=>x.id!==p.id && String(x.instructor||'').trim()===String(p.instructor||'').trim())
+    .sort((a,b)=>projLabel(a).localeCompare(projLabel(b)));
   prevProjSelect.innerHTML = [`<option value="">(선택)</option>`].concat(
-    ps.map(x=>`<option value="${esc(x.id)}">${esc(projLabel(x))}</option>`)
+    sameInstructorProjects.map(x=>`<option value="${esc(x.id)}">${esc(projLabel(x))}</option>`)
   ).join('');
+
+  if((p.prevLink?.mode || 'none') === 'none' && !isAutoPrevOptOut(p.id) && !hasPrevManualNumbers(p)){
+    const autoCandidate = findAutoPrevProjectCandidate(p, listProjects());
+    if(autoCandidate){
+      p.prevLink = { mode:'linked', prevProjectId:autoCandidate.id, manual:{db:0,spend:0,revenue:0} };
+    }
+  }
 
   const mode=p.prevLink?.mode || 'none';
   const linkedId=p.prevLink?.prevProjectId || '';
