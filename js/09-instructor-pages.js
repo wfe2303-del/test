@@ -65,7 +65,12 @@
       instructorCohortChips.innerHTML = '';
       nextCalcBaseLabel.innerHTML = '<b>-</b>';
       nextCalcNextLabel.innerHTML = '<b>-</b>';
-      nextCalcSummary.innerHTML = '다음 기수 예상 매출을 계산하려면 먼저 기수를 등록해줘.';
+      if(nextCalcProjectedRevenue) nextCalcProjectedRevenue.textContent = '₩0';
+      if(nextCalcProjectedSub) nextCalcProjectedSub.textContent = '다음 기수 예상 매출을 계산하려면 먼저 기수를 등록해줘.';
+      if(nextCalcAddedDb) nextCalcAddedDb.textContent = '0';
+      if(nextCalcCpa) nextCalcCpa.textContent = '₩0';
+      if(nextCalcValuePerDb) nextCalcValuePerDb.textContent = '₩0';
+      nextCalcSummary.textContent = '기수를 등록하면 자동으로 현재 기수 기준값을 잡아 계산해줘.';
       return;
     }
 
@@ -108,20 +113,20 @@
     const baseExpected = valuePerDb * baseRecruitDb;
     const nextExpected = valuePerDb * (baseRecruitDb + addPaidDb);
 
+    if(nextCalcAddedDb) nextCalcAddedDb.textContent = fmtInt(addPaidDb);
+    if(nextCalcCpa) nextCalcCpa.textContent = avgCpa > 0 ? fmtWon(avgCpa) : '데이터 없음';
+    if(nextCalcValuePerDb) nextCalcValuePerDb.textContent = valuePerDb > 0 ? fmtWon(valuePerDb) : '데이터 없음';
+
     if(valuePerDb <= 0){
-      nextCalcSummary.innerHTML =
-        `현재 선택 기수의 <b>실매출</b> 또는 <b>모집DB</b>가 없어 DB당 가치를 계산하지 못했어.<br/>` +
-        `먼저 실매출과 DB 데이터를 넣어두면 다음 기수 광고비 증액 예상 매출을 계산할 수 있어.`;
+      if(nextCalcProjectedRevenue) nextCalcProjectedRevenue.textContent = '계산 불가';
+      if(nextCalcProjectedSub) nextCalcProjectedSub.textContent = '실매출 또는 모집DB가 없어서 DB당 가치를 계산할 수 없어.';
+      nextCalcSummary.textContent = '현재 기수에 실매출과 모집DB를 먼저 넣어주면 광고비 증액 예상 매출을 계산해줘.';
       return;
     }
 
-    nextCalcSummary.innerHTML =
-      `<b>기준 기수</b> ${esc(current.instructor)} / ${esc(current.cohort)}<br/>` +
-      `<b>현재 모집DB</b> ${fmtInt(baseRecruitDb)} / <b>현재 광고비</b> ${fmtWon(snap.spend)} / <b>평균 CPA</b> ${fmtWon(avgCpa)}<br/>` +
-      `<b>현재 DB당 가치</b> ${fmtWon(valuePerDb)}<br/>` +
-      `<b>현재 기수 기준 기본 예상 매출</b> ${fmtWon(baseExpected)}<br/>` +
-      `<b>추가 광고비</b> ${fmtWon(extraSpend)} → <b>추가 Paid DB 예상</b> ${fmtInt(addPaidDb)}<br/>` +
-      `<b>${esc(getNextCohortLabel(current))} 예상 매출</b> ${fmtWon(nextExpected)}`;
+    if(nextCalcProjectedRevenue) nextCalcProjectedRevenue.textContent = fmtWon(nextExpected);
+    if(nextCalcProjectedSub) nextCalcProjectedSub.textContent = `${fmtWon(extraSpend)} 증액 시 ${fmtInt(addPaidDb)}건의 추가 Paid DB를 가정해 계산했어.`;
+    nextCalcSummary.textContent = `현재 예상매출 ${fmtWon(baseExpected)} → 다음 기수 예상매출 ${fmtWon(nextExpected)} · 기준 CPA ${fmtWon(avgCpa)} · DB당 가치 ${fmtWon(valuePerDb)}`;
   }
 
   if(nextCalcExtraSpend){

@@ -63,32 +63,67 @@
         <h2 id="pageInstructorTitle">-</h2>
         <div id="pageInstructorSub" class="hint">-</div>
       </div>
-      <button id="btnOpenCompareTab" class="btn-primary">강사/기수 비교 열기</button>
+      <button id="btnOpenCompareTab" class="btn-primary btn-soft">강사/기수 비교</button>
     </div>
 
     <div id="instructorHeroStats" class="instructorHeroStats"></div>
 
     <div class="instructorHeroGrid">
-      <div class="chartBox">
-        <div style="font-weight:900;margin-bottom:8px">등록된 기수 목록</div>
-        <div class="small" style="margin-bottom:10px">기수를 누르면 현재 프로젝트가 바로 바뀌고 기존 화면도 해당 기수 기준으로 갱신돼.</div>
+      <div class="chartBox cohortPanelWhite">
+        <div class="panelTitleRow">
+          <div>
+            <div class="panelEyebrow">COHORTS</div>
+            <div class="panelTitle">등록된 기수</div>
+          </div>
+        </div>
+        <div class="small" style="margin-bottom:10px">기수를 누르면 현재 프로젝트가 바로 바뀌어.</div>
         <div id="instructorCohortChips" class="instructorCohortChips"></div>
       </div>
 
-      <div class="chartBox">
-        <div style="font-weight:900;margin-bottom:8px">다음 기수 광고비 증액 예상 매출 계산기</div>
-        <div class="small" style="margin-bottom:10px">현재 선택한 기수를 기준으로 다음 기수 광고비를 더 넣었을 때 예상되는 매출을 계산해줘. 다음 기수가 이미 종료됐어도 기준 기수 + 1 계산으로 보여줘.</div>
-        <div class="row">
-          <label class="small">기준 기수</label>
-          <div id="nextCalcBaseLabel" class="badge"><b>-</b></div>
-          <label class="small">다음 기수</label>
-          <div id="nextCalcNextLabel" class="badge"><b>-</b></div>
+      <div class="chartBox calcPanelWhite">
+        <div class="panelTitleRow calcTopRow">
+          <div>
+            <div class="panelEyebrow">NEXT COHORT CALCULATOR</div>
+            <div class="panelTitle">광고비 증액 예상 매출</div>
+          </div>
+          <div class="calcLabelsCompact">
+            <div class="calcMiniLabel">
+              <span>기준 기수</span>
+              <div id="nextCalcBaseLabel" class="badge calcBadge"><b>-</b></div>
+            </div>
+            <div class="calcMiniLabel">
+              <span>다음 기수</span>
+              <div id="nextCalcNextLabel" class="badge calcBadge"><b>-</b></div>
+            </div>
+          </div>
         </div>
-        <div class="row" style="margin-top:10px">
-          <label class="small">추가 광고비(원)</label>
-          <input id="nextCalcExtraSpend" type="number" min="0" step="10000" value="0" style="min-width:220px"/>
+        <div class="small calcIntro">광고비 증액만 입력하면 현재 기수의 DB당 가치와 CPA를 기준으로 다음 기수 예상 매출을 바로 계산해줘.</div>
+        <div class="calcInputRow">
+          <label class="small" for="nextCalcExtraSpend">광고비 증액(원)</label>
+          <div class="calcInputWrap">
+            <input id="nextCalcExtraSpend" type="number" min="0" step="10000" value="0" inputmode="numeric" placeholder="예: 500000" />
+          </div>
         </div>
-        <div id="nextCalcSummary" class="note" style="margin-top:12px"></div>
+        <div class="calcResultHero">
+          <div class="calcResultHeroLabel">다음 기수 예상 매출</div>
+          <div id="nextCalcProjectedRevenue" class="calcResultHeroValue">₩0</div>
+          <div id="nextCalcProjectedSub" class="calcResultHeroSub">광고비 증액을 입력하면 예상 매출이 계산돼.</div>
+        </div>
+        <div class="calcMetricGrid">
+          <div class="calcMetricCard">
+            <div class="calcMetricLabel">추가 Paid DB 예상</div>
+            <div id="nextCalcAddedDb" class="calcMetricValue">0</div>
+          </div>
+          <div class="calcMetricCard">
+            <div class="calcMetricLabel">현재 기수 기준 CPA</div>
+            <div id="nextCalcCpa" class="calcMetricValue">₩0</div>
+          </div>
+          <div class="calcMetricCard">
+            <div class="calcMetricLabel">현재 DB당 가치</div>
+            <div id="nextCalcValuePerDb" class="calcMetricValue">₩0</div>
+          </div>
+        </div>
+        <div id="nextCalcSummary" class="calcSummaryLine">-</div>
       </div>
     </div>
   </section>

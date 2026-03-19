@@ -133,6 +133,11 @@ const nextCalcBaseLabel = $('nextCalcBaseLabel');
 const nextCalcNextLabel = $('nextCalcNextLabel');
 const nextCalcExtraSpend = $('nextCalcExtraSpend');
 const nextCalcSummary = $('nextCalcSummary');
+const nextCalcProjectedRevenue = $('nextCalcProjectedRevenue');
+const nextCalcProjectedSub = $('nextCalcProjectedSub');
+const nextCalcAddedDb = $('nextCalcAddedDb');
+const nextCalcCpa = $('nextCalcCpa');
+const nextCalcValuePerDb = $('nextCalcValuePerDb');
 const btnOpenCompareTab = $('btnOpenCompareTab');
 
 const fileInput = $('fileInput');
