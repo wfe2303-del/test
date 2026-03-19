@@ -1,3 +1,7 @@
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-4Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-5Medium.ttf") format("truetype");font-weight:500;font-style:normal;font-display:swap;}
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-7Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap;}
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-8ExtraBold.ttf") format("truetype");font-weight:800;font-style:normal;font-display:swap;}
 :root{
   --bg:#f4f6fb;
   --surface:#ffffff;
@@ -22,7 +26,7 @@ body[data-page="landing-dashboard"]{
   margin:0;
   background:var(--bg);
   color:var(--text);
-  font-family:"Pretendard Variable","Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:"Paperlogy","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 body[data-page="landing-dashboard"] *{box-sizing:border-box;}
 button,input{font:inherit;}
@@ -297,7 +301,7 @@ button,input{font:inherit;}
 }
 
 /* v7d polish overrides */
-body[data-page="landing-dashboard"]{font-family:"Pretendard Variable","Pretendard",system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#eef1f6;color:#121826;}
+body[data-page="landing-dashboard"]{font-family:"Paperlogy",system-ui,-apple-system,"Noto Sans KR",sans-serif;background:#eef1f6;color:#121826;}
 .brandLogoImg{display:block;object-fit:contain;}
 .loginScreen{padding:32px;background:linear-gradient(180deg,#eef2f8 0%,#e9edf5 100%);}
 .loginSimpleCard{width:min(460px,100%);margin:40px auto;padding:28px;border-radius:24px;background:#fff;border:1px solid #dde3ef;box-shadow:0 24px 60px rgba(15,23,42,.08);}

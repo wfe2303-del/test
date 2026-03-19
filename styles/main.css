@@ -1,13 +1,17 @@
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-4Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-5Medium.ttf") format("truetype");font-weight:500;font-style:normal;font-display:swap;}
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-7Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap;}
+@font-face{font-family:"Paperlogy";src:url("../assets/fonts/Paperlogy-8ExtraBold.ttf") format("truetype");font-weight:800;font-style:normal;font-display:swap;}
 :root{
       --bg:#f6f7fb; --card:#ffffff; --bd:#e5e7eb; --fg:#0f172a; --muted:#64748b;
       --brand:#2563eb; --brand2:#1d4ed8;
       --danger:#ef4444; --danger2:#dc2626;
       --shadow:0 10px 30px rgba(15,23,42,.08);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --mono:"Paperlogy","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
       --softBlue:#eff6ff; --softRed:#fff1f2; --softGray:#f8fafc;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:var(--bg);color:var(--fg)}
+    body{margin:0;font-family:"Paperlogy","Apple SD Gothic Neo","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg)}
     header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter: blur(8px);border-bottom:1px solid var(--bd)}
     .wrap{max-width:1360px;margin:0 auto;padding:14px 16px}
     .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -1484,4 +1488,453 @@ body[data-page="landing-dashboard"]{
   .dashSpotlightGrid,
   .dashCategorySummaryGrid{grid-template-columns:1fr;}
   .dashSpotlightName{font-size:24px;}
+}
+
+/* ===== Instructor Page Refresh v7k ===== */
+body[data-page="instructor"]{
+  background:#f4f7fb;
+  color:#111827;
+}
+body[data-page="instructor"] header{
+  position:sticky;
+  top:0;
+  z-index:80;
+  background:rgba(255,255,255,.92);
+  border-bottom:1px solid #e6edf7;
+  box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+body[data-page="instructor"] .wrap,
+body[data-page="instructor"] main{
+  max-width:1440px;
+}
+body[data-page="instructor"] .wrap{
+  padding:14px 22px;
+}
+body[data-page="instructor"] main{
+  padding:22px;
+}
+body[data-page="instructor"] .topbar{
+  align-items:flex-start;
+}
+body[data-page="instructor"] .title h1{
+  font-size:22px;
+  line-height:1.15;
+  letter-spacing:-.03em;
+}
+body[data-page="instructor"] .title .sub{
+  margin-top:6px;
+  max-width:780px;
+  font-size:13px;
+  line-height:1.55;
+}
+body[data-page="instructor"] .actions{
+  gap:10px;
+}
+body[data-page="instructor"] .actions .pill,
+body[data-page="instructor"] .projToolbar .badge{
+  min-height:40px;
+  padding:0 14px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid #dde6f2;
+  font-size:12px;
+}
+body[data-page="instructor"] .projToolbar{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #edf2f8;
+}
+body[data-page="instructor"] .iconBtn{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+}
+body[data-page="instructor"] .projectMenuPanel{
+  top:56px;
+  border-radius:22px;
+  border-color:#dbe5f0;
+  box-shadow:0 24px 56px rgba(15,23,42,.16);
+}
+body[data-page="instructor"] .tabs{
+  display:flex;
+  gap:10px;
+  padding:6px;
+  margin:20px 0 18px;
+  background:#eef3f8;
+  border:1px solid #dce5ef;
+  border-radius:18px;
+}
+body[data-page="instructor"] .tab{
+  min-height:42px;
+  padding:0 16px;
+  border:none;
+  border-radius:12px;
+  background:transparent;
+  color:#526072;
+  font-size:13px;
+  font-weight:700;
+}
+body[data-page="instructor"] .tab.active{
+  background:#fff;
+  color:#0f172a;
+  border:1px solid #d7e3f1;
+  box-shadow:0 4px 14px rgba(15,23,42,.06);
+}
+body[data-page="instructor"] .card,
+body[data-page="instructor"] .chartBox,
+body[data-page="instructor"] .vsWrap,
+body[data-page="instructor"] .compareSide,
+body[data-page="instructor"] .compareMetricPanel,
+body[data-page="instructor"] .cmpGraphWrap,
+body[data-page="instructor"] .cmpControls{
+  border-radius:22px;
+  border-color:#dfe8f2;
+  box-shadow:0 12px 28px rgba(15,23,42,.05);
+}
+body[data-page="instructor"] .card .hd{
+  padding:18px 20px 0;
+}
+body[data-page="instructor"] .card .bd{
+  padding:16px 20px 20px;
+}
+body[data-page="instructor"] .card .hd h2{
+  font-size:18px;
+  letter-spacing:-.02em;
+}
+body[data-page="instructor"] .hint,
+body[data-page="instructor"] .small,
+body[data-page="instructor"] .note,
+body[data-page="instructor"] .badge,
+body[data-page="instructor"] .pill,
+body[data-page="instructor"] table,
+body[data-page="instructor"] tbody td,
+body[data-page="instructor"] thead th,
+body[data-page="instructor"] input,
+body[data-page="instructor"] select,
+body[data-page="instructor"] button{
+  letter-spacing:-.01em;
+}
+body[data-page="instructor"] .instructorHero{
+  margin-bottom:20px;
+}
+body[data-page="instructor"] .instructorHeroSurface{
+  display:grid;
+  gap:18px;
+  padding:26px;
+  background:linear-gradient(180deg,#ffffff 0%,#fafcff 100%);
+  border:1px solid #dde6f1;
+  border-radius:28px;
+  box-shadow:0 18px 44px rgba(15,23,42,.06);
+}
+body[data-page="instructor"] .instructorHeroHead{
+  gap:18px;
+  align-items:flex-start;
+}
+body[data-page="instructor"] .instructorHeroTitleBlock{
+  display:grid;
+  gap:8px;
+}
+body[data-page="instructor"] .instructorHeroEyebrow{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.14em;
+  color:#6b7b92;
+}
+body[data-page="instructor"] .instructorHeroHead h2{
+  margin:0;
+  font-size:34px;
+  line-height:1.08;
+  letter-spacing:-.05em;
+}
+body[data-page="instructor"] .instructorHeroSub{
+  max-width:760px;
+  font-size:14px;
+  line-height:1.6;
+  color:#64748b;
+}
+body[data-page="instructor"] .instructorHeroActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-left:auto;
+}
+body[data-page="instructor"] .instructorActionBtn{
+  min-height:46px;
+  padding:0 18px;
+  border-radius:14px;
+  font-weight:700;
+}
+body[data-page="instructor"] .instructorHeroStats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+body[data-page="instructor"] .instructorStatCard{
+  min-height:118px;
+  padding:18px 18px 16px;
+  border-radius:22px;
+  border:1px solid #dee7f1;
+  background:#fff;
+  box-shadow:0 10px 24px rgba(15,23,42,.04);
+  display:grid;
+  gap:10px;
+  align-content:start;
+}
+body[data-page="instructor"] .instructorStatLabel{
+  font-size:12px;
+  font-weight:700;
+  color:#6b7b92;
+}
+body[data-page="instructor"] .instructorStatValue{
+  font-size:26px;
+  line-height:1.1;
+  font-weight:800;
+  letter-spacing:-.04em;
+  color:#111827;
+  overflow-wrap:anywhere;
+}
+body[data-page="instructor"] .instructorStatSub{
+  font-size:12px;
+  line-height:1.5;
+  color:#94a3b8;
+}
+body[data-page="instructor"] .instructorHeroGrid{
+  grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);
+  gap:18px;
+}
+body[data-page="instructor"] .instructorPanelCard{
+  border-radius:24px;
+  padding:22px;
+  background:#fff;
+  border:1px solid #dfe8f2;
+  box-shadow:0 14px 32px rgba(15,23,42,.05);
+}
+body[data-page="instructor"] .panelEyebrow{
+  font-size:11px;
+  color:#7b8ba4;
+}
+body[data-page="instructor"] .panelTitle{
+  font-size:24px;
+  letter-spacing:-.04em;
+}
+body[data-page="instructor"] .instructorPanelHint,
+body[data-page="instructor"] .calcIntro,
+body[data-page="instructor"] .calcLauncherCaption,
+body[data-page="instructor"] .calcLauncherOpenText{
+  font-size:13px;
+  line-height:1.6;
+  color:#64748b;
+}
+body[data-page="instructor"] .calcLauncherMetaRow,
+body[data-page="instructor"] .calcLauncherPreview{
+  gap:14px;
+}
+body[data-page="instructor"] .calcLauncherMetaBox,
+body[data-page="instructor"] .calcLauncherMetricBox{
+  display:grid;
+  gap:8px;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid #e3ebf5;
+  background:#f8fbff;
+}
+body[data-page="instructor"] .calcStatusBadge{
+  background:#f3f6fb;
+  border-color:#e0e8f3;
+  color:#56657d;
+}
+body[data-page="instructor"] .calcBadge{
+  min-height:42px;
+  padding:0 14px;
+  background:#fff;
+  border-color:#d8e5f7;
+  color:#1f2937;
+}
+body[data-page="instructor"] .calcLauncherLabel,
+body[data-page="instructor"] .calcLauncherMetaBox span{
+  font-size:12px;
+  font-weight:700;
+  color:#718198;
+}
+body[data-page="instructor"] .calcLauncherValue{
+  font-size:22px;
+  line-height:1.12;
+  font-weight:800;
+  color:#111827;
+}
+body[data-page="instructor"] .calcLauncherBottom{
+  padding:18px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);
+  border-color:#d5e4ff;
+}
+body[data-page="instructor"] .calcLauncherRevenue{
+  font-size:34px;
+  line-height:1.04;
+  font-weight:800;
+  color:#275df2;
+  min-width:180px;
+}
+body[data-page="instructor"] .cohortMiniBtn{
+  min-height:42px;
+  padding:0 14px;
+  border-radius:14px;
+  font-size:13px;
+  font-weight:700;
+}
+body[data-page="instructor"] .calcModalBackdrop[hidden]{display:none !important;}
+body[data-page="instructor"] .calcModalBackdrop{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  background:rgba(15,23,42,.54);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .2s ease, visibility .2s ease;
+}
+body[data-page="instructor"] .calcModalBackdrop.open{
+  opacity:1;
+  visibility:visible;
+}
+body[data-page="instructor"] .calcModalCard{
+  width:min(760px,100%);
+  padding:30px;
+  border-radius:30px;
+}
+body[data-page="instructor"] .calcModalClose{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+body[data-page="instructor"] .calcModalTitleRow h3{
+  font-size:38px;
+  line-height:1.04;
+}
+body[data-page="instructor"] .calcModalSub{
+  max-width:560px;
+}
+body[data-page="instructor"] .calcAppPanel{
+  margin-top:8px;
+  padding:22px;
+  border-radius:24px;
+  background:#f7fafe;
+}
+body[data-page="instructor"] .calcAppInputLabel{
+  font-size:13px;
+  color:#0f172a;
+}
+body[data-page="instructor"] .calcInputWrap input{
+  min-height:72px;
+  border-radius:20px;
+  font-size:32px;
+}
+body[data-page="instructor"] .calcResultHero{
+  margin-top:16px;
+  padding:22px 24px;
+  border-radius:24px;
+}
+body[data-page="instructor"] .calcResultHeroLabel{
+  font-size:12px;
+}
+body[data-page="instructor"] .calcResultHeroValue{
+  font-size:46px;
+  line-height:1.02;
+}
+body[data-page="instructor"] .calcResultHeroSub,
+body[data-page="instructor"] .calcSummaryLine{
+  font-size:13px;
+}
+body[data-page="instructor"] .calcMetricGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+body[data-page="instructor"] .calcMetricCard{
+  min-height:112px;
+  border-radius:20px;
+}
+body[data-page="instructor"] .calcMetricValue{
+  font-size:24px;
+  line-height:1.12;
+}
+body[data-page="instructor"] .table-wrap{
+  border-radius:20px;
+}
+body[data-page="instructor"] table{
+  min-width:980px;
+}
+body[data-page="instructor"] thead th{
+  font-size:12px;
+  padding:12px 12px;
+  background:#f8fafc;
+}
+body[data-page="instructor"] tbody td{
+  padding:11px 12px;
+  font-size:13px;
+}
+body[data-page="instructor"] .kpi .box{
+  border-radius:18px;
+  padding:16px;
+}
+body[data-page="instructor"] .kpi .box .lbl,
+body[data-page="instructor"] .kpi .box .sub{
+  font-size:12px;
+}
+body[data-page="instructor"] .kpi .box .val{
+  font-size:20px;
+  line-height:1.12;
+}
+@media (max-width: 1180px){
+  body[data-page="instructor"] .instructorHeroGrid{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width: 980px){
+  body[data-page="instructor"] .instructorHeroStats{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  body[data-page="instructor"] .calcMetricGrid,
+  body[data-page="instructor"] .calcLauncherPreview,
+  body[data-page="instructor"] .calcLauncherMetaRow,
+  body[data-page="instructor"] .calcAppBadges{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width: 720px){
+  body[data-page="instructor"] .wrap,
+  body[data-page="instructor"] main{
+    padding:14px;
+  }
+  body[data-page="instructor"] .instructorHeroSurface,
+  body[data-page="instructor"] .instructorPanelCard{
+    padding:18px;
+    border-radius:22px;
+  }
+  body[data-page="instructor"] .instructorHeroHead h2{
+    font-size:28px;
+  }
+  body[data-page="instructor"] .instructorHeroStats{
+    grid-template-columns:1fr;
+  }
+  body[data-page="instructor"] .instructorStatValue{
+    font-size:24px;
+  }
+  body[data-page="instructor"] .calcLauncherRevenue,
+  body[data-page="instructor"] .calcResultHeroValue{
+    font-size:32px;
+  }
+  body[data-page="instructor"] .calcInputWrap input{
+    min-height:64px;
+    font-size:28px;
+  }
+  body[data-page="instructor"] .calcModalCard{
+    padding:20px;
+    border-radius:24px;
+  }
+  body[data-page="instructor"] .calcModalTitleRow h3{
+    font-size:30px;
+  }
 }

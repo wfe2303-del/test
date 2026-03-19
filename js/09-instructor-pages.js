@@ -53,16 +53,18 @@
   function openCalcModal(){
     const modal = document.getElementById('nextCalcModal');
     if(!modal) return;
-    modal.hidden = false;
+    modal.removeAttribute('hidden');
+    modal.classList.add('open');
     document.body.classList.add('body-lock');
     const input = document.getElementById('nextCalcExtraSpend');
-    if(input) setTimeout(()=> input.focus(), 20);
+    if(input) setTimeout(()=> input.focus(), 30);
   }
 
   function closeCalcModal(){
     const modal = document.getElementById('nextCalcModal');
     if(!modal) return;
-    modal.hidden = true;
+    modal.classList.remove('open');
+    modal.setAttribute('hidden','hidden');
     document.body.classList.remove('body-lock');
   }
 
@@ -72,7 +74,11 @@
     const modal = document.getElementById('nextCalcModal');
     if(openBtn && !openBtn.dataset.bound){
       openBtn.dataset.bound = '1';
-      openBtn.addEventListener('click', openCalcModal);
+      openBtn.addEventListener('click', (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        openCalcModal();
+      });
     }
     if(closeBtn && !closeBtn.dataset.bound){
       closeBtn.dataset.bound = '1';
@@ -139,11 +145,17 @@
     }, 0) / Math.max(scoped.length, 1);
 
     instructorHeroStats.innerHTML = [
-      `<span class="badge"><b>등록 기수</b> ${fmtInt(scoped.length)}개</span>`,
-      `<span class="badge"><b>누적 실매출</b> ${fmtWon(totalActual)}</span>`,
-      `<span class="badge"><b>누적 광고비</b> ${fmtWon(totalSpend)}</span>`,
-      `<span class="badge"><b>평균 DB당 가치</b> ${fmtWon(avgValue)}</span>`
-    ].join('');
+      { label:'등록 기수', value:`${fmtInt(scoped.length)}개`, sub:'현재 강사/아이템 기준' },
+      { label:'누적 실매출', value:fmtWon(totalActual), sub:'종료/진행 기수 합산' },
+      { label:'누적 광고비', value:fmtWon(totalSpend), sub:'광고 일예산 기준' },
+      { label:'평균 DB당 가치', value:fmtWon(avgValue), sub:'실매출 ÷ 모집DB 평균' }
+    ].map(item=>`
+      <div class="instructorStatCard">
+        <div class="instructorStatLabel">${item.label}</div>
+        <div class="instructorStatValue">${item.value}</div>
+        <div class="instructorStatSub">${item.sub}</div>
+      </div>
+    `).join('');
 
     const current = getProj() || scoped[0];
     instructorCohortChips.innerHTML = scoped.map(p=>{
@@ -194,6 +206,21 @@
   document.addEventListener('input', (e)=>{
     if(e.target && e.target.id === 'nextCalcExtraSpend') renderInstructorHero();
   });
+
+  document.addEventListener('click', (e)=>{
+    const openBtn = e.target && e.target.closest ? e.target.closest('#btnOpenCalcModal') : null;
+    const closeBtn = e.target && e.target.closest ? e.target.closest('#btnCloseCalcModal') : null;
+    if(openBtn){
+      e.preventDefault();
+      openCalcModal();
+      return;
+    }
+    if(closeBtn){
+      e.preventDefault();
+      closeCalcModal();
+    }
+  });
+
 
   const btnOpenCompareTab = document.getElementById('btnOpenCompareTab');
   if(btnOpenCompareTab){
