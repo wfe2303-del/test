@@ -1,5 +1,5 @@
 const SUPABASE_URL = 'https://eaukbojyuygwhkaxdvnx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImVhdWtib2p5dXlnd2hrYXhkdm54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTk0OTMsImV4cCI6MjA4ODc3NTQ5M30.0IAiljx47666xWxJq5N_kDmjPUpESmibPqEjDtb2TRc';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhdWtib2p5dXlnd2hrYXhkdm54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTk0OTMsImV4cCI6MjA4ODc3NTQ5M30.0IAiljx47666xWxJq5N_kDmjPUpESmibPqEjDtb2TRc';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const LOGIN_ID_MAP = {
@@ -12,31 +12,6 @@ const CATEGORY_CONFIG = [
   { id: 'content', label: '콘텐츠' },
   { id: 'ecommerce', label: '이커머스' },
   { id: 'marketing', label: '마케팅' }
-];
-
-const CATEGORY_RULES = {
-  'real-estate': [
-    '부동산', '경매', '에어비엔비', '에어비앤비', '호스텔', '숙박', '얼죽집', '33m²', '33m2', '카페창업'
-  ],
-  'ecommerce': [
-    '쿠팡', '로켓그로스', '로켓배송', '스마트스토어', '상세페이지', '해외구매대행', '공동구매', '이커머스',
-    '커머스', '쇼핑', '의류', '건기식', '코스트코리셀', '트렌드커머스', '농수산물', '농축수산물', '올웨이즈',
-    '토스', '굿즈', '화장품창업', '폰창업'
-  ],
-  'marketing': [
-    '마케팅', '병원마케팅', '제휴마케팅', '애드센스', '사업개발', '영업왕', 'ai로고디자인', 'chatgpt', 'ai부트캠프',
-    'ai사주', '타로', '주식', '코인', '소개부업', '네이버카페'
-  ],
-  'content': [
-    '쇼츠', '숏폼', '롱폼', '유튜브', '블로그', '인스타', '인스타툰', '이모티콘', '콘텐츠', '틱톡', '영화쇼츠',
-    '시니어쇼츠', '홈페이지', '워드프레스', 'ppt', '미리캔버스', 'ai콘텐츠', 'ai유튜브', 'ai크리에이터', 'ai숏폼',
-    'ai숏폼대행'
-  ]
-};
-
-const SCOPE_CONFIG = [
-  { id: 'all', label: '전체 랭킹' },
-  { id: 'category', label: '카테고리별 랭킹' }
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -52,18 +27,17 @@ const els = {
   searchSidebar: $('sidebarInstructorSearch'),
   instructorCount: $('landingInstructorCount'),
   projectCount: $('landingProjectCount'),
-  heroSelectedInstructor: $('heroSelectedInstructor'),
-  heroSelectedItem: $('heroSelectedItem'),
+  categoryCount: $('landingCategoryCount'),
+  scopeSummaryLabel: $('scopeSummaryLabel'),
+  scopeCategoryPills: $('scopeCategoryPills'),
   sidebarNav: $('sidebarCategoryNav'),
-  sidebarCategoryTabs: $('sidebarCategoryTabs'),
   statsGrid: $('landingStatsGrid'),
   spotlight: $('landingSpotlight'),
   rankingWrap: $('landingRankingTableWrap'),
   spotlightOpenBtn: $('spotlightOpenBtn'),
+  sidebarSearchWrap: $('sidebarSearchWrap'),
   sortMetric: $('landingSortMetric'),
-  sortOrder: $('landingSortOrder'),
-  scopeTabs: $('landingScopeTabs'),
-  categoryTabs: $('landingCategoryTabs')
+  sortOrder: $('landingSortOrder')
 };
 
 let authSession = null;
@@ -71,7 +45,7 @@ let projectRows = [];
 let entityStats = [];
 let selectedEntityKey = '';
 let selectedCategoryId = CATEGORY_CONFIG[0].id;
-let rankingScope = 'all';
+let selectedScopeMode = 'all';
 let rankingSortMetric = 'roas';
 let rankingSortOrder = 'desc';
 
@@ -94,10 +68,11 @@ function fmtWon(n) {
 function fmtWonCompact(n) {
   const x = Number(n);
   if (!Number.isFinite(x)) return '₩0';
-  const abs = Math.abs(x);
-  if (abs >= 1e12) return `₩${(x / 1e12).toFixed(abs >= 1e13 ? 0 : 1)}조`;
-  if (abs >= 1e8) return `₩${(x / 1e8).toFixed(abs >= 1e9 ? 0 : 1)}억`;
-  if (abs >= 1e4) return `₩${(x / 1e4).toFixed(abs >= 1e5 ? 0 : 1)}만`;
+  if (Math.abs(x) >= 100000000) {
+    const eok = x / 100000000;
+    const digits = Math.abs(eok) >= 100 ? 0 : 1;
+    return `₩${eok.toFixed(digits).replace(/\.0$/, '')}억`;
+  }
   return fmtWon(x);
 }
 function fmtRoas(n) {
@@ -128,28 +103,24 @@ function parseCohortLabel(label) {
   const numberMatch = cohortText.match(/(\d+)/);
   return { item, cohortText, cohortNo: numberMatch ? Number(numberMatch[1]) : NaN };
 }
-function normalizeText(value) {
-  return String(value || '').trim().toLowerCase().replace(/\s+/g, '');
-}
-function detectCategoryId(item) {
-  const normalized = normalizeText(item);
-  if (!normalized) return 'content';
-  for (const keyword of CATEGORY_RULES['real-estate']) {
-    if (normalized.includes(normalizeText(keyword))) return 'real-estate';
-  }
-  for (const keyword of CATEGORY_RULES['ecommerce']) {
-    if (normalized.includes(normalizeText(keyword))) return 'ecommerce';
-  }
-  for (const keyword of CATEGORY_RULES['marketing']) {
-    if (normalized.includes(normalizeText(keyword))) return 'marketing';
-  }
-  for (const keyword of CATEGORY_RULES['content']) {
-    if (normalized.includes(normalizeText(keyword))) return 'content';
-  }
-  return 'content';
-}
 function makeEntityKey(instructor, item) {
   return `${String(instructor || '').trim()}||${String(item || '기타').trim()}`;
+}
+
+function normalizeText(v) {
+  return String(v || '').trim().toLowerCase();
+}
+function classifyCategoryId(item, instructor = '') {
+  const text = `${item || ''} ${instructor || ''}`.toLowerCase();
+  const has = (keywords) => keywords.some((k) => text.includes(k));
+  if (has(['부동산','경매','공매','숙소','호스텔','에어비앤비','임대','재개발','토지','상가','공실','월세','오피스텔'])) return 'real-estate';
+  if (has(['쿠팡','구매대행','이커머스','스마트스토어','로켓그로스','쇼핑','상세페이지','브랜드','셀러','상품','도매','위탁','오픈마켓','자사몰','아마존','사입'])) return 'ecommerce';
+  if (has(['쇼츠','유튜브','블로그','콘텐츠','전자책','이모티콘','인스타','릴스','영상','크리에이터','sns','글쓰기','카피','채널'])) return 'content';
+  if (has(['마케팅','광고','crm','브랜딩','퍼포먼스','대행','리드','세일즈','퍼널','그로스','트래픽'])) return 'marketing';
+  return 'content';
+}
+function getCategoryLabelById(id) {
+  return CATEGORY_CONFIG.find((item) => item.id === id)?.label || '기타';
 }
 function getLoginAlias(email) {
   const found = Object.entries(LOGIN_ID_MAP).find(([, mappedEmail]) => mappedEmail === email);
@@ -215,7 +186,6 @@ async function loadDashboardData() {
   if (error) throw error;
   projectRows = Array.isArray(projects) ? projects : [];
   buildEntityStats();
-  ensureSelectionVisible();
   renderAll();
 }
 function buildEntityStats() {
@@ -234,7 +204,7 @@ function buildEntityStats() {
         key,
         instructor,
         item,
-        categoryId: detectCategoryId(item),
+        categoryId: classifyCategoryId(item, instructor),
         projectCount: 0,
         spend: 0,
         revenue: 0,
@@ -257,22 +227,32 @@ function buildEntityStats() {
     ...item,
     roas: item.spend > 0 ? item.revenue / item.spend : 0
   }));
+  const sorted = getSortedEntityStats();
+  if (!selectedEntityKey && sorted.length) selectedEntityKey = sorted[0].key;
+  if (selectedEntityKey && !entityStats.find((row) => row.key === selectedEntityKey)) {
+    selectedEntityKey = sorted[0]?.key || '';
+  }
 }
-function getSidebarSearchKeyword() {
+function getSearchKeyword() {
   return String(els.searchSidebar?.value || '').trim().toLowerCase();
 }
-function getSidebarEntities() {
-  const keyword = getSidebarSearchKeyword();
-  let list = entityStats.filter((item) => item.categoryId === selectedCategoryId);
+function getSidebarEntityStats() {
+  const keyword = getSearchKeyword();
+  let list = entityStats.slice();
   if (keyword) {
-    list = list.filter((item) => [item.instructor, item.item, ...(item.cohorts || [])].join(' ').toLowerCase().includes(keyword));
+    list = list.filter((item) => {
+      const haystack = [item.instructor, item.item, ...(item.cohorts || [])].join(' ').toLowerCase();
+      return haystack.includes(keyword);
+    });
   }
   return list;
 }
-function getScopeEntities() {
-  return rankingScope === 'category'
-    ? entityStats.filter((item) => item.categoryId === selectedCategoryId)
-    : entityStats.slice();
+function getScopedEntityStats() {
+  const list = entityStats.slice();
+  if (selectedScopeMode === 'category') {
+    return list.filter((item) => item.categoryId === selectedCategoryId);
+  }
+  return list;
 }
 function compareEntity(a, b, metric = rankingSortMetric, order = rankingSortOrder) {
   const direction = order === 'asc' ? 1 : -1;
@@ -293,128 +273,117 @@ function compareEntity(a, b, metric = rankingSortMetric, order = rankingSortOrde
   }
   return result * direction;
 }
-function getSortedScopeEntities() {
-  return getScopeEntities().slice().sort((a, b) => compareEntity(a, b));
-}
-function ensureSelectionVisible() {
-  const scoped = getScopeEntities();
-  const inScope = scoped.find((item) => item.key === selectedEntityKey);
-  if (inScope) return;
-  const sidebarFirst = getSidebarEntities().slice().sort(sortByName)[0];
-  selectedEntityKey = sidebarFirst?.key || scoped[0]?.key || entityStats[0]?.key || '';
+function getSortedEntityStats() {
+  return getScopedEntityStats().slice().sort((a, b) => compareEntity(a, b));
 }
 function getSelectedEntity() {
-  const scoped = getScopeEntities();
-  return scoped.find((item) => item.key === selectedEntityKey)
-    || entityStats.find((item) => item.key === selectedEntityKey)
-    || scoped[0]
-    || entityStats[0]
-    || null;
-}
-function sortByName(a, b) {
-  const byInstructor = String(a.instructor).localeCompare(String(b.instructor), 'ko');
-  if (byInstructor !== 0) return byInstructor;
-  return String(a.item).localeCompare(String(b.item), 'ko');
-}
-function getCategoryLabel(id) {
-  return CATEGORY_CONFIG.find((item) => item.id === id)?.label || id;
-}
-function renderSidebarCategories() {
-  if (!els.sidebarCategoryTabs) return;
-  els.sidebarCategoryTabs.innerHTML = CATEGORY_CONFIG.map((category) => {
-    const count = entityStats.filter((item) => item.categoryId === category.id).length;
-    return `
-      <button type="button" class="portalSidebarCategoryButton ${selectedCategoryId === category.id ? 'is-active' : ''}" data-category-id="${esc(category.id)}">
-        <span>${esc(category.label)}</span>
-        <b>${fmtInt(count)}</b>
-      </button>
-    `;
-  }).join('');
-  els.sidebarCategoryTabs.querySelectorAll('[data-category-id]').forEach((button) => {
-    button.addEventListener('click', () => {
-      selectedCategoryId = button.dataset.categoryId || CATEGORY_CONFIG[0].id;
-      if (rankingScope === 'category') ensureSelectionVisible();
-      renderAll();
-    });
-  });
+  const filtered = getSortedEntityStats();
+  return filtered.find((item) => item.key === selectedEntityKey) || filtered[0] || entityStats.find((item) => item.key === selectedEntityKey) || null;
 }
 function renderSidebar() {
   if (!els.sidebarNav) return;
-  const filtered = getSidebarEntities().slice().sort(sortByName);
-  const rows = filtered.map((item) => `
-    <button type="button" class="portalInstructorNavButton portalInstructorNavButtonLight ${selectedEntityKey === item.key ? 'is-active' : ''}" data-entity-key="${esc(item.key)}">
-      <span class="portalInstructorNavMain">
-        <strong>${esc(item.instructor)}</strong>
-        <span>${esc(item.item)} · ${fmtInt(item.projectCount)}기수</span>
-      </span>
-      <span class="portalInstructorNavMetric">${esc(fmtRoas(item.roas))}</span>
-    </button>
+  const searched = getSidebarEntityStats();
+  const groups = CATEGORY_CONFIG.map((category) => {
+    const items = searched
+      .filter((item) => item.categoryId === category.id)
+      .sort((a, b) => {
+        const byInstructor = String(a.instructor).localeCompare(String(b.instructor), 'ko');
+        return byInstructor || String(a.item).localeCompare(String(b.item), 'ko');
+      });
+    return { category, items };
+  });
+  els.sidebarNav.innerHTML = groups.map(({ category, items }) => `
+    <section class="portalCategorySection ${selectedCategoryId === category.id ? 'is-current' : ''}">
+      <button type="button" class="portalCategoryHeader ${selectedCategoryId === category.id ? 'is-open' : ''}" data-category-id="${esc(category.id)}">
+        <span class="portalCategoryHeaderLeft">
+          <span class="portalCategoryDot"></span>
+          <span>${esc(category.label)}</span>
+        </span>
+        <span class="portalCategoryCount">${fmtInt(items.length)}</span>
+      </button>
+      <div class="portalCategoryList" style="display:${selectedCategoryId === category.id ? '' : 'none'}">
+        ${items.length ? items.map((item) => `
+          <button type="button" class="portalInstructorNavButton ${selectedEntityKey === item.key ? 'is-active' : ''}" data-entity-key="${esc(item.key)}">
+            <span class="portalInstructorNavMain">
+              <strong>${esc(item.instructor)}</strong>
+              <span>${esc(item.item)} · ${fmtInt(item.projectCount)}기수</span>
+            </span>
+            <span class="portalInstructorNavMetric">${esc(fmtRoas(item.roas))}</span>
+          </button>
+        `).join('') : '<div class="portalEmptyState sidebarEmpty">표시할 항목이 없어.</div>'}
+      </div>
+    </section>
   `).join('');
-  els.sidebarNav.innerHTML = rows || '<div class="portalEmptyState sidebarEmptyState">검색 결과가 없어.</div>';
+  els.sidebarNav.querySelectorAll('[data-category-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedCategoryId = button.dataset.categoryId || CATEGORY_CONFIG[0].id;
+      renderAll();
+    });
+  });
   els.sidebarNav.querySelectorAll('[data-entity-key]').forEach((button) => {
     button.addEventListener('click', () => {
       selectedEntityKey = button.dataset.entityKey || '';
+      const selected = entityStats.find((item) => item.key === selectedEntityKey);
+      if (selected?.categoryId) selectedCategoryId = selected.categoryId;
       renderAll();
     });
   });
 }
-function renderScopeTabs() {
-  if (els.scopeTabs) {
-    els.scopeTabs.innerHTML = SCOPE_CONFIG.map((scope) => `
-      <button type="button" class="portalSegmentedButton ${rankingScope === scope.id ? 'is-active' : ''}" data-scope-id="${esc(scope.id)}">${esc(scope.label)}</button>
-    `).join('');
-    els.scopeTabs.querySelectorAll('[data-scope-id]').forEach((button) => {
-      button.addEventListener('click', () => {
-        rankingScope = button.dataset.scopeId || 'all';
-        ensureSelectionVisible();
-        renderAll();
-      });
-    });
+
+function renderScopePanel() {
+  document.querySelectorAll('[data-scope-mode]').forEach((button) => {
+    button.classList.toggle('is-active', (button.dataset.scopeMode || '') === selectedScopeMode);
+  });
+  if (els.scopeSummaryLabel) {
+    els.scopeSummaryLabel.textContent = selectedScopeMode === 'all'
+      ? '전체 강사·아이템 기준 랭킹을 보고 있어.'
+      : `${getCategoryLabelById(selectedCategoryId)} 카테고리 기준 랭킹을 보고 있어.`;
   }
-  if (els.categoryTabs) {
-    els.categoryTabs.innerHTML = CATEGORY_CONFIG.map((category) => `
-      <button type="button" class="portalCategoryPill ${selectedCategoryId === category.id ? 'is-active' : ''}" data-category-id="${esc(category.id)}">${esc(category.label)}</button>
-    `).join('');
-    els.categoryTabs.querySelectorAll('[data-category-id]').forEach((button) => {
+  if (els.scopeCategoryPills) {
+    els.scopeCategoryPills.innerHTML = CATEGORY_CONFIG.map((category) => {
+      const count = entityStats.filter((item) => item.categoryId === category.id).length;
+      return `<button type="button" class="scopeCategoryBtn ${selectedCategoryId === category.id ? 'is-active' : ''}" data-pill-category="${esc(category.id)}">${esc(category.label)} <b>${fmtInt(count)}</b></button>`;
+    }).join('');
+    els.scopeCategoryPills.querySelectorAll('[data-pill-category]').forEach((button) => {
       button.addEventListener('click', () => {
-        selectedCategoryId = button.dataset.categoryId || CATEGORY_CONFIG[0].id;
-        if (rankingScope === 'category') ensureSelectionVisible();
+        selectedCategoryId = button.dataset.pillCategory || CATEGORY_CONFIG[0].id;
+        selectedScopeMode = 'category';
         renderAll();
       });
     });
   }
 }
+
 function renderStats() {
   if (!els.statsGrid) return;
-  const scoped = getScopeEntities();
+  const scoped = getScopedEntityStats();
   const totalProjects = scoped.reduce((sum, item) => sum + Number(item.projectCount || 0), 0);
   const totalSpend = scoped.reduce((sum, item) => sum + Number(item.spend || 0), 0);
   const totalRevenue = scoped.reduce((sum, item) => sum + Number(item.revenue || 0), 0);
   const avgRoas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
-  const best = getSortedScopeEntities()[0] || null;
+  const best = getSortedEntityStats()[0] || null;
   if (els.instructorCount) els.instructorCount.textContent = fmtInt(scoped.length);
   if (els.projectCount) els.projectCount.textContent = fmtInt(totalProjects);
-  const scopeSub = rankingScope === 'all' ? '전체 카테고리 합산' : `${getCategoryLabel(selectedCategoryId)} 기준`;
+  if (els.categoryCount) els.categoryCount.textContent = fmtInt(CATEGORY_CONFIG.length);
   const cards = [
-    { label: rankingScope === 'all' ? '항목' : '카테고리 항목', value: `${fmtInt(scoped.length)}개`, sub: scopeSub },
+    { label: '항목', value: `${fmtInt(scoped.length)}개`, sub: selectedScopeMode === 'all' ? '전체 강사·아이템' : `${getCategoryLabelById(selectedCategoryId)} 카테고리` },
     { label: '프로젝트', value: `${fmtInt(totalProjects)}개`, sub: '등록 기수 합산' },
-    { label: '광고비', value: fmtWon(totalSpend), sub: '일예산 합산', emph: true },
-    { label: '실매출', value: fmtWon(totalRevenue), sub: '강사·아이템 합산', emph: true },
-    { label: '평균 ROAS', value: fmtRoas(avgRoas), sub: best ? `현재 1위 ${best.instructor} · ${best.item}` : '표시할 항목 없음', roas: true }
+    { label: '총 광고비', value: fmtWon(totalSpend), sub: '일예산 합산 기준', emph: true },
+    { label: '총 실매출', value: fmtWon(totalRevenue), sub: '실매출 합산', emph: true },
+    { label: '평균 ROAS', value: fmtRoas(avgRoas), sub: best ? `현재 1위 ${best.instructor} · ${best.item}` : '표시할 항목 없음', emph: true }
   ];
   els.statsGrid.innerHTML = cards.map((card) => `
-    <article class="portalStatCard slimStatCard ${card.emph ? 'statCardEmphasis' : ''} ${card.roas ? 'statCardRoas' : ''}">
+    <article class="portalStatCard slimStatCard ${card.emph ? 'is-emphasis' : ''}">
       <div class="portalStatLabel">${esc(card.label)}</div>
-      <div class="portalStatValue" title="${esc(card.value)}">${esc(card.value)}</div>
+      <div class="portalStatValue">${esc(card.value)}</div>
       <div class="portalStatSub">${esc(card.sub)}</div>
     </article>
   `).join('');
 }
+
 function renderSpotlight() {
   if (!els.spotlight) return;
   const selected = getSelectedEntity();
-  if (els.heroSelectedInstructor) els.heroSelectedInstructor.textContent = selected?.instructor || '-';
-  if (els.heroSelectedItem) els.heroSelectedItem.textContent = selected?.item || '-';
   if (!selected) {
     els.spotlight.innerHTML = '<div class="portalEmptyState">선택 가능한 항목이 없어.</div>';
     if (els.spotlightOpenBtn) els.spotlightOpenBtn.disabled = true;
@@ -426,37 +395,40 @@ function renderSpotlight() {
     <div class="portalSpotlightHead compactSpotlightHead">
       <div>
         <div class="portalSpotlightName">${esc(selected.instructor)}</div>
-        <div class="portalSpotlightSub">${esc(selected.item)} · 등록 기수 ${fmtInt(selected.projectCount)}개 · 최근 ${esc(fmtDate(selected.latestCreatedAt))}</div>
+        <div class="portalSpotlightSub">${esc(getCategoryLabelById(selected.categoryId))} · ${esc(selected.item)} · 등록 기수 ${fmtInt(selected.projectCount)}개 · 최근 ${esc(fmtDate(selected.latestCreatedAt))}</div>
       </div>
       <div class="portalRoasPill">ROAS ${esc(fmtRoas(selected.roas))}</div>
     </div>
-    <div class="portalMetricGrid compactMetricGrid spotlightMetricGrid">
-      <div class="portalMetricCard"><span>총 광고비</span><b title="${esc(fmtWon(selected.spend))}">${esc(fmtWonCompact(selected.spend))}</b></div>
-      <div class="portalMetricCard"><span>총 실매출</span><b title="${esc(fmtWon(selected.revenue))}">${esc(fmtWonCompact(selected.revenue))}</b></div>
-      <div class="portalMetricCard"><span>카테고리</span><b>${esc(getCategoryLabel(selected.categoryId))}</b></div>
+    <div class="portalMetricGrid compactMetricGrid">
+      <div class="portalMetricCard"><span>총 광고비</span><b class="nowrapValue">${fmtWonCompact(selected.spend)}</b></div>
+      <div class="portalMetricCard"><span>총 실매출</span><b class="nowrapValue">${fmtWonCompact(selected.revenue)}</b></div>
+      <div class="portalMetricCard"><span>아이템</span><b>${esc(selected.item)}</b></div>
       <div class="portalMetricCard"><span>기수 수</span><b>${fmtInt(selected.projectCount)}개</b></div>
     </div>
     <div class="portalChipList compactChipList">
-      ${recentCohorts.length ? recentCohorts.map((cohort) => `<span class="portalChip" title="${esc(cohort)}">${esc(cohort)}</span>`).join('') : '<span class="portalChip">등록된 기수 없음</span>'}
+      ${recentCohorts.length ? recentCohorts.map((cohort) => `<span class="portalChip">${esc(cohort)}</span>`).join('') : '<span class="portalChip">등록된 기수 없음</span>'}
     </div>
   `;
 }
 function getSortLabel() {
-  const metricMap = { roas: 'ROAS', spend: '광고비', revenue: '실매출', projects: '프로젝트 수', name: '가나다순' };
+  const metricMap = {
+    roas: 'ROAS',
+    spend: '광고비',
+    revenue: '실매출',
+    projects: '기수 수',
+    name: '가나다순'
+  };
   const orderMap = { asc: '오름차순', desc: '내림차순' };
   return `${metricMap[rankingSortMetric] || 'ROAS'} ${orderMap[rankingSortOrder] || '내림차순'}`;
 }
 function renderRankingTable() {
   if (!els.rankingWrap) return;
-  const filtered = getSortedScopeEntities();
-  const scopeLabel = rankingScope === 'all' ? '전체 카테고리 합산' : `${getCategoryLabel(selectedCategoryId)} 기준`;
+  const filtered = getSortedEntityStats();
   const rows = filtered.map((item, index) => `
     <tr class="${selectedEntityKey === item.key ? 'is-active' : ''}" data-rank-key="${esc(item.key)}">
       <td class="center"><span class="portalRankBadge ${index < 3 ? 'top3' : ''}">${index + 1}</span></td>
-      <td class="comboEntityCell">
-        <div class="comboEntityName">${esc(item.instructor)}</div>
-        <div class="comboEntitySub" title="${esc(item.item)}">${esc(item.item)}</div>
-      </td>
+      <td class="cellInstructor">${esc(item.instructor)}</td>
+      <td class="cellItem" title="${esc(item.item)}">${esc(item.item)}</td>
       <td class="center cellProjects">${fmtInt(item.projectCount)}개</td>
       <td class="num spendCell">${fmtWon(item.spend)}</td>
       <td class="num revenueCell">${fmtWon(item.revenue)}</td>
@@ -467,23 +439,24 @@ function renderRankingTable() {
   els.rankingWrap.innerHTML = `
     <div class="portalRankingHint compactHint">
       <span>정렬: ${esc(getSortLabel())}</span>
-      <span>${esc(scopeLabel)} · 광고비 기준: 일예산 합산</span>
+      <span>${selectedScopeMode === 'all' ? '전체 랭킹' : `${getCategoryLabelById(selectedCategoryId)} 랭킹`} · 광고비 기준: 일예산 합산</span>
     </div>
     <div class="portalRankingTableWrap">
-      <table class="portalRankingTable compactTable entityTable emphasisTable rankingCompactTable">
+      <table class="portalRankingTable compactTable entityTable emphasisTable">
         <thead>
           <tr>
             <th class="center" style="width:56px">순위</th>
-            <th style="width:180px">강사 / 아이템</th>
+            <th style="width:104px">강사</th>
+            <th style="width:120px">아이템</th>
             <th class="center" style="width:72px">기수</th>
-            <th style="width:180px">광고비</th>
-            <th style="width:192px">실매출</th>
-            <th class="center" style="width:100px">ROAS</th>
+            <th style="width:176px">광고비</th>
+            <th style="width:188px">실매출</th>
+            <th class="center" style="width:96px">ROAS</th>
             <th class="center" style="width:78px">상세</th>
           </tr>
         </thead>
         <tbody>
-          ${rows || '<tr><td colspan="7"><div class="portalEmptyState">표시할 항목이 없어.</div></td></tr>'}
+          ${rows || '<tr><td colspan="8"><div class="portalEmptyState">표시할 항목이 없어.</div></td></tr>'}
         </tbody>
       </table>
     </div>
@@ -503,9 +476,11 @@ function renderRankingTable() {
   });
 }
 function renderAll() {
-  ensureSelectionVisible();
-  renderSidebarCategories();
-  renderScopeTabs();
+  const scoped = getScopedEntityStats();
+  if (selectedScopeMode === 'category' && scoped.length && !scoped.find((item) => item.key === selectedEntityKey)) {
+    selectedEntityKey = getSortedEntityStats()[0]?.key || selectedEntityKey;
+  }
+  renderScopePanel();
   renderSidebar();
   renderStats();
   renderSpotlight();
@@ -539,22 +514,29 @@ function wireEvents() {
       alert(err?.message || '로그아웃 실패');
     }
   });
-  els.searchSidebar?.addEventListener('input', () => renderSidebar());
+  els.searchSidebar?.addEventListener('input', () => renderAll());
   els.sortMetric?.addEventListener('change', () => {
     rankingSortMetric = els.sortMetric.value || 'roas';
     if (rankingSortMetric === 'name') rankingSortOrder = 'asc';
     if (els.sortOrder) els.sortOrder.value = rankingSortOrder;
-    renderRankingTable();
+    renderAll();
   });
   els.sortOrder?.addEventListener('change', () => {
     rankingSortOrder = els.sortOrder.value || 'desc';
-    renderRankingTable();
+    renderAll();
   });
   els.spotlightOpenBtn?.addEventListener('click', () => {
     const selected = getSelectedEntity();
     openInstructorPage(selected?.instructor || '', selected?.item || '');
   });
+  document.querySelectorAll('[data-scope-mode]').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedScopeMode = button.dataset.scopeMode || 'all';
+      renderAll();
+    });
+  });
 }
+
 (async function init() {
   wireEvents();
   try {
