@@ -816,7 +816,8 @@ body[data-page="landing"]{
   align-items:stretch;
 }
 .cohortPanelWhite,
-.calcPanelWhite{
+.calcPanelWhite,
+.calcLauncherPanelWhite{
   background:#fff;
   border:1px solid #e6ebf5;
   border-radius:24px;
@@ -1002,6 +1003,172 @@ body[data-page="landing"]{
   background:#f8fbff;
   border-color:#2563eb;
 }
+
+.calcLauncherPanelWhite{
+  display:grid;
+  gap:16px;
+}
+.calcLaunchBtn{
+  min-width:132px;
+  min-height:44px;
+  border-radius:14px;
+}
+.calcLauncherMetaRow{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.calcLauncherMetaBox{
+  display:grid;
+  gap:6px;
+}
+.calcLauncherMetaBox span,
+.calcLauncherLabel{
+  font-size:12px;
+  font-weight:800;
+  color:#64748b;
+}
+.calcLauncherPreview{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.calcLauncherValue{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:-.03em;
+  color:#0f172a;
+  word-break:break-word;
+}
+.calcLauncherBottom{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 18px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+  border:1px solid #dbe6ff;
+}
+.calcLauncherCaption{
+  font-size:13px;
+  line-height:1.55;
+  color:#64748b;
+  max-width:320px;
+}
+.calcLauncherRevenue{
+  font-size:32px;
+  line-height:1.05;
+  font-weight:1000;
+  letter-spacing:-.04em;
+  color:#2563eb;
+  text-align:right;
+  word-break:break-word;
+}
+.calcModalBackdrop{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  background:rgba(15,23,42,.48);
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
+.calcModalCard{
+  position:relative;
+  width:min(720px,100%);
+  max-height:min(92vh,860px);
+  overflow:auto;
+  border-radius:28px;
+  background:#ffffff;
+  border:1px solid #e7edf7;
+  box-shadow:0 40px 80px rgba(15,23,42,.24);
+  padding:28px;
+}
+.calcModalClose{
+  position:absolute;
+  top:18px;
+  right:18px;
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  border:1px solid #dbe3f1;
+  background:#fff;
+  color:#0f172a;
+  font-size:18px;
+  font-weight:900;
+}
+.calcModalEyebrow{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 12px;
+  border-radius:999px;
+  background:#eef3ff;
+  color:#4f6edb;
+  font-size:12px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+.calcModalTitleRow h3{
+  margin:0;
+  font-size:34px;
+  letter-spacing:-.04em;
+  line-height:1.05;
+  color:#0f172a;
+}
+.calcModalSub{
+  margin:10px 0 0;
+  color:#64748b;
+  font-size:14px;
+  line-height:1.6;
+}
+.calcAppBadges{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:20px 0 18px;
+}
+.calcAppBadgeGroup{
+  display:grid;
+  gap:6px;
+}
+.calcAppBadgeGroup span{
+  font-size:12px;
+  font-weight:800;
+  color:#64748b;
+}
+.calcAppPanel{
+  border-radius:24px;
+  background:#f8fafc;
+  border:1px solid #e8edf5;
+  padding:20px;
+}
+.calcAppInputLabel{
+  display:block;
+  margin-bottom:10px;
+  font-size:13px;
+  font-weight:900;
+  color:#0f172a;
+}
+.calcAppInputWrap::before{
+  color:#2563eb;
+}
+.calcAppResultHero{
+  margin-top:14px;
+  background:#fff;
+}
+.calcAppMetricGrid{
+  margin-top:16px;
+}
+.calcAppMetricCard{
+  background:#fff;
+}
+.calcAppSummary{
+  margin-top:16px;
+  border-top:1px dashed #d7dfea;
+}
+
 @media (max-width: 900px){
   .landingHeader{
     flex-direction:column;
@@ -1012,8 +1179,26 @@ body[data-page="landing"]{
   .instructorHeroGrid{
     grid-template-columns:1fr;
   }
-  .calcMetricGrid{
+  .calcMetricGrid,
+  .calcLauncherPreview,
+  .calcLauncherMetaRow,
+  .calcAppBadges{
     grid-template-columns:1fr;
+  }
+  .calcLauncherBottom{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .calcLauncherRevenue{
+    text-align:left;
+    font-size:28px;
+  }
+  .calcModalCard{
+    padding:22px 18px;
+    border-radius:24px;
+  }
+  .calcModalTitleRow h3{
+    font-size:28px;
   }
   .calcTopRow{
     flex-direction:column;
@@ -1040,6 +1225,9 @@ body[data-page="landing"]{
   .calcInputWrap input{
     font-size:24px;
     min-height:58px;
+  }
+  .calcModalBackdrop{
+    padding:14px;
   }
   .calcResultHeroValue{
     font-size:30px;
