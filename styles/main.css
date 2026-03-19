@@ -2091,3 +2091,26 @@ body[data-page="instructor"] .settingsCalcRevenue{
     font-size:24px;
   }
 }
+
+
+.menuHint,
+.calcModalSub,
+.settingsCalcHint,
+.modalSub,
+.categoryManageFootnote,
+#pageInstructorSub:empty,
+.calcResultHeroSub:empty,
+.calcSummaryLine:empty,
+.title .sub:empty {
+  display:none !important;
+}
+
+#pageInstructorSub {
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+.calcResultHeroSub,
+.calcSummaryLine {
+  min-height: 0 !important;
+}

@@ -131,18 +131,16 @@
     const scopeTitle = itemFilter ? `${inst} · ${itemFilter}` : inst;
     pageInstructorTitle.textContent = `${scopeTitle} 페이지`;
     document.title = `${scopeTitle} · 강사별 DB보고서`;
-    pageInstructorSub.textContent = scoped.length
-      ? `등록 기수 ${fmtInt(scoped.length)}개 · 기수를 누르면 현재 프로젝트가 바로 바뀌어.`
-      : '아직 등록된 기수가 없어.';
+    pageInstructorSub.textContent = '';
 
     if(!scoped.length){
       instructorHeroStats.innerHTML = '<span class="badge">등록된 기수가 없어.</span>';
       ['previewCalcBaseLabel','nextCalcBaseLabel','previewCalcNextLabel','nextCalcNextLabel'].forEach(id=> setHtml(id,'<b>-</b>'));
       ['previewCalcRevenue','nextCalcProjectedRevenue'].forEach(id=> setText(id,'₩0'));
       ['previewCalcCpa','nextCalcCpa','previewCalcValuePerDb','nextCalcValuePerDb'].forEach(id=> setText(id,'₩0'));
-      setText('nextCalcProjectedSub','광고비 증액을 입력하면 예상 매출이 계산돼.');
+      setText('nextCalcProjectedSub','');
       setText('nextCalcAddedDb','0');
-      setText('nextCalcSummary','기수를 등록하면 자동으로 현재 기수 기준값을 잡아 계산해줘.');
+      setText('nextCalcSummary','');
       return;
     }
 
@@ -204,15 +202,15 @@
 
     if(valuePerDb <= 0){
       ['previewCalcRevenue','nextCalcProjectedRevenue'].forEach(id=> setText(id,'계산 불가'));
-      setText('nextCalcProjectedSub','실매출 또는 모집DB가 없어서 DB당 가치를 계산할 수 없어.');
-      setText('nextCalcSummary','현재 기수에 실매출과 모집DB를 먼저 넣어주면 광고비 증액 예상 매출을 계산해줘.');
+      setText('nextCalcProjectedSub','');
+      setText('nextCalcSummary','');
       return;
     }
 
     const nextExpectedText = fmtWon(nextExpected);
     ['previewCalcRevenue','nextCalcProjectedRevenue'].forEach(id=> setText(id,nextExpectedText));
-    setText('nextCalcProjectedSub', `${fmtWon(extraSpend)} 증액 시 ${fmtInt(addPaidDb)}건의 추가 Paid DB를 가정해 계산했어.`);
-    setText('nextCalcSummary', `현재 예상매출 ${fmtWon(baseExpected)} → 다음 기수 예상매출 ${fmtWon(nextExpected)} · 기준 CPA ${fmtWon(avgCpa)} · DB당 가치 ${fmtWon(valuePerDb)}`);
+    setText('nextCalcProjectedSub', '');
+    setText('nextCalcSummary', '');
   }
 
   document.addEventListener('input', (e)=>{
