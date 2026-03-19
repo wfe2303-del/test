@@ -492,96 +492,97 @@
         </div>
       </div>
       <div class="bd">
-        <div class="threeCol">
-          <div class="chartBox">
-            <div style="font-weight:900;margin-bottom:8px">현재 기수 설정</div>
-            <div class="row">
-              <label class="small">일예산(원)</label>
-              <input type="number" id="cfgDailyBudget" min="0" step="1000" style="min-width:220px"/>
+        <div class="settingsLayout">
+          <div class="settingsTopGrid">
+            <div class="chartBox">
+              <div style="font-weight:900;margin-bottom:8px">현재 기수 설정</div>
+              <div class="row">
+                <label class="small">일예산(원)</label>
+                <input type="number" id="cfgDailyBudget" min="0" step="1000" style="min-width:220px"/>
+              </div>
+              <div class="row" style="margin-top:8px">
+                <label class="small">강사별 정산비율(0.5 또는 50 입력 가능)</label>
+                <input type="number" id="cfgInstructorRate" min="0" max="100" step="0.1" style="min-width:220px"/>
+                <span class="small">예: 35 입력 = 35%</span>
+              </div>
+              <div class="row" style="margin-top:8px">
+                <label class="small">광고 분담비율(0.5 또는 50 입력 가능)</label>
+                <input type="number" id="cfgAdShareCost" min="0" step="1000" style="min-width:220px"/>
+                <span class="small">강사별 부담 광고비 기록용</span>
+              </div>
+              <div class="row" style="margin-top:8px">
+                <label class="small">DB당 가치(자동)</label>
+                <input type="number" id="cfgValuePerDb" readonly style="min-width:220px"/>
+                <span class="small">= 실매출 / 모집DB(Owned+Paid)</span>
+              </div>
+              <div class="row" style="margin-top:8px">
+                <button id="btnSaveCfg" class="btn-primary">저장</button>
+              </div>
+              <div class="sep"></div>
+              <div class="note"></div>
             </div>
-            <div class="row" style="margin-top:8px">
-              <label class="small">강사별 정산비율(0.5 또는 50 입력 가능)</label>
-              <input type="number" id="cfgInstructorRate" min="0" max="100" step="0.1" style="min-width:220px"/>
-              <span class="small">예: 35 입력 = 35%</span>
-            </div>
-            <div class="row" style="margin-top:8px">
-              <label class="small">광고 분담비율(0.5 또는 50 입력 가능)</label>
-              <input type="number" id="cfgAdShareCost" min="0" step="1000" style="min-width:220px"/>
-              <span class="small">강사별 부담 광고비 기록용</span>
-            </div>
-            <div class="row" style="margin-top:8px">
-              <label class="small">DB당 가치(자동)</label>
-              <input type="number" id="cfgValuePerDb" readonly style="min-width:220px"/>
-              <span class="small">= 실매출 / 모집DB(Owned+Paid)</span>
-            </div>
-            <div class="row" style="margin-top:8px">
-              <button id="btnSaveCfg" class="btn-primary">저장</button>
-            </div>
-            <div class="sep"></div>
-            <div class="note"></div>
-          </div>
 
-          <div class="chartBox">
-            <div style="font-weight:900;margin-bottom:8px">이전 기수 연결</div>
-            <div class="row">
-              <label class="small">이전기수(프로젝트) 선택</label>
-              <select id="prevProjSelect" style="min-width:260px"></select>
-              <button id="btnLinkPrev" class="btn-primary">연결</button>
-              <button id="btnUnlinkPrev">해제</button>
-              <button id="btnOpenPrevManual" type="button" onclick="window.openPrevManualModal && window.openPrevManualModal()">수동 입력</button>
-            </div>
-            <div class="sep"></div>
-            <div class="note" id="prevLinkInfo">현재: 이전기수 미연결 (같은 강사 내부에서 수동 연결 가능 / 같은 강사+아이템이면 자동 연결)</div>
-          </div>
-
-          <div class="chartBox revenueInputBox">
-            <div class="revenueInputHead">
-              <div>
-                <div class="revenueInputTitle">현재 기수 실매출 입력</div>
-                <div class="revenueInputSub">최종 결제매출 기준으로 입력해 주세요.</div>
+            <div class="chartBox">
+              <div style="font-weight:900;margin-bottom:8px">이전 기수 연결</div>
+              <div class="row">
+                <label class="small">이전기수(프로젝트) 선택</label>
+                <select id="prevProjSelect" style="min-width:260px"></select>
+                <button id="btnLinkPrev" class="btn-primary">연결</button>
+                <button id="btnUnlinkPrev">해제</button>
+                <button id="btnOpenPrevManual" type="button" onclick="window.openPrevManualModal && window.openPrevManualModal()">수동 입력</button>
               </div>
-            </div>
-            <div class="row revenueInputRow">
-              <label class="small">실매출(원)</label>
-              <input type="number" id="actualRevenue" min="0" step="1000" style="min-width:240px"/>
-              <button id="btnSaveActualRevenue" class="btn-primary">저장</button>
-            </div>
-            <div class="sep"></div>
-            <div class="revenueComparePanel" id="revenueCompareBox"></div>
-          </div>
-
-          <div class="chartBox settingsCalcBox">
-            <div class="settingsCalcHeadRow">
-              <div>
-                <div style="font-weight:900;margin-bottom:8px">다음 기수 예상 매출 계산기</div>
-                
-              </div>
-              <button id="btnOpenCalcModal" class="btn-primary settingsCalcOpenBtn" type="button">계산기 열기</button>
-            </div>
-            <div class="settingsCalcGrid">
-              <div class="settingsCalcMiniCard">
-                <span>기준 기수</span>
-                <div id="previewCalcBaseLabel" class="badge calcBadge"><b>-</b></div>
-              </div>
-              <div class="settingsCalcMiniCard">
-                <span>다음 기수</span>
-                <div id="previewCalcNextLabel" class="badge calcBadge"><b>-</b></div>
-              </div>
-              <div class="settingsCalcMiniCard">
-                <span>현재 CPA</span>
-                <b id="previewCalcCpa" class="settingsCalcValue">₩0</b>
-              </div>
-              <div class="settingsCalcMiniCard">
-                <span>현재 DB당 가치</span>
-                <b id="previewCalcValuePerDb" class="settingsCalcValue">₩0</b>
-              </div>
-              <div class="settingsCalcMiniCard settingsCalcRevenueCard">
-                <span>다음 기수 예상 매출</span>
-                <b id="previewCalcRevenue" class="settingsCalcRevenue">₩0</b>
-              </div>
+              <div class="sep"></div>
+              <div class="note" id="prevLinkInfo">현재: 이전기수 미연결 (같은 강사 내부에서 수동 연결 가능 / 같은 강사+아이템이면 자동 연결)</div>
             </div>
           </div>
 
+          <div class="settingsBottomGrid">
+            <div class="chartBox revenueInputBox">
+              <div class="revenueInputHead">
+                <div>
+                  <div class="revenueInputTitle">현재 기수 실매출 입력</div>
+                  <div class="revenueInputSub">최종 결제매출 기준으로 입력해 주세요.</div>
+                </div>
+              </div>
+              <div class="row revenueInputRow">
+                <label class="small">실매출(원)</label>
+                <input type="number" id="actualRevenue" min="0" step="1000" style="min-width:240px"/>
+                <button id="btnSaveActualRevenue" class="btn-primary">저장</button>
+              </div>
+              <div class="sep"></div>
+              <div class="revenueComparePanel" id="revenueCompareBox"></div>
+            </div>
+
+            <div class="chartBox settingsCalcBox">
+              <div class="settingsCalcHeadRow">
+                <div>
+                  <div style="font-weight:900;margin-bottom:8px">다음 기수 예상 매출 계산기</div>
+                </div>
+                <button id="btnOpenCalcModal" class="btn-primary settingsCalcOpenBtn" type="button">계산기 열기</button>
+              </div>
+              <div class="settingsCalcGrid">
+                <div class="settingsCalcMiniCard">
+                  <span>기준 기수</span>
+                  <div id="previewCalcBaseLabel" class="badge calcBadge"><b>-</b></div>
+                </div>
+                <div class="settingsCalcMiniCard">
+                  <span>다음 기수</span>
+                  <div id="previewCalcNextLabel" class="badge calcBadge"><b>-</b></div>
+                </div>
+                <div class="settingsCalcMiniCard">
+                  <span>현재 CPA</span>
+                  <b id="previewCalcCpa" class="settingsCalcValue">₩0</b>
+                </div>
+                <div class="settingsCalcMiniCard">
+                  <span>현재 DB당 가치</span>
+                  <b id="previewCalcValuePerDb" class="settingsCalcValue">₩0</b>
+                </div>
+                <div class="settingsCalcMiniCard settingsCalcRevenueCard">
+                  <span>다음 기수 예상 매출</span>
+                  <b id="previewCalcRevenue" class="settingsCalcRevenue">₩0</b>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

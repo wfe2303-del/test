@@ -2266,3 +2266,44 @@ body[data-page="instructor"] .settingsCalcRevenue{
 .calcSummaryLine {
   min-height: 0 !important;
 }
+
+
+/* v7w settings tab revenue/calc split layout */
+.settingsLayout{display:grid;gap:14px}
+.settingsTopGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.settingsBottomGrid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(320px,1fr);gap:14px;align-items:start}
+@media (max-width:1100px){
+  .settingsTopGrid,.settingsBottomGrid{grid-template-columns:1fr}
+}
+body[data-page="instructor"] .settingsBottomGrid .revenueInputBox{
+  min-height:100%;
+}
+body[data-page="instructor"] .settingsBottomGrid .settingsCalcBox{
+  min-height:100%;
+  position:relative;
+}
+body[data-page="instructor"] .settingsBottomGrid .settingsCalcHeadRow{
+  align-items:center;
+}
+body[data-page="instructor"] .settingsBottomGrid .settingsCalcGrid{
+  grid-template-columns:1fr;
+}
+body[data-page="instructor"] .settingsBottomGrid .settingsCalcMiniCard{
+  min-height:88px;
+}
+body[data-page="instructor"] .settingsBottomGrid .settingsCalcRevenueCard{
+  min-height:116px;
+}
+body[data-page="instructor"] .settingsBottomGrid .settingsCalcRevenue{
+  font-size:30px;
+}
+body[data-page="instructor"] .settingsBottomGrid .revenueHeroGrid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+body[data-page="instructor"] .settingsBottomGrid .revenueMiniGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+@media (max-width:900px){
+  body[data-page="instructor"] .settingsBottomGrid .revenueHeroGrid,
+  body[data-page="instructor"] .settingsBottomGrid .revenueMiniGrid{grid-template-columns:1fr}
+}

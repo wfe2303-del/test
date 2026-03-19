@@ -1,19 +1,31 @@
-   99 README.md
-  167 index.html
-   17 instructor.html
-   52 js/00-bootstrap.js
-  361 js/01-core-utils-state-auth.js
-  520 js/02-core-db-mapping.js
-  540 js/03-core-dom-ui.js
-  369 js/04-data.js
-  605 js/05-render-shell.js
-  902 js/06-project-import-management.js
-  668 js/07-charts-compare.js
-  523 js/08-events-init.js
-  253 js/09-instructor-pages.js
-  800 js/landing.js
- 1286 styles/landing-dashboard.css
- 2268 styles/main.css
-   81 supabase/project_extra_configs.sql
-    4 vercel.json
-  707 views/app-shell.html
+361 js/01-core-utils-state-auth.js
+520 js/02-core-db-mapping.js
+540 js/03-core-dom-ui.js
+369 js/04-data.js
+605 js/05-render-shell.js
+902 js/06-project-import-management.js
+668 js/07-charts-compare.js
+523 js/08-events-init.js
+52 js/00-bootstrap.js
+253 js/09-instructor-pages.js
+800 js/landing.js
+189 js/landing.js.bak
+2309 styles/main.css
+861 styles/main.css.bak
+1286 styles/landing-dashboard.css
+708 views/app-shell.html
+167 index.html
+4 vercel.json
+2 .gitignore
+99 README.md
+20 line-counts.txt
+3 templates/project-extra-input-template.csv
+21 templates/project-extra-input-template.xlsx
+17 instructor.html
+48 index.html.bak
+81 supabase/project_extra_configs.sql
+5 assets/classaround-logo.png
+6192 assets/fonts/Paperlogy-4Regular.ttf
+6053 assets/fonts/Paperlogy-5Medium.ttf
+6242 assets/fonts/Paperlogy-7Bold.ttf
+6016 assets/fonts/Paperlogy-8ExtraBold.ttf
