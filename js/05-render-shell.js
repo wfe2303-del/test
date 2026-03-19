@@ -512,11 +512,42 @@ function refreshSettingsUI(){
   const totalAdSpend = (p.adsEntries||[]).reduce((a,b)=>a+Number(b.spend||0),0);
   const adShareAmount = totalAdSpend * Number(p.settlement?.adShareRate||0) / 100;
   revenueCompareBox.innerHTML =
-    `<b>현재</b> 실매출 ${fmtWon(p.actualRevenue||0)} / 모집DB ${fmtInt(recruitFinal)} (Owned+Paid)<br/>` +
-    `<b>현재 DB당 가치</b> ${fmtWon(valuePerDbAuto)} (실매출/모집DB)<br/>` +
-    `<b>강사 정산비율</b> ${fmtRate(Number(p.settlement?.instructorRate||0)/100)} → <b>정산 예상액</b> ${fmtWon(instructorSettle)}<br/>` +
-    `<b>광고 분담비율</b> ${fmtRate(Number(p.settlement?.adShareRate||0)/100)} → <b>광고 분담 예상액</b> ${fmtWon(adShareAmount)} (총 광고비 ${fmtWon(totalAdSpend)} 기준)<br/>` +
-    `<b>이전기수 DB당 가치</b> ${fmtWon(prevValuePerDbFinal)} → <b>예상매출</b> ${fmtWon(expected)} (이전 DB당가치×현 모집DB)`;
+    `<div class="revMainCard">` +
+      `<div class="revMainTop">` +
+        `<div>` +
+          `<div class="revMainLabel">현재 실매출</div>` +
+          `<div class="revMainValue">${fmtWon(p.actualRevenue||0)}</div>` +
+        `</div>` +
+        `<span class="revPill">모집DB ${fmtInt(recruitFinal)}</span>` +
+      `</div>` +
+      `<div class="revMainMeta">` +
+        `<span class="revPill">현재 DB당 가치 ${fmtWon(valuePerDbAuto)}</span>` +
+        `<span class="revPill">이전기수 DB당 가치 ${fmtWon(prevValuePerDbFinal)}</span>` +
+        `<span class="revPill">예상매출 ${fmtWon(expected)}</span>` +
+      `</div>` +
+    `</div>` +
+    `<div class="revMiniGrid">` +
+      `<div class="revMiniCard">` +
+        `<div class="revMiniLabel">강사 정산 예상액</div>` +
+        `<div class="revMiniValue">${fmtWon(instructorSettle)}</div>` +
+        `<div class="revMiniMeta">정산비율 ${fmtRate(Number(p.settlement?.instructorRate||0)/100)}</div>` +
+      `</div>` +
+      `<div class="revMiniCard">` +
+        `<div class="revMiniLabel">광고 분담 예상액</div>` +
+        `<div class="revMiniValue">${fmtWon(adShareAmount)}</div>` +
+        `<div class="revMiniMeta">분담비율 ${fmtRate(Number(p.settlement?.adShareRate||0)/100)}</div>` +
+      `</div>` +
+      `<div class="revMiniCard">` +
+        `<div class="revMiniLabel">총 광고비 기준</div>` +
+        `<div class="revMiniValue">${fmtWon(totalAdSpend)}</div>` +
+        `<div class="revMiniMeta">광고DB 누적 기준입니다.</div>` +
+      `</div>` +
+      `<div class="revMiniCard">` +
+        `<div class="revMiniLabel">현 모집DB 기준 예상매출</div>` +
+        `<div class="revMiniValue">${fmtWon(expected)}</div>` +
+        `<div class="revMiniMeta">이전 DB당 가치 × 현 모집DB</div>` +
+      `</div>` +
+    `</div>`;
 }
 function renderAll(){
   updateAuthUi();
