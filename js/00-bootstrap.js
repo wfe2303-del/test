@@ -45,7 +45,7 @@
         <div style="max-width:720px;margin:40px auto;padding:20px;border:1px solid #fecaca;background:#fff1f2;color:#881337;border-radius:16px;line-height:1.6;">
           <div style="font-weight:800;font-size:18px;margin-bottom:8px;">앱 로딩 실패</div>
           <div>${String(err?.message || err)}</div>
-          <div style="margin-top:8px;font-size:13px;color:#9f1239;">GitHub/Vercel에 업로드할 때 views, js, styles 폴더가 함께 올라갔는지 확인해줘.</div>
+          <div style="margin-top:8px;font-size:13px;color:#9f1239;">GitHub/Vercel에 업로드하실 때 views, js, styles 폴더가 함께 업로드되었는지 확인해 주세요.</div>
         </div>`;
     }
   }

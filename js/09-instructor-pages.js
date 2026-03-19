@@ -134,7 +134,7 @@
     pageInstructorSub.textContent = '';
 
     if(!scoped.length){
-      instructorHeroStats.innerHTML = '<span class="badge">등록된 기수가 없어.</span>';
+      instructorHeroStats.innerHTML = '<span class="badge">등록된 기수가 없습니다.</span>';
       ['previewCalcBaseLabel','nextCalcBaseLabel','previewCalcNextLabel','nextCalcNextLabel'].forEach(id=> setHtml(id,'<b>-</b>'));
       ['previewCalcRevenue','nextCalcProjectedRevenue'].forEach(id=> setText(id,'₩0'));
       ['previewCalcCpa','nextCalcCpa','previewCalcValuePerDb','nextCalcValuePerDb'].forEach(id=> setText(id,'₩0'));

@@ -254,7 +254,7 @@ function renderCategoryManageList() {
       </div>
     `;
   }).join('');
-  els.categoryManageList.innerHTML = rows || '<div class="portalEmptyState">등록된 카테고리가 없어.</div>';
+  els.categoryManageList.innerHTML = rows || '<div class="portalEmptyState">등록된 카테고리가 없습니다.</div>';
   els.categoryManageList.querySelectorAll('[data-delete-category]').forEach((button) => {
     button.addEventListener('click', () => {
       deleteCategory(button.dataset.deleteCategory || '');
@@ -350,7 +350,7 @@ async function loginWithIdPassword(id, password) {
   }
   authSession = signUpData?.session || null;
   if (authSession) return signUpData;
-  throw new Error('test 계정 생성 후 이메일 인증이 필요할 수 있어. Supabase Auth 설정을 확인해줘.');
+  throw new Error('test 계정 생성 후 이메일 인증이 필요할 수 있습니다. Supabase Auth 설정을 확인해 주세요.');
 }
 async function logout() {
   const { error } = await sb.auth.signOut();
@@ -532,7 +532,7 @@ function renderSidebar() {
       <span class="portalInstructorNavMetric">${esc(fmtRoas(item.roas))}</span>
     </button>
   `).join('');
-  els.sidebarNav.innerHTML = rows || '<div class="portalEmptyState sidebarEmptyState">검색 결과가 없어.</div>';
+  els.sidebarNav.innerHTML = rows || '<div class="portalEmptyState sidebarEmptyState">검색 결과가 없습니다.</div>';
   els.sidebarNav.querySelectorAll('[data-entity-key]').forEach((button) => {
     button.addEventListener('click', () => {
       selectedEntityKey = button.dataset.entityKey || '';
@@ -598,7 +598,7 @@ function renderSpotlight() {
   if (els.heroSelectedInstructor) els.heroSelectedInstructor.textContent = selected?.instructor || '-';
   if (els.heroSelectedItem) els.heroSelectedItem.textContent = selected?.item || '-';
   if (!selected) {
-    els.spotlight.innerHTML = '<div class="portalEmptyState">선택 가능한 항목이 없어.</div>';
+    els.spotlight.innerHTML = '<div class="portalEmptyState">선택 가능한 항목이 없습니다.</div>';
     if (els.spotlightOpenBtn) els.spotlightOpenBtn.disabled = true;
     return;
   }
@@ -698,7 +698,7 @@ function renderRankingTable() {
           </tr>
         </thead>
         <tbody>
-          ${rows || '<tr><td colspan="8"><div class="portalEmptyState">표시할 항목이 없어.</div></td></tr>'}
+          ${rows || '<tr><td colspan="8"><div class="portalEmptyState">표시할 항목이 없습니다.</div></td></tr>'}
         </tbody>
       </table>
     </div>
@@ -795,6 +795,6 @@ function wireEvents() {
     if (isLoggedIn()) await loadDashboardData();
   } catch (err) {
     console.error(err);
-    if (els.loginMsg) els.loginMsg.textContent = '초기 로딩 실패. Supabase 연결 상태를 확인해줘.';
+    if (els.loginMsg) els.loginMsg.textContent = '초기 로딩에 실패했습니다. Supabase 연결 상태를 확인해 주세요.';
   }
 })();

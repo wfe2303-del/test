@@ -242,7 +242,7 @@ async function importAdsCsvForPlatform(csvText, platform){
     cur.spend+=spend; cur.clicks+=clicks; cur.realDb+=realDb;
     agg.set(date,cur);
   }
-  if(agg.size===0){ alert('인식된 일자(B열)가 없어. B열 날짜 형식 확인'); return; }
+  if(agg.size===0){ alert('인식된 일자(B열)가 없습니다. B열 날짜 형식을 확인해 주세요.'); return; }
 
   try{
     const payload = [];
@@ -282,7 +282,7 @@ async function importAdsXlsxForPlatform(file, platform){
     cur.spend+=spend; cur.clicks+=clicks; cur.realDb+=realDb;
     agg.set(date,cur);
   }
-  if(agg.size===0){ alert('인식된 일자(B열)가 없어. B열 날짜 형식 확인'); return; }
+  if(agg.size===0){ alert('인식된 일자(B열)가 없습니다. B열 날짜 형식을 확인해 주세요.'); return; }
 
   try{
     const payload = [];
@@ -320,7 +320,7 @@ async function importOwnedXlsx(file){
     const k = `${date}||${media}`;
     agg.set(k, (agg.get(k)||0) + 1);
   }
-  if(agg.size===0){ alert('인식된 데이터가 없어. D/H 위치 확인'); return; }
+  if(agg.size===0){ alert('인식된 데이터가 없습니다. D/H 위치를 확인해 주세요.'); return; }
 
   try{
     const payload = [];
@@ -351,7 +351,7 @@ async function importOwnedCsv(csvText){
     const k=`${date}||${media}`;
     agg.set(k,(agg.get(k)||0)+1);
   }
-  if(agg.size===0){ alert('인식된 데이터가 없어. D/H 컬럼 확인'); return; }
+  if(agg.size===0){ alert('인식된 데이터가 없습니다. D/H 컬럼을 확인해 주세요.'); return; }
 
   try{
     const payload = [];

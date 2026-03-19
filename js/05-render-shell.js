@@ -117,7 +117,7 @@ function renderProjectMenu(){
   const query = String(projectMenuSearch?.value || '').trim().toLowerCase();
   if(!groups.length){
     if(projectMenuMeta) projectMenuMeta.textContent = '강사 0명 · 기수 0개';
-    projectMenuList.innerHTML = `<div class="menuEmpty">등록된 프로젝트가 없어.</div>`;
+    projectMenuList.innerHTML = `<div class="menuEmpty">등록된 프로젝트가 없습니다.</div>`;
     return;
   }
   const current = getProj();
@@ -140,7 +140,7 @@ function renderProjectMenu(){
     : `전체 강사 ${fmtInt(groups.length)}명 · 기수 ${fmtInt(totalProjects)}개`;
 
   if(!filtered.length){
-    projectMenuList.innerHTML = `<div class="menuEmpty">검색 결과가 없어. 강사명이나 기수명을 다시 확인해줘.</div>`;
+    projectMenuList.innerHTML = `<div class="menuEmpty">검색 결과가 없습니다. 강사명이나 기수명을 다시 확인해 주세요.</div>`;
     return;
   }
 

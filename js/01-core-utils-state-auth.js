@@ -346,7 +346,7 @@ async function loginWithIdPassword(id, password){
   authSession = signUpData?.session || null;
   if(authSession) return signUpData;
 
-  throw new Error('test 계정은 생성됐지만 이메일 인증이 필요해. Supabase Auth에서 Email 인증 설정을 확인해줘.');
+  throw new Error('test 계정은 생성되었지만 이메일 인증이 필요합니다. Supabase Auth의 Email 인증 설정을 확인해 주세요.');
 }
 async function logout(){
   const { error } = await sb.auth.signOut();
@@ -356,6 +356,6 @@ async function logout(){
 function requireLogin(){
   if(!isLoggedIn()){
     updateAuthUi();
-    throw new Error('로그인이 필요해.');
+    throw new Error('로그인이 필요합니다.');
   }
 }

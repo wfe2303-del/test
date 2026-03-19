@@ -67,7 +67,7 @@ btnMobileSettings?.addEventListener('click', ()=> switchTab('settings'));
 btnRecalc.addEventListener('click', ()=> renderAll());
 
 btnReset.addEventListener('click', async ()=>{
-  if(!isLoggedIn()) return alert('로그인 후 사용할 수 있어');
+  if(!isLoggedIn()) return alert('로그인 후 이용하실 수 있습니다.');
   if(!confirm('정말 전체 초기화할까? (모든 프로젝트/데이터 삭제)')) return;
   try{
     await clearAllDataOnDb();
@@ -159,7 +159,7 @@ btnLinkPrev.addEventListener('click', async ()=>{
   const target = state.projects?.[id];
   if(!target) return alert('선택한 이전기수 프로젝트를 찾지 못했어');
   if(String(target.instructor||'').trim() !== String(p.instructor||'').trim()){
-    return alert('이전기수 연결은 같은 강사 내부 프로젝트끼리만 가능해');
+    return alert('이전기수 연결은 같은 강사의 내부 프로젝트끼리만 가능합니다.');
   }
 
   p.prevLink = { mode:'linked', prevProjectId:id, manual:{db:0,spend:0,revenue:0} };
@@ -255,16 +255,16 @@ fileInput.addEventListener('change', async ()=>{
 
   try{
     const loadingMap = {
-      ads_meta:['메타 광고DB 업로드 중','CSV/엑셀을 읽어서 메타 광고DB에 반영하고 있어.'],
-      ads_google:['구글 광고DB 업로드 중','CSV/엑셀을 읽어서 구글 광고DB에 반영하고 있어.'],
-      owned_xlsx:['온드DB 업로드 중','엑셀을 읽어서 온드DB를 반영하고 있어.'],
-      owned_csv:['온드DB 업로드 중','CSV를 읽어서 온드DB를 반영하고 있어.'],
-      project_sheet:['프로젝트 정리표 업로드 중','강사/아이템/기수 데이터를 읽어서 프로젝트를 반영하고 있어.'],
-      project_batch_files:['날짜/광고DB 파일 일괄반영 중','파일명으로 프로젝트를 찾고 헤더 기준으로 값을 밀어넣고 있어.'],
-      project_meta_batch:['추가입력값 일괄업로드 중','프로젝트명/실매출/일예산 같은 설정값을 한 번에 반영하고 있어.'],
-      project_zip:['ZIP 광고DB 분석 중','ZIP 파일 안의 구글/메타 파일을 분석하고 있어.']
+      ads_meta:['메타 광고DB 업로드 중','CSV/엑셀을 읽어 메타 광고DB에 반영하고 있습니다.'],
+      ads_google:['구글 광고DB 업로드 중','CSV/엑셀을 읽어 구글 광고DB에 반영하고 있습니다.'],
+      owned_xlsx:['온드DB 업로드 중','엑셀을 읽어 온드DB를 반영하고 있습니다.'],
+      owned_csv:['온드DB 업로드 중','CSV를 읽어 온드DB를 반영하고 있습니다.'],
+      project_sheet:['프로젝트 정리표 업로드 중','강사/아이템/기수 데이터를 읽어 프로젝트를 반영하고 있습니다.'],
+      project_batch_files:['날짜/광고DB 파일 일괄반영 중','파일명으로 프로젝트를 찾고 헤더 기준으로 값을 반영하고 있습니다.'],
+      project_meta_batch:['추가입력값 일괄업로드 중','프로젝트명/실매출/일예산 등의 설정값을 한 번에 반영하고 있습니다.'],
+      project_zip:['ZIP 광고DB 분석 중','ZIP 파일 내부의 구글/메타 파일을 분석하고 있습니다.']
     };
-    const loadingInfo = loadingMap[pendingUpload] || ['업로드 중','파일을 처리하고 있어. 잠시만 기다려줘.'];
+    const loadingInfo = loadingMap[pendingUpload] || ['업로드 중','파일을 처리하고 있습니다. 잠시만 기다려 주세요.'];
     showLoading(loadingInfo[0], loadingInfo[1]);
     if(pendingUpload==='ads_meta' || pendingUpload==='ads_google'){
       const platform = pendingUpload==='ads_meta'?'meta':'google';
@@ -332,7 +332,7 @@ zipFileInput?.addEventListener('change', async (e)=>{
   const f = e.target?.files?.[0];
   try{
     if(!f) return;
-    showLoading('ZIP 광고DB 분석 중', 'ZIP 안의 CSV 파일을 읽어서 미리보기를 만들고 있어.');
+    showLoading('ZIP 광고DB 분석 중', 'ZIP 내부의 CSV 파일을 읽어 미리보기를 생성하고 있습니다.');
     updateLoadingProgress(2, 'ZIP 파일을 준비하는 중...');
     const name = String(f.name || '').toLowerCase();
     if(!name.endsWith('.zip')){
@@ -356,7 +356,7 @@ btnZipPreviewCancel?.addEventListener('click', closeZipPreview);
 btnZipPreviewApply?.addEventListener('click', async ()=>{
   try{
     btnZipPreviewApply.disabled = true;
-    showLoading('광고DB 반영 중', '프로젝트를 만들고 ZIP 안의 CSV 광고DB를 서버에 저장하고 있어.');
+    showLoading('광고DB 반영 중', '프로젝트를 생성하고 ZIP 내부의 CSV 광고DB를 서버에 저장하고 있습니다.');
     updateLoadingProgress(3, '반영 준비 중...');
     await applyZipAdsPreview(getZipDuplicateMode(), ({ percent, text })=>updateLoadingProgress(percent, text));
   }catch(err){
@@ -518,6 +518,6 @@ btnLogout.addEventListener('click', async ()=>{
     renderAll();
   }catch(err){
     console.error(err);
-    alert('초기 로딩 실패: Supabase URL / anon key / Email 로그인 / RLS 설정을 확인해줘');
+    alert('초기 로딩에 실패했습니다. Supabase URL / anon key / Email 로그인 / RLS 설정을 확인해 주세요.');
   }
 })();
