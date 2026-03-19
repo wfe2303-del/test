@@ -117,6 +117,20 @@ function fmtRoas(n) {
   const x = Number(n);
   return Number.isFinite(x) && x > 0 ? `${x.toFixed(2)}배` : '-';
 }
+function normalizeRateForCalc(v) {
+  const x = Number(v || 0);
+  if (!Number.isFinite(x) || x <= 0) return 0;
+  return x <= 1 ? x * 100 : x;
+}
+function getLocalExtraCfgRate(projectId) {
+  try {
+    const raw = JSON.parse(localStorage.getItem('INDEPENDENT_REPORT_V441_EXTRA_CFG') || '{}');
+    const row = raw && raw[String(projectId || '')];
+    return normalizeRateForCalc(row?.instructorRate || 0);
+  } catch {
+    return 0;
+  }
+}
 function fmtDate(v) {
   if (!v) return '-';
   const d = new Date(v);
@@ -236,13 +250,13 @@ async function loadDashboardData() {
   const extraMap = new Map();
   if (!extraRes.error && Array.isArray(extraRes.data)) {
     extraRes.data.forEach((row) => {
-      extraMap.set(String(row.project_id || ''), Number(row.instructor_rate || 0));
+      extraMap.set(String(row.project_id || ''), normalizeRateForCalc(row.instructor_rate || 0));
     });
   }
 
   projectRows = (Array.isArray(projectRes.data) ? projectRes.data : []).map((row) => ({
     ...row,
-    instructor_rate: extraMap.get(String(row.id || '')) || 0
+    instructor_rate: (extraMap.has(String(row.id || '')) ? extraMap.get(String(row.id || '')) : getLocalExtraCfgRate(row.id)) || 0
   }));
 
   buildEntityStats();
