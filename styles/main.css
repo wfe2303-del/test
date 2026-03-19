@@ -1938,3 +1938,156 @@ body[data-page="instructor"] .kpi .box .val{
     font-size:30px;
   }
 }
+
+/* v7l instructor page refinement */
+body[data-page="instructor"] .instructorHeroSurface{
+  gap:14px;
+  padding:22px;
+  border-radius:24px;
+}
+body[data-page="instructor"] .instructorHeroHead h2{
+  font-size:28px;
+  line-height:1.08;
+}
+body[data-page="instructor"] .instructorHeroSub{
+  font-size:12px;
+  line-height:1.5;
+}
+body[data-page="instructor"] .instructorHeroStats{
+  gap:12px;
+}
+body[data-page="instructor"] .instructorStatCard{
+  min-height:96px;
+  padding:14px 15px;
+  gap:8px;
+  border-radius:18px;
+}
+body[data-page="instructor"] .instructorStatLabel,
+body[data-page="instructor"] .instructorStatSub{
+  font-size:11px;
+}
+body[data-page="instructor"] .instructorStatValue{
+  font-size:20px;
+  line-height:1.1;
+}
+body[data-page="instructor"] .instructorHeroGrid{
+  grid-template-columns:1fr;
+  gap:14px;
+}
+body[data-page="instructor"] .instructorPanelCard{
+  padding:18px;
+  border-radius:20px;
+}
+body[data-page="instructor"] .panelEyebrow{
+  font-size:10px;
+}
+body[data-page="instructor"] .panelTitle{
+  font-size:18px;
+}
+body[data-page="instructor"] .instructorPanelHint,
+body[data-page="instructor"] .small,
+body[data-page="instructor"] .note,
+body[data-page="instructor"] .hint{
+  font-size:12px;
+  line-height:1.55;
+}
+body[data-page="instructor"] .cohortMiniBtn{
+  min-height:38px;
+  padding:0 12px;
+  font-size:12px;
+}
+body[data-page="instructor"] .tabs .tab{
+  font-size:12px;
+  min-height:38px;
+  padding:0 14px;
+}
+body[data-page="instructor"] .card .hd h2{
+  font-size:16px;
+}
+body[data-page="instructor"] .kpi .box .val{
+  font-size:18px;
+}
+body[data-page="instructor"] .table-wrap{
+  border-radius:16px;
+}
+body[data-page="instructor"] thead th{
+  font-size:11px;
+  padding:10px 12px;
+}
+body[data-page="instructor"] tbody td{
+  font-size:12px;
+  padding:10px 12px;
+}
+body[data-page="instructor"] .settingsCalcBox{
+  display:grid;
+  gap:12px;
+}
+body[data-page="instructor"] .settingsCalcHeadRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+body[data-page="instructor"] .settingsCalcOpenBtn{
+  min-height:40px;
+  padding:0 14px;
+  white-space:nowrap;
+}
+body[data-page="instructor"] .settingsCalcHint{
+  color:#64748b;
+}
+body[data-page="instructor"] .settingsCalcGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+body[data-page="instructor"] .settingsCalcMiniCard{
+  display:grid;
+  gap:8px;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid #e3ebf5;
+  background:#f8fbff;
+}
+body[data-page="instructor"] .settingsCalcMiniCard span{
+  font-size:11px;
+  font-weight:700;
+  color:#718198;
+}
+body[data-page="instructor"] .settingsCalcValue{
+  font-size:18px;
+  line-height:1.15;
+  font-weight:800;
+  color:#111827;
+}
+body[data-page="instructor"] .settingsCalcRevenueCard{
+  grid-column:1 / -1;
+  background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);
+  border-color:#d5e4ff;
+}
+body[data-page="instructor"] .settingsCalcRevenue{
+  font-size:28px;
+  line-height:1.05;
+  font-weight:800;
+  color:#275df2;
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+@media (max-width:980px){
+  body[data-page="instructor"] .settingsCalcGrid,
+  body[data-page="instructor"] .instructorHeroStats{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media (max-width:720px){
+  body[data-page="instructor"] .settingsCalcHeadRow{
+    flex-direction:column;
+  }
+  body[data-page="instructor"] .settingsCalcGrid,
+  body[data-page="instructor"] .instructorHeroStats{
+    grid-template-columns:1fr;
+  }
+  body[data-page="instructor"] .settingsCalcRevenue{
+    font-size:24px;
+  }
+}

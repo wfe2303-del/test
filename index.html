@@ -102,24 +102,15 @@
                   <div class="portalSectionEyebrow">RANKING</div>
                   <h3>강사 · 아이템 랭킹</h3>
                 </div>
-                <div class="rankingControlGroup">
-                  <label class="inlineField">
+                <div class="rankingControlGroup buttonSortControlGroup">
+                  <div class="inlineButtonField">
                     <span>정렬 기준</span>
-                    <select id="landingSortMetric">
-                      <option value="roas">ROAS</option>
-                      <option value="spend">광고비</option>
-                      <option value="revenue">실매출</option>
-                      <option value="projects">프로젝트 수</option>
-                      <option value="name">가나다순</option>
-                    </select>
-                  </label>
-                  <label class="inlineField">
+                    <div id="landingSortMetricTabs" class="sortButtonTabs"></div>
+                  </div>
+                  <div class="inlineButtonField orderButtonField">
                     <span>순서</span>
-                    <select id="landingSortOrder">
-                      <option value="desc">내림차순</option>
-                      <option value="asc">오름차순</option>
-                    </select>
-                  </label>
+                    <div id="landingSortOrderTabs" class="sortButtonTabs"></div>
+                  </div>
                 </div>
               </div>
               <div id="landingRankingTableWrap"></div>
