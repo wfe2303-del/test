@@ -104,9 +104,20 @@
     const pageInstructorSub = document.getElementById('pageInstructorSub');
     const instructorHeroStats = document.getElementById('instructorHeroStats');
     const nextCalcExtraSpend = document.getElementById('nextCalcExtraSpend');
+    const cohortChipsEl = document.getElementById('instructorCohortChips');
     bindCalcModal();
 
     if(!instructorHero) return;
+    if(!pageInstructorTitle || !pageInstructorSub || !instructorHeroStats){
+      console.warn('[instructor] hero DOM missing', {
+        hasInstructorHero: !!instructorHero,
+        hasPageInstructorTitle: !!pageInstructorTitle,
+        hasPageInstructorSub: !!pageInstructorSub,
+        hasInstructorHeroStats: !!instructorHeroStats,
+        hasInstructorCohortChips: !!cohortChipsEl
+      });
+      return;
+    }
     const inst = getPageInstructorFilter ? getPageInstructorFilter() : '';
     const itemFilter = getPageItemFilter ? getPageItemFilter() : '';
     if(!inst){
@@ -156,16 +167,19 @@
     `).join('');
 
     const current = getProj() || scoped[0];
-    instructorCohortChips.innerHTML = scoped.map(p=>{
+    if(!current) return;
+    if(cohortChipsEl){
+      cohortChipsEl.innerHTML = scoped.map(p=>{
       const active = current && current.id === p.id ? 'active' : '';
       return `<button type="button" class="cohortMiniBtn ${active}" data-proj-id="${esc(p.id)}">${esc(p.cohort)}</button>`;
-    }).join('');
+      }).join('');
 
-    instructorCohortChips.querySelectorAll('[data-proj-id]').forEach(btn=>{
+      cohortChipsEl.querySelectorAll('[data-proj-id]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         setCurrent(btn.dataset.projId || '');
       });
-    });
+      });
+    }
 
     const baseLabelHtml = `<b>${esc(current.cohort || '-')}</b>`;
     const nextLabelHtml = `<b>${esc(getNextCohortLabel(current))}</b>`;

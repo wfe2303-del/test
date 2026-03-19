@@ -11,7 +11,8 @@
   function loadScript(path){
     return new Promise((resolve, reject)=>{
       const script = document.createElement('script');
-      script.src = path;
+      const bust = (window.__APP_VERSION__ || 'v7q');
+      script.src = `${path}${path.includes('?') ? '&' : '?'}v=${encodeURIComponent(bust)}`;
       script.defer = false;
       script.onload = ()=> resolve();
       script.onerror = ()=> reject(new Error(`스크립트 로드 실패: ${path}`));
@@ -19,6 +20,7 @@
     });
   }
 
+  window.__APP_VERSION__ = 'v7q-20260319-2';
   try{
     root.innerHTML = await loadHtml('./views/app-shell.html');
     const scripts = [
