@@ -7,12 +7,15 @@ const LOGIN_ID_MAP = {
   test: 'test@gmail.com'
 };
 
-const CATEGORY_CONFIG = [
+const DEFAULT_CATEGORY_CONFIG = [
   { id: 'real-estate', label: '부동산' },
   { id: 'content', label: '콘텐츠' },
   { id: 'ecommerce', label: '이커머스' },
   { id: 'marketing', label: '마케팅' }
 ];
+const UNCATEGORIZED_CATEGORY = { id: 'uncategorized', label: '미설정' };
+const CATEGORY_STORAGE_KEY = 'CA_DASHBOARD_CATEGORY_CONFIG_V2';
+const CATEGORY_ASSIGN_STORAGE_KEY = 'CA_DASHBOARD_CATEGORY_ASSIGN_V2';
 
 const CATEGORY_RULES = {
   'real-estate': [
@@ -76,14 +79,24 @@ const els = {
   sortMetricTabs: $('landingSortMetricTabs'),
   sortOrderTabs: $('landingSortOrderTabs'),
   scopeTabs: $('landingScopeTabs'),
-  categoryTabs: $('landingCategoryTabs')
+  categoryTabs: $('landingCategoryTabs'),
+  btnOpenCategoryManage: $('btnOpenCategoryManage'),
+  categoryManageModal: $('categoryManageModal'),
+  btnCloseCategoryManage: $('btnCloseCategoryManage'),
+  newCategoryName: $('newCategoryName'),
+  btnAddCategory: $('btnAddCategory'),
+  categoryManageList: $('categoryManageList'),
+  spotlightCategorySelect: $('spotlightCategorySelect'),
+  spotlightCategorySaveBtn: $('spotlightCategorySaveBtn')
 };
 
 let authSession = null;
 let projectRows = [];
 let entityStats = [];
 let selectedEntityKey = '';
-let selectedCategoryId = CATEGORY_CONFIG[0].id;
+let categoryConfig = loadCategoryConfig();
+let instructorCategoryAssignments = loadInstructorCategoryAssignments();
+let selectedCategoryId = getCategoryConfig()[0]?.id || 'uncategorized';
 let rankingScope = 'all';
 let rankingSortMetric = 'roas';
 let rankingSortOrder = 'desc';
@@ -158,22 +171,139 @@ function parseCohortLabel(label) {
 function normalizeText(value) {
   return String(value || '').trim().toLowerCase().replace(/\s+/g, '');
 }
-function detectCategoryId(item) {
+
+function slugifyCategoryId(label) {
+  const base = String(label || '').trim().toLowerCase()
+    .replace(/[^a-z0-9가-힣\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+  return base || `category-${Date.now()}`;
+}
+function loadCategoryConfig() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(CATEGORY_STORAGE_KEY) || '[]');
+    if (Array.isArray(raw) && raw.length) return raw.filter(x => x && x.id && x.label && x.id !== 'uncategorized');
+  } catch {}
+  return DEFAULT_CATEGORY_CONFIG.slice();
+}
+function saveCategoryConfig() {
+  localStorage.setItem(CATEGORY_STORAGE_KEY, JSON.stringify(categoryConfig.filter(x => x.id !== 'uncategorized')));
+}
+function loadInstructorCategoryAssignments() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(CATEGORY_ASSIGN_STORAGE_KEY) || '{}');
+    return raw && typeof raw === 'object' ? raw : {};
+  } catch {
+    return {};
+  }
+}
+function saveInstructorCategoryAssignments() {
+  localStorage.setItem(CATEGORY_ASSIGN_STORAGE_KEY, JSON.stringify(instructorCategoryAssignments || {}));
+}
+function getCategoryConfig() {
+  const base = Array.isArray(categoryConfig) && categoryConfig.length ? categoryConfig : DEFAULT_CATEGORY_CONFIG.slice();
+  return [...base, UNCATEGORIZED_CATEGORY];
+}
+function ensureValidCategoryState() {
+  const ids = new Set(getCategoryConfig().map(item => item.id));
+  Object.keys(instructorCategoryAssignments || {}).forEach((key) => {
+    if (!ids.has(instructorCategoryAssignments[key])) instructorCategoryAssignments[key] = 'uncategorized';
+  });
+  if (!ids.has(selectedCategoryId)) selectedCategoryId = getCategoryConfig()[0]?.id || 'uncategorized';
+}
+function getInstructorCategoryAssignment(instructor) {
+  const key = normalizeText(instructor);
+  const id = instructorCategoryAssignments[key];
+  return getCategoryConfig().some(item => item.id === id) ? id : '';
+}
+function setInstructorCategoryAssignment(instructor, categoryId) {
+  const key = normalizeText(instructor);
+  if (!key) return;
+  instructorCategoryAssignments[key] = categoryId || 'uncategorized';
+  saveInstructorCategoryAssignments();
+}
+function deleteCategory(categoryId) {
+  if (!categoryId || categoryId === 'uncategorized') return;
+  categoryConfig = categoryConfig.filter(item => item.id !== categoryId);
+  Object.keys(instructorCategoryAssignments || {}).forEach((key) => {
+    if (instructorCategoryAssignments[key] === categoryId) instructorCategoryAssignments[key] = 'uncategorized';
+  });
+  saveCategoryConfig();
+  saveInstructorCategoryAssignments();
+  ensureValidCategoryState();
+}
+function addCategory(label) {
+  const clean = String(label || '').trim();
+  if (!clean) throw new Error('카테고리 이름을 입력해줘.');
+  const id = slugifyCategoryId(clean);
+  if (getCategoryConfig().some(item => item.id === id || item.label === clean)) throw new Error('이미 있는 카테고리야.');
+  categoryConfig.push({ id, label: clean });
+  saveCategoryConfig();
+  ensureValidCategoryState();
+}
+function renderCategoryManageList() {
+  if (!els.categoryManageList) return;
+  const rows = getCategoryConfig().map((category) => {
+    const count = entityStats.filter((item) => item.categoryId === category.id).length;
+    const deletable = category.id !== 'uncategorized';
+    return `
+      <div class="categoryManageRow">
+        <div class="categoryManageName">${esc(category.label)}</div>
+        <div class="categoryManageMeta">${fmtInt(count)}개 항목</div>
+        ${deletable ? `<button type="button" class="ghostBtn smallGhostBtn" data-delete-category="${esc(category.id)}">삭제</button>` : `<span class="categoryManageLock">고정</span>`}
+      </div>
+    `;
+  }).join('');
+  els.categoryManageList.innerHTML = rows || '<div class="portalEmptyState">등록된 카테고리가 없어.</div>';
+  els.categoryManageList.querySelectorAll('[data-delete-category]').forEach((button) => {
+    button.addEventListener('click', () => {
+      deleteCategory(button.dataset.deleteCategory || '');
+      buildEntityStats();
+      ensureSelectionVisible();
+      renderAll();
+      renderCategoryManageList();
+    });
+  });
+}
+function openCategoryManageModal() {
+  if (!els.categoryManageModal) return;
+  renderCategoryManageList();
+  els.categoryManageModal.removeAttribute('hidden');
+  document.body.classList.add('body-lock');
+}
+function closeCategoryManageModal() {
+  if (!els.categoryManageModal) return;
+  els.categoryManageModal.setAttribute('hidden', 'hidden');
+  document.body.classList.remove('body-lock');
+}
+function detectCategoryId(item, instructor = '') {
+  ensureValidCategoryState();
+  const assigned = getInstructorCategoryAssignment(instructor);
+  if (assigned) return assigned;
   const normalized = normalizeText(item);
-  if (!normalized) return 'content';
-  for (const keyword of CATEGORY_RULES['real-estate']) {
-    if (normalized.includes(normalizeText(keyword))) return 'real-estate';
+  if (!normalized) return 'uncategorized';
+  const availableIds = new Set(getCategoryConfig().map(item => item.id));
+  if (availableIds.has('real-estate')) {
+    for (const keyword of CATEGORY_RULES['real-estate']) {
+      if (normalized.includes(normalizeText(keyword))) return 'real-estate';
+    }
   }
-  for (const keyword of CATEGORY_RULES['ecommerce']) {
-    if (normalized.includes(normalizeText(keyword))) return 'ecommerce';
+  if (availableIds.has('ecommerce')) {
+    for (const keyword of CATEGORY_RULES['ecommerce']) {
+      if (normalized.includes(normalizeText(keyword))) return 'ecommerce';
+    }
   }
-  for (const keyword of CATEGORY_RULES['marketing']) {
-    if (normalized.includes(normalizeText(keyword))) return 'marketing';
+  if (availableIds.has('marketing')) {
+    for (const keyword of CATEGORY_RULES['marketing']) {
+      if (normalized.includes(normalizeText(keyword))) return 'marketing';
+    }
   }
-  for (const keyword of CATEGORY_RULES['content']) {
-    if (normalized.includes(normalizeText(keyword))) return 'content';
+  if (availableIds.has('content')) {
+    for (const keyword of CATEGORY_RULES['content']) {
+      if (normalized.includes(normalizeText(keyword))) return 'content';
+    }
   }
-  return 'content';
+  return 'uncategorized';
 }
 function makeEntityKey(instructor, item) {
   return `${String(instructor || '').trim()}||${String(item || '기타').trim()}`;
@@ -260,6 +390,7 @@ async function loadDashboardData() {
   }));
 
   buildEntityStats();
+  ensureValidCategoryState();
   ensureSelectionVisible();
   renderAll();
 }
@@ -281,7 +412,7 @@ function buildEntityStats() {
         key,
         instructor,
         item,
-        categoryId: detectCategoryId(item),
+        categoryId: detectCategoryId(item, instructor),
         projectCount: 0,
         spend: 0,
         revenue: 0,
@@ -368,11 +499,11 @@ function sortByName(a, b) {
   return String(a.item).localeCompare(String(b.item), 'ko');
 }
 function getCategoryLabel(id) {
-  return CATEGORY_CONFIG.find((item) => item.id === id)?.label || id;
+  return getCategoryConfig().find((item) => item.id === id)?.label || id;
 }
 function renderSidebarCategories() {
   if (!els.sidebarCategoryTabs) return;
-  els.sidebarCategoryTabs.innerHTML = CATEGORY_CONFIG.map((category) => {
+  els.sidebarCategoryTabs.innerHTML = getCategoryConfig().map((category) => {
     const count = entityStats.filter((item) => item.categoryId === category.id).length;
     return `
       <button type="button" class="portalSidebarCategoryButton ${selectedCategoryId === category.id ? 'is-active' : ''}" data-category-id="${esc(category.id)}">
@@ -383,7 +514,7 @@ function renderSidebarCategories() {
   }).join('');
   els.sidebarCategoryTabs.querySelectorAll('[data-category-id]').forEach((button) => {
     button.addEventListener('click', () => {
-      selectedCategoryId = button.dataset.categoryId || CATEGORY_CONFIG[0].id;
+      selectedCategoryId = button.dataset.categoryId || getCategoryConfig()[0].id;
       if (rankingScope === 'category') ensureSelectionVisible();
       renderAll();
     });
@@ -423,12 +554,12 @@ function renderScopeTabs() {
     });
   }
   if (els.categoryTabs) {
-    els.categoryTabs.innerHTML = CATEGORY_CONFIG.map((category) => `
+    els.categoryTabs.innerHTML = getCategoryConfig().map((category) => `
       <button type="button" class="portalCategoryPill ${selectedCategoryId === category.id ? 'is-active' : ''}" data-category-id="${esc(category.id)}">${esc(category.label)}</button>
     `).join('');
     els.categoryTabs.querySelectorAll('[data-category-id]').forEach((button) => {
       button.addEventListener('click', () => {
-        selectedCategoryId = button.dataset.categoryId || CATEGORY_CONFIG[0].id;
+        selectedCategoryId = button.dataset.categoryId || getCategoryConfig()[0].id;
         if (rankingScope === 'category') ensureSelectionVisible();
         renderAll();
       });
@@ -491,6 +622,10 @@ function renderSpotlight() {
       ${recentCohorts.length ? recentCohorts.map((cohort) => `<span class="portalChip" title="${esc(cohort)}">${esc(cohort)}</span>`).join('') : '<span class="portalChip">등록된 기수 없음</span>'}
     </div>
   `;
+  if (els.spotlightCategorySelect) {
+    els.spotlightCategorySelect.innerHTML = getCategoryConfig().map((category) => `<option value="${esc(category.id)}">${esc(category.label)}</option>`).join('');
+    els.spotlightCategorySelect.value = selected.categoryId || 'uncategorized';
+  }
 }
 function getSortLabel() {
   const metricMap = { roas: 'ROAS', spend: '광고비', revenue: '실매출', profit: '영업이익', projects: '기수 수', name: '가나다순' };
@@ -625,8 +760,34 @@ function wireEvents() {
     const selected = getSelectedEntity();
     openInstructorPage(selected?.instructor || '', selected?.item || '');
   });
+  els.spotlightCategorySaveBtn?.addEventListener('click', () => {
+    const selected = getSelectedEntity();
+    if (!selected) return;
+    setInstructorCategoryAssignment(selected.instructor, els.spotlightCategorySelect?.value || 'uncategorized');
+    buildEntityStats();
+    ensureSelectionVisible();
+    renderAll();
+  });
+  els.btnOpenCategoryManage?.addEventListener('click', openCategoryManageModal);
+  els.btnCloseCategoryManage?.addEventListener('click', closeCategoryManageModal);
+  els.categoryManageModal?.addEventListener('click', (event) => {
+    if (event.target === els.categoryManageModal) closeCategoryManageModal();
+  });
+  els.btnAddCategory?.addEventListener('click', () => {
+    try {
+      addCategory(els.newCategoryName?.value || '');
+      if (els.newCategoryName) els.newCategoryName.value = '';
+      buildEntityStats();
+      ensureSelectionVisible();
+      renderAll();
+      renderCategoryManageList();
+    } catch (err) {
+      alert(err?.message || '카테고리 추가 실패');
+    }
+  });
 }
 (async function init() {
+  ensureValidCategoryState();
   wireEvents();
   try {
     await ensureAuth();

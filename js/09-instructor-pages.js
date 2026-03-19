@@ -103,7 +103,6 @@
     const pageInstructorTitle = document.getElementById('pageInstructorTitle');
     const pageInstructorSub = document.getElementById('pageInstructorSub');
     const instructorHeroStats = document.getElementById('instructorHeroStats');
-    const instructorCohortChips = document.getElementById('instructorCohortChips');
     const nextCalcExtraSpend = document.getElementById('nextCalcExtraSpend');
     bindCalcModal();
 
@@ -127,7 +126,6 @@
 
     if(!scoped.length){
       instructorHeroStats.innerHTML = '<span class="badge">등록된 기수가 없어.</span>';
-      instructorCohortChips.innerHTML = '';
       ['previewCalcBaseLabel','nextCalcBaseLabel','previewCalcNextLabel','nextCalcNextLabel'].forEach(id=> setHtml(id,'<b>-</b>'));
       ['previewCalcRevenue','nextCalcProjectedRevenue'].forEach(id=> setText(id,'₩0'));
       ['previewCalcCpa','nextCalcCpa','previewCalcValuePerDb','nextCalcValuePerDb'].forEach(id=> setText(id,'₩0'));
@@ -220,12 +218,6 @@
       closeCalcModal();
     }
   });
-
-
-  const btnOpenCompareTab = document.getElementById('btnOpenCompareTab');
-  if(btnOpenCompareTab){
-    btnOpenCompareTab.addEventListener('click', ()=> switchTab('compare'));
-  }
 
   const baseRenderAll = window.renderAll;
   if(typeof baseRenderAll === 'function'){

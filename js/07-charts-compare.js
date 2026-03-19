@@ -459,8 +459,12 @@ function getSelectedCompareMetricKeys(){
   state.compare.selectedMetricKeys = keys;
   return keys;
 }
+function compareProjectsSource(){
+  const ps = typeof rawProjects === 'function' ? rawProjects() : listProjects();
+  return ps.slice().sort((a,b)=>projLabel(a).localeCompare(projLabel(b)));
+}
 function projectsForInstructor(inst){
-  const ps = listProjects().sort((a,b)=>projLabel(a).localeCompare(projLabel(b)));
+  const ps = compareProjectsSource();
   if(!inst || inst==='all') return ps;
   return ps.filter(p=>p.instructor===inst);
 }
@@ -470,10 +474,10 @@ function syncCompareSide(which){
   const projectKey = isLeft ? 'leftId' : 'rightId';
   const instEl = isLeft ? cmpLeftInstructor : cmpRightInstructor;
   const projEl = isLeft ? cmpLeftProject : cmpRightProject;
-  const instructors = [...new Set(listProjects().map(p=>p.instructor).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const instructors = [...new Set(compareProjectsSource().map(p=>p.instructor).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 
   if(!isLeft){
-    const fixed = state.projects[state.currentProjectId] || state.projects[state.compare.rightId] || listProjects()[0] || null;
+    const fixed = state.projects[state.currentProjectId] || state.projects[state.compare.rightId] || listProjects()[0] || compareProjectsSource()[0] || null;
     const fixedInst = fixed?.instructor || instructors[0] || '';
     setOptionsPreserve(instEl, fixedInst ? [{value:fixedInst,label:fixedInst}] : [], fixedInst);
     setOptionsPreserve(projEl, fixed ? [{value:fixed.id,label:fixed.cohort}] : [], fixed?.id || '');

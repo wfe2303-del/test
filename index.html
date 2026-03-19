@@ -16,10 +16,14 @@
       <div class="loginSimpleBrand">
         <img src="./assets/classaround-logo.png" alt="ClassAround" class="brandLogoImg"/>
         <div>
+          <div class="loginSimpleName">ClassAround</div>
+          <div class="loginSimpleSub">Performance Dashboard</div>
         </div>
       </div>
       <div class="loginSimpleHead">
+        <span class="loginKicker">운영 대시보드</span>
         <h1>로그인</h1>
+        <p>등록된 계정으로 로그인하면 강사 랭킹 대시보드가 열려.</p>
       </div>
       <div class="loginSimpleForm">
         <label>
@@ -44,7 +48,7 @@
         </div>
       </div>
 
-      <div class="portalSidebarSectionTitle sidebarLightTitle">카테고리</div>
+      <div class="portalSidebarSectionRow"><div class="portalSidebarSectionTitle sidebarLightTitle">카테고리</div><button id="btnOpenCategoryManage" type="button" class="sidebarManageBtn">관리</button></div>
       <div id="sidebarCategoryTabs" class="portalSidebarCategoryList"></div>
 
       <div class="portalSidebarSearchWrap portalSidebarSearchWrapLight">
@@ -123,11 +127,39 @@
                 <button id="spotlightOpenBtn" type="button" class="primaryBtn">강사 페이지 열기</button>
               </div>
               <div id="landingSpotlight"></div>
+            <div class="spotlightCategoryAssign">
+              <label for="spotlightCategorySelect">카테고리 할당</label>
+              <div class="spotlightCategoryAssignRow">
+                <select id="spotlightCategorySelect"></select>
+                <button id="spotlightCategorySaveBtn" type="button" class="ghostBtn smallGhostBtn">저장</button>
+              </div>
+            </div>
+
             </article>
           </div>
         </section>
       </section>
     </main>
+  </div>
+
+  
+
+  <div id="categoryManageModal" class="portalModalBackdrop" hidden>
+    <div class="portalModalCard" role="dialog" aria-modal="true" aria-labelledby="categoryManageTitle">
+      <div class="portalModalHead">
+        <div>
+          <div class="portalSectionEyebrow">CATEGORY</div>
+          <h3 id="categoryManageTitle">카테고리 관리</h3>
+        </div>
+        <button id="btnCloseCategoryManage" type="button" class="ghostBtn">닫기</button>
+      </div>
+      <div class="categoryManageAddRow">
+        <input id="newCategoryName" type="text" placeholder="새 카테고리 이름" />
+        <button id="btnAddCategory" type="button" class="primaryBtn">추가</button>
+      </div>
+      <div id="categoryManageList" class="categoryManageList"></div>
+      <div class="categoryManageFootnote">카테고리를 삭제하면 할당된 강사는 <b>미설정</b>으로 변경돼.</div>
+    </div>
   </div>
 
   <script src="./js/landing.js"></script>

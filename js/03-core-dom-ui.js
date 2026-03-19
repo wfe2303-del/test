@@ -223,13 +223,21 @@ function rawProjects(){ return Object.values(state.projects || {}); }
 function listProjects(){
   const all = rawProjects();
   const inst = getPageInstructorFilter ? getPageInstructorFilter() : '';
+  const item = getPageItemFilter ? getPageItemFilter() : '';
   if(!inst) return all;
-  return all.filter(p => String(p?.instructor || '').trim() === inst);
+  return all.filter(p => {
+    const instOk = String(p?.instructor || '').trim() === inst;
+    if(!instOk) return false;
+    if(!item) return true;
+    const parsed = splitProjectCohortLabel ? splitProjectCohortLabel(p?.cohort) : { item: '' };
+    return String(parsed?.item || '').trim() === item;
+  });
 }
 function getProj(){
   const p = state.projects[state.currentProjectId];
-  const inst = getPageInstructorFilter ? getPageInstructorFilter() : '';
-  if(inst && p && String(p.instructor || '').trim() !== inst) return listProjects()[0] || null;
+  const scoped = listProjects();
+  if(!p) return scoped[0] || null;
+  if(!scoped.some(x => x.id === p.id)) return scoped[0] || null;
   return p;
 }
 
