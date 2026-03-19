@@ -13,7 +13,6 @@
       <div>
         <div class="landingEyebrow">ClassAround · Instructor Hub</div>
         <h1>등록된 강사 목록</h1>
-        <p>강사를 누르면 새 창으로 해당 강사의 기수 목록과 비교 화면이 열려. 각 강사 페이지에서 기존 기능과 다음 기수 광고비 증액 예상 매출 계산기를 같이 볼 수 있어.</p>
       </div>
       <div class="landingAuth">
         <span class="pill">로그인: <b id="landingAuthStatus">미로그인</b></span>
