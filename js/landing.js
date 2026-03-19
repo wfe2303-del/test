@@ -259,7 +259,7 @@ function buildEntityStats() {
     const spend = Number(row.daily_budget || 0);
     const revenue = Number(row.actual_revenue || 0);
     const instructorRate = Number(row.instructor_rate || 0);
-    const operatingProfit = revenue - (revenue * instructorRate / 100);
+    const operatingProfit = revenue - spend - (revenue * instructorRate / 100);
     const createdAt = row.created_at || '';
     const key = makeEntityKey(instructor, item);
     if (!map.has(key)) {
