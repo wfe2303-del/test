@@ -44,7 +44,7 @@
   function getFreeLectureStart(firstPaymentDate){
     if(!isValidDate(firstPaymentDate)) return null;
     var start = new Date(firstPaymentDate.getTime());
-    start.setHours(19, 30, 0, 0);
+    start.setHours(19, 0, 0, 0);
     return start;
   }
 

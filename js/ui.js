@@ -224,7 +224,7 @@
     title.textContent = '결제 인원 추이';
     var subtitle = document.createElement('p');
     subtitle.className = 'payment-trend-subtitle';
-    subtitle.textContent = 'H열 결제시각 기준 · ' + (model ? model.binMinutes : 15) + '분 단위 · 무료강의 19:30 시작 기준';
+    subtitle.textContent = 'H열 결제시각 기준 · ' + (model ? model.binMinutes : 15) + '분 단위 · 무료강의 19:00 시작 기준';
     titleWrap.appendChild(title);
     titleWrap.appendChild(subtitle);
     head.appendChild(titleWrap);
