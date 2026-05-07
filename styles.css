@@ -123,6 +123,8 @@ body{
 .summary-value{display:block;font-size:15px;line-height:1.4;word-break:break-word}
 .panel-button-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .check-row{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+.lecture-link-row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:center;margin-top:14px}
+.lecture-link-label{font-size:12px;font-weight:800;color:var(--muted)}
 .panel-actions{margin-top:16px}
 .panel-meta{margin-top:12px}
 .panel-meta.hidden{display:none !important}
@@ -155,6 +157,15 @@ body{
 .payment-trend-line-dot{fill:#f97316;stroke:#fff;stroke-width:1.5}
 .payment-trend-note{margin-top:10px;color:var(--muted);font-size:12px}
 .payment-trend-warning{margin-top:10px;color:var(--warn);font-size:12px;font-weight:700}
+.lecture-comparison{margin-top:14px}
+.lecture-comparison-title{font-size:13px;font-weight:800;margin-bottom:8px}
+.lecture-comparison-table{border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:320px;background:#fff}
+.lecture-comparison-row{display:grid;grid-template-columns:minmax(92px,1fr) minmax(64px,.6fr) minmax(140px,1.4fr);min-width:480px}
+.lecture-comparison-row.head{position:sticky;top:0;z-index:1;background:#f8fafc;font-size:12px;font-weight:800;color:var(--muted)}
+.lecture-comparison-cell{padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.lecture-comparison-row:last-child .lecture-comparison-cell{border-bottom:0}
+.lecture-comparison-cell a{color:var(--primary);font-weight:800;text-decoration:none}
+.lecture-comparison-cell a:hover{text-decoration:underline}
 .result-filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
 .result-filter-btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 14px;border-radius:999px;cursor:pointer;font:inherit;font-weight:700}
 .result-filter-btn.active{background:#eef2ff;border-color:#c7d2fe;color:#3730a3}
@@ -195,6 +206,7 @@ th{position:sticky;top:0;background:#f8fafc;font-size:12px}
   .brand-wrap{align-items:flex-start}
   .brand-logo{width:96px}
   .panel-summary-grid,.panel-button-grid,.result-button-grid{grid-template-columns:1fr}
+  .lecture-link-row{grid-template-columns:1fr}
   .payment-trend-stats{grid-template-columns:1fr}
   .modal-overlay{padding:12px}
   .login-card{padding:40px 22px 28px}

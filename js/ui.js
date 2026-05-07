@@ -224,7 +224,7 @@
     title.textContent = '결제 인원 추이';
     var subtitle = document.createElement('p');
     subtitle.className = 'payment-trend-subtitle';
-    subtitle.textContent = 'H열 결제시각 기준 · ' + (model ? model.binMinutes : 15) + '분 단위 · 0명 구간 제외';
+    subtitle.textContent = 'H열 결제시각 기준 · ' + (model ? model.binMinutes : 15) + '분 단위 · 무료강의 19:30 시작 기준';
     titleWrap.appendChild(title);
     titleWrap.appendChild(subtitle);
     head.appendChild(titleWrap);
@@ -255,12 +255,16 @@
     appendTrendStat(stats, '피크', model.peakCount + '명');
     appendTrendStat(stats, '첫 결제', trend.formatDateTime(model.minDate));
     appendTrendStat(stats, '마지막 결제', trend.formatDateTime(model.maxDate));
+    appendTrendStat(stats, '무료강의 시작', trend.formatDateTime(model.freeLectureStart));
+    appendTrendStat(stats, '유튜브 링크', model.freeLectureUrl ? '입력됨' : '미입력');
     card.appendChild(stats);
 
     var chartWrap = document.createElement('div');
     chartWrap.className = 'payment-trend-chart';
     chartWrap.appendChild(buildPaymentTrendSvg(model));
     card.appendChild(chartWrap);
+
+    appendLectureComparison(card, model);
 
     if(model.peakLabels && model.peakLabels.length){
       var peak = document.createElement('div');
@@ -278,6 +282,58 @@
     }
 
     root.appendChild(card);
+  }
+
+  function appendLectureComparison(card, model){
+    if(!model || !model.hasData || !model.displayBins || !model.displayBins.length) return;
+
+    var wrap = document.createElement('div');
+    wrap.className = 'lecture-comparison';
+    var title = document.createElement('div');
+    title.className = 'lecture-comparison-title';
+    title.textContent = '무료강의 구간 비교';
+    wrap.appendChild(title);
+
+    var table = document.createElement('div');
+    table.className = 'lecture-comparison-table';
+    appendLectureComparisonRow(table, ['결제 구간', '결제', '무료강의 구간'], true);
+    model.displayBins.forEach(function(bin){
+      appendLectureComparisonRow(table, [
+        bin.label,
+        bin.count + '명',
+        {
+          text: bin.lectureSegment || '',
+          href: bin.lectureUrl || ''
+        }
+      ]);
+    });
+    wrap.appendChild(table);
+    card.appendChild(wrap);
+  }
+
+  function appendLectureComparisonRow(root, cells, isHead){
+    var row = document.createElement('div');
+    row.className = 'lecture-comparison-row' + (isHead ? ' head' : '');
+    cells.forEach(function(cell){
+      var item = document.createElement('div');
+      item.className = 'lecture-comparison-cell';
+      if(cell && typeof cell === 'object'){
+        if(cell.href){
+          var link = document.createElement('a');
+          link.href = cell.href;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = cell.text || cell.href;
+          item.appendChild(link);
+        } else {
+          item.textContent = cell.text || '';
+        }
+      } else {
+        item.textContent = cell == null ? '' : String(cell);
+      }
+      row.appendChild(item);
+    });
+    root.appendChild(row);
   }
 
   function appendTrendStat(root, labelText, valueText){
@@ -372,7 +428,8 @@
         class: 'payment-trend-bar'
       });
       var rectTitle = svgNode('title');
-      rectTitle.textContent = bin.fullLabel + ' · ' + bin.count + '명';
+      rectTitle.textContent = bin.fullLabel + ' · ' + bin.count + '명' +
+        (bin.lectureSegment ? ' · 무료강의 ' + bin.lectureSegment : '');
       rect.appendChild(rectTitle);
       svg.appendChild(rect);
       linePoints.push([centerX, y]);

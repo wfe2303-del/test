@@ -22,6 +22,70 @@
     return pad2(date.getMonth() + 1) + '/' + pad2(date.getDate()) + ' ' + time;
   }
 
+  function formatDuration(totalSeconds){
+    var seconds = Math.max(0, Math.floor(Number(totalSeconds || 0)));
+    var hours = Math.floor(seconds / 3600);
+    var minutes = Math.floor((seconds % 3600) / 60);
+    var secs = seconds % 60;
+    if(hours > 0) return hours + ':' + pad2(minutes) + ':' + pad2(secs);
+    return minutes + ':' + pad2(secs);
+  }
+
+  function formatLectureSegment(startSeconds, endSeconds){
+    if(startSeconds < 0 && endSeconds <= 0){
+      return '시작 전';
+    }
+    if(startSeconds < 0){
+      return '시작 전 ~ ' + formatDuration(endSeconds);
+    }
+    return formatDuration(startSeconds) + ' ~ ' + formatDuration(endSeconds);
+  }
+
+  function getFreeLectureStart(firstPaymentDate){
+    if(!isValidDate(firstPaymentDate)) return null;
+    var start = new Date(firstPaymentDate.getTime());
+    start.setHours(19, 30, 0, 0);
+    return start;
+  }
+
+  function extractYoutubeId(url){
+    var host = url.hostname.replace(/^www\./, '').toLowerCase();
+    var pathParts = url.pathname.split('/').filter(Boolean);
+    if(host === 'youtu.be') return pathParts[0] || '';
+    if(host === 'youtube.com' || host === 'm.youtube.com' || host === 'music.youtube.com'){
+      if(url.searchParams.get('v')) return url.searchParams.get('v');
+      if((pathParts[0] === 'embed' || pathParts[0] === 'shorts' || pathParts[0] === 'live') && pathParts[1]){
+        return pathParts[1];
+      }
+    }
+    return '';
+  }
+
+  function normalizeYoutubeUrl(value){
+    var raw = String(value || '').trim();
+    if(!raw) return '';
+    if(!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
+    try {
+      var url = new URL(raw);
+      var id = extractYoutubeId(url);
+      if(id) return 'https://www.youtube.com/watch?v=' + encodeURIComponent(id);
+      return url.href;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function buildTimestampUrl(baseUrl, seconds){
+    if(!baseUrl) return '';
+    try {
+      var url = new URL(baseUrl);
+      url.searchParams.set('t', Math.max(0, Math.floor(seconds)) + 's');
+      return url.href;
+    } catch (error) {
+      return '';
+    }
+  }
+
   function excelSerialToDate(serial){
     var utcDays = Math.floor(serial - 25569);
     var utcValue = utcDays * 86400;
@@ -123,6 +187,7 @@
     var opts = options || {};
     var binMinutes = Math.max(1, Number(opts.binMinutes || DEFAULT_BIN_MINUTES));
     var removeZeroBins = opts.removeZeroBins !== false;
+    var freeLectureUrl = normalizeYoutubeUrl(opts.freeLectureUrl);
     var rows = rosterRows || [];
     var rawValues = rows.map(function(row){ return row ? row.paymentTime : ''; });
     var fallbackYear = detectFallbackYear(rawValues);
@@ -163,12 +228,14 @@
         failCount: failed.length,
         failed: failed,
         bins: [],
-        displayBins: []
+        displayBins: [],
+        freeLectureUrl: freeLectureUrl
       };
     }
 
     var minDate = parsed[0].date;
     var maxDate = parsed[parsed.length - 1].date;
+    var freeLectureStart = getFreeLectureStart(minDate);
     var start = floorToBin(minDate, binMinutes);
     var end = ceilToBin(maxDate, binMinutes);
     var stepMs = binMinutes * 60 * 1000;
@@ -202,6 +269,7 @@
     displayBins.forEach(function(bin){
       bin.label = formatShortLabel(bin.start, includeDateInLabels);
       bin.fullLabel = formatDateTime(bin.start) + ' ~ ' + formatDateTime(bin.end);
+      attachLectureSegment(bin, freeLectureStart, freeLectureUrl);
     });
 
     return {
@@ -217,6 +285,8 @@
       maxDate: maxDate,
       start: start,
       end: end,
+      freeLectureStart: freeLectureStart,
+      freeLectureUrl: freeLectureUrl,
       bins: bins,
       displayBins: displayBins,
       zeroBinCount: zeroBinCount,
@@ -226,10 +296,22 @@
     };
   }
 
+  function attachLectureSegment(bin, freeLectureStart, freeLectureUrl){
+    if(!freeLectureStart) return;
+    var lectureStartMs = freeLectureStart.getTime();
+    var startSeconds = Math.floor((bin.start.getTime() - lectureStartMs) / 1000);
+    var endSeconds = Math.floor((bin.end.getTime() - lectureStartMs) / 1000);
+    bin.lectureOffsetSeconds = startSeconds;
+    bin.lectureEndOffsetSeconds = endSeconds;
+    bin.lectureSegment = formatLectureSegment(startSeconds, endSeconds);
+    bin.lectureUrl = startSeconds >= 0 ? buildTimestampUrl(freeLectureUrl, startSeconds) : '';
+  }
+
   window.KakaoCheckTrend = {
     buildPaymentTrend: buildPaymentTrend,
     parsePaymentTimeValue: parsePaymentTimeValue,
     formatDateTime: formatDateTime,
-    formatShortLabel: formatShortLabel
+    formatShortLabel: formatShortLabel,
+    formatDuration: formatDuration
   };
 })();

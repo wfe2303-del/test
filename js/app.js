@@ -80,7 +80,8 @@
       id: panelId,
       el: panelEl,
       files: [],
-      selectedSheet: ''
+      selectedSheet: '',
+      freeLectureUrl: ''
     };
     state.panels.set(panelId, panelState);
     bindPanelEvents(panelState);
@@ -114,6 +115,7 @@
   function bindPanelEvents(panelState){
     var el = panelState.el;
     var fileInput = utils.qs('.js-file-input', el);
+    var freeLectureInput = utils.qs('.js-free-lecture-url', el);
     var runBtn = utils.qs('.js-run-btn', el);
     var trendBtn = utils.qs('.js-trend-btn', el);
     var demoBtn = utils.qs('.js-demo-btn', el);
@@ -140,6 +142,10 @@
       if(modal && modal.type === 'file-manager' && modal.panelId === panelState.id){
         openFileManager(panelState.id);
       }
+    });
+
+    freeLectureInput.addEventListener('input', function(event){
+      panelState.freeLectureUrl = String(event.target.value || '').trim();
     });
 
     runBtn.addEventListener('click', function(){
@@ -236,7 +242,7 @@
       var parsed = parser.parseChatText(chatText);
       var roster = await sheets.loadRosterRows(panelState.selectedSheet);
       var result = matcher.buildResult(roster, parsed);
-      var paymentTrend = trend.buildPaymentTrend(roster);
+      var paymentTrend = buildPanelPaymentTrend(panelState, roster);
 
       if(!previewOnly && result.updates.length){
         await sheets.writeUpdates(result.updates);
@@ -261,7 +267,7 @@
       if(!panelState.selectedSheet) throw new Error('탭을 먼저 선택하세요.');
 
       var roster = await sheets.loadRosterRows(panelState.selectedSheet);
-      var paymentTrend = trend.buildPaymentTrend(roster);
+      var paymentTrend = buildPanelPaymentTrend(panelState, roster);
       ui.renderPaymentTrend(panelState.el, paymentTrend);
       ui.setPanelStatus(panelState.el, paymentTrend.hasData ? '결제 추이 완료' : '결제시각 없음', paymentTrend.hasData ? 'ok' : 'warn');
     } catch (error) {
@@ -295,10 +301,16 @@
       '김혜영님이 나갔습니다'
     ].join('\n'));
     var result = matcher.buildResult(roster, parsed);
-    var paymentTrend = trend.buildPaymentTrend(roster);
+    var paymentTrend = buildPanelPaymentTrend(panelState, roster);
     ui.setPanelError(panelState.el, '');
     renderRunResult(panelState, result, true, paymentTrend);
     ui.setPanelStatus(panelState.el, '데모 완료', 'ok');
+  }
+
+  function buildPanelPaymentTrend(panelState, roster){
+    return trend.buildPaymentTrend(roster, {
+      freeLectureUrl: panelState.freeLectureUrl
+    });
   }
 
   function renderRunResult(panelState, result, previewOnly, paymentTrend){
